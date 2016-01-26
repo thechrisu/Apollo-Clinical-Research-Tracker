@@ -1,0 +1,24 @@
+h4 {
+  margin-top: 25px;
+}
+.row {
+  margin-bottom: 10px;
+}
+.row .row {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+[class*="col-"]{
+  font-size: 10pt;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: #DDDDDD;
+  background-color: #DDDDDD;
+  border: 1px solid #ddd;
+  border: 1px solid rgba(86,61,124,.2);
+}
+
+hr {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
