@@ -1,0 +1,32 @@
+body {
+    background-color: #bbc5c4;
+    /*background: url("../images/bg.png");*/
+}
+
+#sign-in-container {
+    transform: translateX(-50%) translateY(-50%);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+}
+
+#sign-in-container h1 {
+    color: #1b617b !important;
+}
+
+#sign-in-container .btn-primary {
+    background-color: #1b617b !important;
+    border-color: #1b617b !important;
+}
+
+#nav-breadcrumbs {
+    margin-bottom: 0 !important;
+}
+
+#record .form-group {
+    margin-bottom: 0 !important;
+}
+
+.top-buffer {
+    margin-top: 15px;
+}
