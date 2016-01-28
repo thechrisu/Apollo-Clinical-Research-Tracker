@@ -56,7 +56,9 @@
     <div class="panel panel-default">
 
         <div class="panel-heading">
-            <a href="edit.html" class="btn btn-primary btn-sm pull-right"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> &nbsp;&nbsp;&nbsp;Edit this record</a>
+            <a href="edit.html" class="btn btn-primary btn-sm pull-right"><span class="glyphicon glyphicon-pencil"
+                                                                                aria-hidden="true"></span> &nbsp;&nbsp;&nbsp;Edit
+                this record</a>
             <ol class="breadcrumb" id="nav-breadcrumbs">
                 <li>Apollo</li>
                 <li><a href="record.html">Records</a></li>
@@ -74,7 +76,8 @@
 
                 <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
 
-                &nbsp;&nbsp;&nbsp;&nbsp;You have successfully updated the record #531 belonging to Charlotte Warren-Gash.
+                &nbsp;&nbsp;&nbsp;&nbsp;You have successfully updated the record #531 belonging to Charlotte
+                Warren-Gash.
 
             </div>
 
@@ -83,13 +86,23 @@
                     <img src="images/record.png" class="img-thumbnail">
                 </div>
                 <div class="col-md-5">
-                    <h3>Charlotte <small>First Name</small></h3>
-                    <h3>Warren-Gash <small>Surname</small></h3>
-                    <h3>c.warren-gash@ucl.ac.uk <small>Email</small></h3>
-                    <h3>07894 664 278 <small>Phone</small></h3>
+                    <h3>Charlotte
+                        <small>First Name</small>
+                    </h3>
+                    <h3>Warren-Gash
+                        <small>Surname</small>
+                    </h3>
+                    <h3>c.warren-gash@ucl.ac.uk
+                        <small>Email</small>
+                    </h3>
+                    <h3>07894 664 278
+                        <small>Phone</small>
+                    </h3>
                 </div>
                 <div class="col-md-4">
-                    <h3><small>Address:</small></h3>
+                    <h3>
+                        <small>Address:</small>
+                    </h3>
                     <h3>Institute of Child Health</h3>
                     <h3>UCL, Gower Street</h3>
                     <h3>WC1E 6BT, London, UK</h3>
@@ -222,13 +235,13 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script src="http://chancejs.com/chance.min.js"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         var chance = new Chance(Math.random);
-        for(var k = 1; k < 4; k++) {
+        for (var k = 1; k < 4; k++) {
             var tableBody = $('#table-body-' + k);
             for (var i = 0; i < 4; i++) {
                 var tr = $('<tr></tr>');
-                tr.append($('<td>' + (k == 1 ? chance.google_analytics() : (k == 2 ? chance.hash({length: 10}) :  chance.ssn())) + '</td>'));
+                tr.append($('<td>' + (k == 1 ? chance.google_analytics() : (k == 2 ? chance.hash({length: 10}) : chance.ssn())) + '</td>'));
                 tableBody.append(tr);
             }
             tableBody.on('click', 'tr', function () {

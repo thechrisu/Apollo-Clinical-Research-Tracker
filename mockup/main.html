@@ -146,15 +146,15 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script src="http://chancejs.com/chance.min.js"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         var tableBody = $('#table-body');
         var chance = new Chance(Math.random);
-        for(var i = 0; i < 10; i++) {
+        for (var i = 0; i < 10; i++) {
             var tr = $('<tr></tr>');
-            tr.append($('<td>' + chance.first() +'</td>'));
-            tr.append($('<td>' + chance.last() +'</td>'));
-            tr.append($('<td>' + chance.email() +'</td>'));
-            tr.append($('<td>' + chance.phone() +'</td>'));
+            tr.append($('<td>' + chance.first() + '</td>'));
+            tr.append($('<td>' + chance.last() + '</td>'));
+            tr.append($('<td>' + chance.email() + '</td>'));
+            tr.append($('<td>' + chance.phone() + '</td>'));
             tableBody.append(tr);
         }
         tableBody.on('click', 'tr', function () {
