@@ -27,6 +27,14 @@ body {
     margin-bottom: 0 !important;
 }
 
+#record .table {
+    margin-bottom: 0px !important;
+}
+
+.secondary-text {
+    color: #999;
+}
+
 .top-buffer {
     margin-top: 15px;
 }
