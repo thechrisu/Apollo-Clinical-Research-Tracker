@@ -3,18 +3,18 @@ body {
     /*background: url("../images/bg.png");*/
 }
 
-#sign-in-container {
+#sign-in {
     transform: translateX(-50%) translateY(-50%);
     position: absolute;
     left: 50%;
     top: 50%;
 }
 
-#sign-in-container h1 {
+#sign-in h1 {
     color: #1b617b !important;
 }
 
-#sign-in-container .btn-primary {
+#sign-in .btn-primary {
     background-color: #1b617b !important;
     border-color: #1b617b !important;
 }
