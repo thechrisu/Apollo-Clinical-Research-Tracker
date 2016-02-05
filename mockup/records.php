@@ -43,7 +43,7 @@ include 'templates/header.php';
 
                 <div class="col-md-2">
 
-                    <a href="search.html" class="btn btn-default btn-block">Add a record</a>
+                    <a href="add.php" class="btn btn-default btn-block">Add a record</a>
 
                 </div>
 

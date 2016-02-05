@@ -16,11 +16,13 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/stylesheet.css">
+    <link rel="stylesheet" href="http://eternicode.github.io/bootstrap-datepicker/bootstrap-datepicker/css/datepicker3.css">
     <title><?= $title ?> | Apollo</title>
 
     <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="http://chancejs.com/chance.min.js"></script>
+    <script src="http://eternicode.github.io/bootstrap-datepicker/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
 
 </head>
 <body<?= isset($page) ? ' id="' . $page . '"' : '' ?>>
@@ -29,6 +31,7 @@
 
     <?php
     if (!isset($hide_nav)) :
+
         ?>
 
         <nav class="navbar navbar-default top-buffer">
