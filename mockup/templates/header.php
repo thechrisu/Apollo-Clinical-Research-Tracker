@@ -62,10 +62,10 @@
                                aria-haspopup="true"
                                aria-expanded="false">User Actions <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Edit Settings</a></li>
-                                <li><a href="#">Manage users</a></li>
+                                <li><a href="settings.php">Edit Settings</a></li>
+                                <li><a href="users.php">Manage users</a></li>
                                 <li role="separator" class="divider"></li>
-                                <li><a href="#">Sign out</a></li>
+                                <li><a href="index.php">Sign out</a></li>
                             </ul>
                         </li>
                     </ul>
