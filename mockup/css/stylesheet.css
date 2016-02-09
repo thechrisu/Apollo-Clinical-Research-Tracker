@@ -1,6 +1,5 @@
 body {
     background-color: #bbc5c4;
-    /*background: url("../images/bg.png");*/
 }
 
 #sign-in {
@@ -29,6 +28,16 @@ body {
 
 #record .table {
     margin-bottom: 0px !important;
+}
+
+#edit-record input.large-font {
+    font-size: 22px !important;
+}
+
+#edit-record .small-table {
+    padding: 0 15px;
+    line-height: 30px;
+    height: 30px;
 }
 
 #fields td {

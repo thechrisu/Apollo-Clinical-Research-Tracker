@@ -50,18 +50,18 @@ include 'templates/header.php';
             </div>
 
             <div class="table-responsive top-buffer">
-            <table class="table table-striped table-hover">
-                <thead>
+                <table class="table table-striped table-hover">
+                    <thead>
                     <tr>
                         <th>First name</th>
                         <th>Surname</th>
                         <th>Email</th>
                         <th>Phone</th>
                     </tr>
-                </thead>
-                <tbody id="table-body">
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody id="table-body">
+                    </tbody>
+                </table>
             </div>
 
             <nav class="text-center">
