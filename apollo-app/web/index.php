@@ -11,23 +11,15 @@
  * @version 0.0.1
  */
 
-// Registering an autoload function to resolve namespaces
-spl_autoload_register(function ($name) {
-    $parts = explode("\\", $name);
-    $count = count($parts);
-    $class = $parts[$count - 1];
-    $namespace = '';
-    for ($i = 0; $i < $count - 1; $i++) {
-        $namespace .= strtolower($parts[$i]) . '/';
-    }
-    require_once '../' . $namespace . $class . '.php';
-});
+
+require_once '../vendor/autoload.php';
 
 
 use Apollo\Apollo;
 
-
+// Defining constants
 define('BASE_URL', 'http://82.0.141.65/');
+
 
 $app = new Apollo();
 
