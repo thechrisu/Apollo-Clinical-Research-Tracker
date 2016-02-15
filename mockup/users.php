@@ -17,6 +17,31 @@ include 'templates/header.php';
 
     <div class="panel-body">
 
+        <div class="responsive-table">
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Last activity</th>
+                <th class="text-right">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Chris Ulshoefer</td>
+                <td>chris@ulshoefer.de</td>
+                <td>November 6, 2015 12:50 am</td>
+                <td class="text-right">
+                    <button class="btn btn-default btn-sm" style="padding: 3px 9px !important;">Reset Password</button>
+                    <button class="btn btn-default btn-sm" style="padding: 3px 9px !important;">View log</button>
+                    <button class="btn btn-default btn-sm" style="padding: 3px 9px !important;">Remove</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
+
     </div>
 
 </div>
