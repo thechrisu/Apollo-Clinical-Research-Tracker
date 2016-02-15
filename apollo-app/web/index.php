@@ -17,9 +17,6 @@ require_once '../vendor/autoload.php';
 
 use Apollo\Apollo;
 
-// Defining constants
-define('BASE_URL', 'http://82.0.141.65/');
-
 
 $app = new Apollo();
 
