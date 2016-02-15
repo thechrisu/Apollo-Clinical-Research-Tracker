@@ -11,5 +11,7 @@
  */
 
 
-// Defining constants
+/**
+ * The base url of the website with a slash "/" in the end
+ */
 define('BASE_URL', 'http://82.0.141.65/');
