@@ -23,15 +23,20 @@ class URLHelper
 {
 
     /**
-     * Method to split the url into parts, stripping the base url before hand
+     * Method to split the url into parts, stripping the base url beforehand.
+     * If $base is not specified default app base is used.
      *
      * @param string $url
+     * @param string $base
      * @return array
      * @since 0.0.1
      */
-    public static function split($url) {
+    public static function split($url, $base = BASE_URL) {
 
-        //TODO: Split the url
+        $url = self::stripBase($url, $base);
+        $url = StringHelper::stripEnd($url, '/');
+
+        return explode('/', $url);
 
     }
 
@@ -48,8 +53,8 @@ class URLHelper
      */
     public static function stripBase($url, $base = BASE_URL) {
 
-        $url = StringHelper::replaceBeginning($url, $base);
-        $url = StringHelper::replaceBeginning($url, '/');
+        $url = StringHelper::stripBeginning($url, $base);
+        $url = StringHelper::stripBeginning($url, '/');
 
         return $url;
 
