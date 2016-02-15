@@ -16,7 +16,7 @@ use PHPUnit_Framework_TestCase;
 class StringHelperTest extends PHPUnit_Framework_TestCase
 {
 
-    public function removeBeginningProvider() {
+    public function stripBeginningProvider() {
         return [
             ['SOMEstring', 'string', 'some', false],
             ['SOMEstring', 'SOMEstring', 'some', true],
@@ -27,11 +27,29 @@ class StringHelperTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider removeBeginningProvider
+     * @dataProvider stripBeginningProvider
      */
-    public function testRemoveBeginning($input, $output, $replace, $case) {
+    public function testStripBeginning($input, $output, $replace, $case) {
             $result = StringHelper::stripBeginning($input, $replace, $case) == $output;
             $this->assertTrue($result);
+    }
+
+    public function stripEndProvider() {
+        return [
+            ['SOMEstring', 'SOME', 'string', false],
+            ['SOMEstring', 'SOMEstring', 'some', true],
+            ['string***[][]//\\\\', 'string', '***[][]//\\\\', true],
+            ['stuff//SoMe\\\\', 'stuff', '//some\\\\', false],
+            ['stuff//SoMe\\\\', 'stuff', '//SoMe\\\\', true],
+        ];
+    }
+
+    /**
+     * @dataProvider stripEndProvider
+     */
+    public function testStripEnd($input, $output, $replace, $case) {
+        $result = StringHelper::stripEnd($input, $replace, $case) == $output;
+        $this->assertTrue($result);
     }
 
 }
