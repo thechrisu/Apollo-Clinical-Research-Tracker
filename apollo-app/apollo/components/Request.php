@@ -9,6 +9,7 @@
 
 
 namespace Apollo\Components;
+use Apollo\Helpers\URLHelper;
 
 
 /**
@@ -21,15 +22,35 @@ class Request
 {
 
     /**
+     * String containing the full current url being accessed, including host name
+     * @var string
+     */
+    public $url;
+
+    /**
+     * Same as $url but without base url and slash "/" in the beginning
+     * @var string
+     */
+    public $stripped_url;
+
+    /**
+     * Array storing the parts of the URL with the base
+     * @var array
+     */
+    public $url_parts;
+
+    /**
      * Request constructor.
      *
-     * Parse the URL
+     * Parses the URL
      *
      * @since 0.0.1
      */
     public function __construct()
     {
-        //TODO: Parse the current url using URLHelper
+        $this->url = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $this->stripped_url = URLHelper::stripBase($this->url);
+        $this->url_parts = URLHelper::split($this->stripped_url);
     }
 
 }
