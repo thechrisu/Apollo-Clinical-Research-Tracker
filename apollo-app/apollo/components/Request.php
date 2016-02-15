@@ -11,12 +11,25 @@
 namespace Apollo\Components;
 
 
+/**
+ * Class Request
+ * @package Apollo\Components
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @since 0.0.1
+ */
 class Request
 {
 
+    /**
+     * Request constructor.
+     *
+     * Parse the URL
+     *
+     * @since 0.0.1
+     */
     public function __construct()
     {
-
+        //TODO: Parse the current url using URLHelper
     }
 
 }
