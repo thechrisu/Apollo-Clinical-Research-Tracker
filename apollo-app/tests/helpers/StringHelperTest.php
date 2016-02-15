@@ -13,7 +13,7 @@ use Apollo\Helpers\StringHelper;
 use PHPUnit_Framework_TestCase;
 
 
-class StringHelperTests extends PHPUnit_Framework_TestCase
+class StringHelperTest extends PHPUnit_Framework_TestCase
 {
 
     public function removeBeginningProvider() {
@@ -30,7 +30,7 @@ class StringHelperTests extends PHPUnit_Framework_TestCase
      * @dataProvider removeBeginningProvider
      */
     public function testRemoveBeginning($input, $output, $replace, $case) {
-            $result = StringHelper::replaceBeginning($input, $replace, $case) == $output;
+            $result = StringHelper::stripBeginning($input, $replace, $case) == $output;
             $this->assertTrue($result);
     }
 

@@ -30,7 +30,7 @@ class StringHelper
      * @return string
      * @since 0.0.1
      */
-    public static function replaceBeginning($string, $replace, $case = false) {
+    public static function stripBeginning($string, $replace, $case = false) {
 
         $pattern = '/^' . preg_quote($replace, '/') . '/' . ($case ? '' : 'i');
 
