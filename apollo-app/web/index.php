@@ -16,5 +16,5 @@ require_once '../apollo/Bootstrap.php';
 
 use Apollo\Apollo;
 
-$app = new Apollo();
-$app->start();
+Apollo::prepare();
+Apollo::getInstance()->start();
