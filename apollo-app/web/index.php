@@ -2,7 +2,7 @@
 /**
  * Apollo application entry script file
  *
- * This file defines the autoload function to parse namespaces for functions and
+ * This file load the bootstrap for namespace autoloading and
  * creates an instance of the Apollo object and starts the application.
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
@@ -12,12 +12,9 @@
  */
 
 
-require_once '../vendor/autoload.php';
-
+require_once '../apollo/Bootstrap.php';
 
 use Apollo\Apollo;
 
-
 $app = new Apollo();
-
 $app->start();
