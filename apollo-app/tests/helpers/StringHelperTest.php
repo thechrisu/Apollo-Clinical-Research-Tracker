@@ -33,6 +33,21 @@ class StringHelperTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($result);
     }
 
+    public function lispCaseToPascalCaseProvider() {
+        return [
+            ['test-test', 'TestTest'],
+            ['123-Tester-TEST', '123TesterTest']
+        ];
+    }
+
+    /**
+     * @dataProvider lispCaseToPascalCaseProvider
+     */
+    public function testLispCaseToPascalCase($input, $output) {
+        $result = StringHelper::lispCaseToPascalCase($input) == $output;
+        $this->assertTrue($result);
+    }
+
     public function stripBeginningProvider() {
         return [
             ['SOMEstring', 'string', 'some', false],

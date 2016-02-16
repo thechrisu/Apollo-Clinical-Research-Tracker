@@ -14,7 +14,7 @@ namespace Apollo\Helpers;
  *
  * @package Apollo\Helpers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  */
 class StringHelper
 {
@@ -29,6 +29,23 @@ class StringHelper
     public static function capitalize($string)
     {
         return ucfirst(strtolower($string));
+    }
+
+    /**
+     * Converts lisp-case to PascalCase
+     *
+     * @param string $string
+     * @return string
+     * @since 0.0.4
+     */
+    public static function lispCaseToPascalCase($string)
+    {
+        $parts = explode('-', $string);
+        $string = '';
+        foreach($parts as $part) {
+            $string .= self::capitalize($part);
+        }
+        return $string;
     }
 
     /**
