@@ -16,6 +16,23 @@ use PHPUnit_Framework_TestCase;
 class StringHelperTest extends PHPUnit_Framework_TestCase
 {
 
+    public function capitalizeProvider() {
+        return [
+            ['SOMEstring', 'Somestring'],
+            ['1Test', '1test'],
+            ['TESTER', 'Tester'],
+            ['//Rome', '//rome']
+        ];
+    }
+
+    /**
+     * @dataProvider capitalizeProvider
+     */
+    public function testCapitalize($input, $output) {
+        $result = StringHelper::capitalize($input) == $output;
+        $this->assertTrue($result);
+    }
+
     public function stripBeginningProvider() {
         return [
             ['SOMEstring', 'string', 'some', false],
