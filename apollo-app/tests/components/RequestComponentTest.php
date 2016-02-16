@@ -19,12 +19,15 @@ class RequestComponentTest extends PHPUnit_Framework_TestCase
     public function constructorProvider() {
         return [
             [BASE_URL, null, null, [], true, true, null],
+            [BASE_URL . '?test=test', null, null, [], true, true, 'test=test'],
+            [BASE_URL . '/?test=test', null, null, [], false, false, 'test=test'],
             [BASE_URL . '123', '123', null, [], true, false, null],
             [BASE_URL . '123&', null, null, [], false, false, null],
             [BASE_URL . '///', null, null, [], false, false, null],
             [BASE_URL . 'asd//', 'Asd', null, [], false, false, null],
             [BASE_URL . 'asd/asd/', 'Asd', 'Asd', [], true, false, null],
             [BASE_URL . 'asd/asd/Test/123/', 'Asd', 'Asd', ['Test', '123'], true, false, null],
+            [BASE_URL . 'asd/asd/Te-st/123/', 'Asd', 'Asd', ['Te-st', '123'], true, false, null],
             [BASE_URL . 'asd/asd/Test//', 'Asd', 'Asd', ['Test'], false, false, null],
             [BASE_URL . 'asd/asd/Test///', 'Asd', 'Asd', ['Test'], false, false, null],
             [BASE_URL . 'asd/asd/Test/Test2/123/', 'Asd', 'Asd', ['Test', 'Test2', '123'], true, false, null],
