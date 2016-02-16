@@ -15,7 +15,8 @@
  * The base url of the website with a slash "/" in the end
  * @since 0.0.1
  */
-define('BASE_URL', 'http://82.0.141.65/');
+define('BASE_URL_AUTO_DETECT', true);
+define('BASE_URL', BASE_URL_AUTO_DETECT ? "http://$_SERVER[HTTP_HOST]/" : 'http://82.0.141.65/');
 
 /**
  * Absolute path to the 'apollo' folder
