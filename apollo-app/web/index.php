@@ -13,8 +13,8 @@
 
 
 require_once '../apollo/Bootstrap.php';
-
 use Apollo\Apollo;
+
 
 Apollo::prepare();
 Apollo::getInstance()->start();
