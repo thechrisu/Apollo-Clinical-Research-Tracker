@@ -80,11 +80,13 @@ class Apollo
      */
     public function start()
     {
+        // Redirect guest users to sign in page
         if ($this->user->isGuest()) {
             if ($this->request->getController() != 'User' || $this->request->getAction() != 'SignIn') {
-                $this->request->sendTo('user/sign-in/?return=' . $this->request->getUrl(), false);
+                $this->request->sendTo('user/sign-in/' . (empty($this->request->getStrippedUrl()) ? '' : '?return=' . $this->request->getStrippedUrl()), false);
             }
         }
+        //TODO: Chris will most likely complain that this looks ugly, might wanna considering refactoring
         // Check that the requested controller exists
         $controller_path = __DIR__ . '/controllers/' . $this->request->getController() . 'Controller.php';
         if (file_exists($controller_path)) {
