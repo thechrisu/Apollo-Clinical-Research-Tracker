@@ -1,4 +1,7 @@
 {
+  "require": {
+    "doctrine/orm": "*"
+  },
   "require-dev": {
     "phpunit/phpunit": "3.7.*"
   },
@@ -7,9 +10,13 @@
     "files": [
       "apollo/Constants.php"
     ],
+    "psr-0": {
+      "": "apollo/entities"
+    },
     "psr-4": {
       "Apollo\\": "apollo",
       "Apollo\\Components\\": "apollo/components",
+      "Apollo\\Entities\\": "apollo/entities",
       "Apollo\\Helpers\\": "apollo/helpers",
       "Apollo\\Tests\\": "tests",
       "Apollo\\Tests\\Helpers\\": "tests/helpers"
