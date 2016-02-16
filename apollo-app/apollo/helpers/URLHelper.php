@@ -46,14 +46,14 @@ class URLHelper
      * @param string $url
      * @param string $base
      * @return string
+     * @since 0.0.3 Removed dependency on StringHelper
      * @since 0.0.2 Added the $base parameter
      * @since 0.0.1
      */
     public static function stripBase($url, $base = BASE_URL)
     {
-        $url = StringHelper::stripBeginning($url, $base);
-        $url = StringHelper::stripBeginning($url, '/');
-        return $url;
+        $pattern = '/^(' . preg_quote($base, '/') . '|\\/)/i';
+        return preg_replace($pattern, '', $url);
     }
 
 }
