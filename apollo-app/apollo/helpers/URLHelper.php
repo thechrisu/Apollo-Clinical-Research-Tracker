@@ -3,7 +3,6 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/gpl-license.php MIT License
- * @version 0.0.2
  */
 
 
@@ -17,14 +16,14 @@ namespace Apollo\Helpers;
  *
  * @package Apollo\Helpers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @since 0.0.1
+ * @version 0.0.3
  */
 class URLHelper
 {
 
     /**
-     * Method to split the url into parts, stripping the base url beforehand.
-     * If $base is not specified default app base is used.
+     * Method to split the url into parts, stripping the base url and the trailing
+     * slash beforehand. If $base is not specified default app base is used.
      *
      * @param string $url
      * @param string $base
@@ -32,13 +31,11 @@ class URLHelper
      * @since 0.0.2 If the $url is empty then return an empty array
      * @since 0.0.1
      */
-    public static function split($url, $base = BASE_URL) {
-
+    public static function split($url, $base = BASE_URL)
+    {
         $url = self::stripBase($url, $base);
         $url = StringHelper::stripEnd($url, '/');
-
         return empty($url) ? [] : explode('/', $url);
-
     }
 
 
@@ -52,13 +49,11 @@ class URLHelper
      * @since 0.0.2 Added the $base parameter
      * @since 0.0.1
      */
-    public static function stripBase($url, $base = BASE_URL) {
-
+    public static function stripBase($url, $base = BASE_URL)
+    {
         $url = StringHelper::stripBeginning($url, $base);
         $url = StringHelper::stripBeginning($url, '/');
-
         return $url;
-
     }
 
 }
