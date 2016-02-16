@@ -7,7 +7,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/gpl-license.php MIT License
- * @version 0.0.1
+ * @version 0.0.2
  */
 
 
@@ -17,6 +17,10 @@
  */
 define('BASE_URL', 'http://82.0.141.65/');
 
+/**
+ * Constants for database connection, self-explanatory
+ * @since 0.0.2
+ */
 define('DB_HOST', '127.0.0.1');
 define('DB_NAME', 'apollo');
 define('DB_USER', 'root');
