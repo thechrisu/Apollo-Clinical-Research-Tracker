@@ -16,6 +16,7 @@ use Philo\Blade\Blade;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @see https://github.com/PhiloNL/Laravel-Blade
  * @version 0.0.1
  */
 class View
