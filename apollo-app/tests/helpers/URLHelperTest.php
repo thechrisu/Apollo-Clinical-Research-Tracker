@@ -34,10 +34,6 @@ class URLHelperTest extends PHPUnit_Framework_TestCase
     public function testSplit($input, $output, $base) {
         if($base != null) {
             $result = URLHelper::split($input, $base) == $output;
-            if(BASE_URL . '/tester/test' == $input) {
-                var_dump($output);
-                var_dump(URLHelper::split($input, $base));
-            }
         } else {
             $result = URLHelper::split($input) == $output;
         }
