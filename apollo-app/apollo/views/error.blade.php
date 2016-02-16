@@ -1,7 +1,5 @@
 <?php
 /**
- * Sign in page which all unauthorised users will see.
- *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/gpl-license.php MIT License
@@ -9,4 +7,8 @@
  */
 ?>
 
-<h1>Hello!</h1>
+<h5>Error Page</h5>
+
+<h1>{{ $error }}</h1>
+
+<p>{{ $error_message }}</p>

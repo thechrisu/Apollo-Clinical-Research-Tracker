@@ -16,10 +16,14 @@ namespace Apollo\Helpers;
  *
  * @package Apollo\Helpers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.4
+ * @version 0.0.5
  */
 class URLHelper
 {
+    public static function get()
+    {
+
+    }
 
     /**
      * Method to split the url into parts, stripping the base url and the trailing
