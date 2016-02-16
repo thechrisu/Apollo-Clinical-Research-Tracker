@@ -13,5 +13,11 @@
 
 /**
  * The base url of the website with a slash "/" in the end
+ * @since 0.0.1
  */
 define('BASE_URL', 'http://82.0.141.65/');
+
+define('DB_HOST', '127.0.0.1');
+define('DB_NAME', 'apollo');
+define('DB_USER', 'root');
+define('DB_PASS', '');
