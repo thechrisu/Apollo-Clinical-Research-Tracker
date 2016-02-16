@@ -16,7 +16,6 @@
         body {
             position: relative;
         }
-
         .top-buffer {
             margin-top: 20px;
         }
@@ -35,6 +34,14 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">Please sign in:</div>
                     <div class="panel-body">
+
+                        @if (isset($data['error']))
+                            <div class="alert alert-danger alert-dismissible" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                {{ $data['error'] }}
+                            </div>
+                        @endif
+
                         <form method="post">
                             <div class="row">
                                 <div class="col-md-12">
