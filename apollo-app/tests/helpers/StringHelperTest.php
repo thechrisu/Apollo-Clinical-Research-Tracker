@@ -59,6 +59,8 @@ class StringHelperTest extends PHPUnit_Framework_TestCase
             ['stuff//SoMe\\\\', 'stuff', '//some\\\\', false],
             ['stuff//SoMe\\\\', 'stuff', '//SoMe\\\\', true],
             ['some/path/to/something/', 'some/path/to/something', '/', true],
+            ['////', '///', '/', true],
+            ['///', '//', '/', true],
         ];
     }
 
