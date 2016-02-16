@@ -35,6 +35,7 @@ class Session
      *
      * @param string $key
      * @param string $value
+     * @since 0.0.1
      */
     public static function set($key, $value) {
         $_SESSION[$key] = $value;
@@ -45,6 +46,7 @@ class Session
      *
      * @param string$key
      * @return string
+     * @since 0.0.1
      */
     public static function get($key) {
         return isset($_SESSION[$key]) ? $_SESSION[$key] : null;
@@ -52,6 +54,8 @@ class Session
 
     /**
      * Destroy the session and unset all variables
+     *
+     * @since 0.0.1
      */
     public static function destroy() {
         session_unset();

@@ -13,7 +13,6 @@ use Apollo\Components\DB;
 use Apollo\Components\Session;
 use Apollo\Components\View;
 use Apollo\Entities\UserEntity;
-use Apollo\Helpers\URLHelper;
 use Doctrine\ORM\EntityRepository;
 
 
@@ -22,12 +21,13 @@ use Doctrine\ORM\EntityRepository;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  */
 class UserController implements GenericController
 {
     /**
      * Default User action, simply redirects to sign in screen
+     *
      * @since 0.0.1
      */
     public function index()
@@ -38,6 +38,8 @@ class UserController implements GenericController
 
     /**
      * Action to handle the sign in, both the view and the POST request
+     *
+     * @since 0.0.1
      */
     public function actionSignIn()
     {
@@ -83,6 +85,11 @@ class UserController implements GenericController
         echo View::getView()->make('user.sign-in', ['data' => $data])->render();
     }
 
+    /**
+     * Destroys the session and redirects the user to the index page
+     *
+     * @since 0.0.2
+     */
     public function actionSignOut()
     {
         Session::destroy();
