@@ -1,10 +1,9 @@
 <?php
 /**
- * Created on 15/02/2016 at 21:23
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/gpl-license.php MIT License
- * @version 0.0.1
+ * @version 0.0.2
  */
 
 
@@ -19,6 +18,7 @@ class URLHelperTest extends PHPUnit_Framework_TestCase
 
     public function splitProvider() {
         return [
+            ['', [], null],
             ['/tester/test', ['tester', 'test'], null],
             [BASE_URL . 'tester/test', ['tester', 'test'], null],
             ['/tester/test', ['tester', 'test'], 'random-domain'],

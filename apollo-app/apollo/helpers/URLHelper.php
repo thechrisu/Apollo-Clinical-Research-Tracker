@@ -29,6 +29,7 @@ class URLHelper
      * @param string $url
      * @param string $base
      * @return array
+     * @since 0.0.2 If the $url is empty then return an empty array
      * @since 0.0.1
      */
     public static function split($url, $base = BASE_URL) {
@@ -36,7 +37,7 @@ class URLHelper
         $url = self::stripBase($url, $base);
         $url = StringHelper::stripEnd($url, '/');
 
-        return explode('/', $url);
+        return empty($url) ? [] : explode('/', $url);
 
     }
 
