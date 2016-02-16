@@ -7,12 +7,13 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/gpl-license.php MIT License
- * @version 0.0.3
+ * @version 0.0.4
  */
 
 
 /**
- * The base url of the website with a slash "/" in the end
+ * The base url of the website with a slash "/" in the end.
+ * @since 0.0.4 Added auto-detection
  * @since 0.0.1
  */
 define('BASE_URL_AUTO_DETECT', true);
