@@ -18,7 +18,7 @@ use Apollo\Helpers\URLHelper;
  * Class Request
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @since 0.0.3
+ * @since 0.0.4
  */
 class Request
 {
@@ -84,6 +84,7 @@ class Request
      * Only alphanumeric characters and dash "-" are accepted as valid values.
      *
      * @param string $url
+     * @since 0.0.4 Now properly converts lisp-case to PascalCase
      * @since 0.0.3 Added query support
      * @since 0.0.2 Added $url parameter
      * @since 0.0.1
@@ -101,7 +102,7 @@ class Request
             switch($i) {
                 case 0:
                     if(preg_match('/^[A-Za-z0-9\-]+$/', $url_part) === 1) {
-                        $this->controller = StringHelper::capitalize($url_part);
+                        $this->controller = StringHelper::lispCaseToPascalCase($url_part);
                     } else {
                         $this->valid = false;
                         break 2;
@@ -109,7 +110,7 @@ class Request
                     break;
                 case 1:
                     if(preg_match('/^[A-Za-z0-9\-]+$/', $url_part) === 1) {
-                        $this->action = StringHelper::capitalize($url_part);
+                        $this->action = StringHelper::lispCaseToPascalCase($url_part);
                     } else {
                         $this->valid = false;
                         break 2;
