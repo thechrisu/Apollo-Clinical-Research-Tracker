@@ -231,4 +231,11 @@ class Request
         return $this->index;
     }
 
+    /**
+     * @return boolean
+     */
+    public function hasAction() {
+        return !empty($this->action);
+    }
+
 }
