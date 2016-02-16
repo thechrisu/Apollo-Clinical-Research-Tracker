@@ -20,6 +20,7 @@ class URLHelperTest extends PHPUnit_Framework_TestCase
         return [
             ['', [], null],
             ['/tester/test', ['tester', 'test'], null],
+            [BASE_URL . '/', ['', ''], null],
             [BASE_URL . 'tester/test', ['tester', 'test'], null],
             ['/tester/test', ['tester', 'test'], 'random-domain'],
             [BASE_URL . '/tester/test', array_merge(explode('/', BASE_URL), ['tester', 'test']), 'random-domain'],

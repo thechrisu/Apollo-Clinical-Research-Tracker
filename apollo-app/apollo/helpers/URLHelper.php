@@ -16,7 +16,7 @@ namespace Apollo\Helpers;
  *
  * @package Apollo\Helpers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  */
 class URLHelper
 {
@@ -28,13 +28,16 @@ class URLHelper
      * @param string $url
      * @param string $base
      * @return array
+     * @since 0.0.4 Added a check before stripEnd()
      * @since 0.0.2 If the $url is empty then return an empty array
      * @since 0.0.1
      */
     public static function split($url, $base = BASE_URL)
     {
         $url = self::stripBase($url, $base);
-        $url = StringHelper::stripEnd($url, '/');
+        if($url != '/') {
+            $url = StringHelper::stripEnd($url, '/');
+        }
         return empty($url) ? [] : explode('/', $url);
     }
 
