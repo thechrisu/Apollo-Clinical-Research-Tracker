@@ -24,7 +24,7 @@ use ReflectionMethod;
  * the appropriate controller.
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.4
+ * @version 0.0.6
  */
 class Apollo
 {
@@ -74,6 +74,8 @@ class Apollo
      * Initialises the application by parsing the request and directing it to an appropriate
      * controller and an appropriate action inside said controller.
      * @access public
+     * @since 0.0.6 Now uses notFound() function from the controller instead of custom error
+     * @since 0.0.5 Error pages are now rendered using the Request class
      * @since 0.0.4 Improved parameter to argument conversion to allow arbitrary amount of arguments
      * @since 0.0.3 Added conversion from request parameters to function arguments
      * @since 0.0.2 Proper controller/action parsing
@@ -119,18 +121,13 @@ class Apollo
                         call_user_func_array([$controller_instance, $action_name], $arguments);
                     }
                 } else {
-                    $this->error('404', 'Page not found! (Action ' . $this->request->getAction() . ' not found in Controller ' . $this->request->getController() . ')');
+                    $controller_instance->notFound();
                 }
             }
         } else {
-            $this->error('404', 'Page not found! (Controller ' . $this->request->getController() . ' not found)');
+            $this->request->error(404, 'Page not found! (Controller ' . $this->request->getController() . ' not found)');
         }
 
-    }
-
-    public function error($error, $message)
-    {
-        echo View::getView()->make('error', ['error' => $error, 'error_message' => $message])->render();
     }
 
     /**
