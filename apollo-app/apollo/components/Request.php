@@ -1,10 +1,8 @@
 <?php
 /**
- * Created on 15/02/2016 at 17:12
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
- * @license http://opensource.org/licenses/gpl-license.php MIT License
- * @version 0.0.1
+ * @license http://opensource.org/licenses/mit-license.php MIT License
  */
 
 
@@ -18,7 +16,7 @@ use Apollo\Helpers\URLHelper;
  * Class Request
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @since 0.0.4
+ * @version 0.0.5
  */
 class Request
 {
@@ -158,6 +156,12 @@ class Request
     public function sendToIndex()
     {
         $this->sendTo('', false);
+    }
+
+    public function error($status_code, $message)
+    {
+        http_response_code($status_code);
+        echo View::getView()->make('error', ['status_cide' => $status_code, 'message' => $message])->render();
     }
 
     /**
