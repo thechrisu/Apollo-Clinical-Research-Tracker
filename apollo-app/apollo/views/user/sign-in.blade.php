@@ -14,10 +14,50 @@
     <title>Sign In | Apollo</title>
     <style>
         body {
+            background-color: #2c3e50;
             position: relative;
         }
         .top-buffer {
-            margin-top: 20px;
+            margin-top: 40px;
+        }
+        .panel-default {
+            padding: 60px 80px 80px 80px !important;
+            border-width: 2px !important;
+            border-radius: 0 !important;
+            background: none !important;
+        }
+        .input-group-addon {
+            border-radius: 0 !important;
+            background: none !important;
+            color: #fff !important;
+            height: 50px !important;
+        }
+        .form-control {
+            font-family: "brandon-grotesque",sans-serif;
+            border-width: 1px !important;
+            border-radius: 0 !important;
+            background: none !important;
+            height: 50px !important;
+            color: #fff !important;
+        }
+        .btn-default, .btn-primary {
+            font-family: "brandon-grotesque",sans-serif;
+            background: none !important;
+            text-transform: uppercase;
+            border: none !important;
+            font-weight: bold;
+            font-size: 22px;
+            padding: 0;
+        }
+        .btn-default {
+            color: #778593;
+        }
+        h1 {
+            font-family: "brandon-grotesque",sans-serif;
+            text-transform: uppercase;
+            text-align: center;
+            margin: 0 0 50px 0;
+            color: #fff;
         }
         body {
             transform: translateX(-50%) translateY(-50%);
@@ -30,10 +70,10 @@
 @section('body')
     <div class="container">
         <div class="row">
-            <div class="col-md-4 col-md-offset-4">
+            <div class="col-md-6 col-md-offset-3">
+
                 <div class="panel panel-default">
-                    <div class="panel-heading">Please sign in:</div>
-                    <div class="panel-body">
+                    <h1>Please sign in</h1>
 
                         @if (isset($data['error']))
                             <div class="alert alert-danger alert-dismissible" role="alert">
@@ -45,7 +85,7 @@
                         <form method="post">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="input-group input-group-md">
+                                    <div class="input-group input-group-lg">
                                     <span class="input-group-addon" id="basic-addon2"><span
                                                 class="glyphicon glyphicon-user" aria-hidden="true"></span></span>
                                         <input type="email" class="form-control" name="email" placeholder="john.smith@example.co.uk"
@@ -56,7 +96,7 @@
 
                             <div class="row top-buffer">
                                 <div class="col-md-12">
-                                    <div class="input-group input-group-md">
+                                    <div class="input-group input-group-lg">
                                     <span class="input-group-addon"><span class="glyphicon glyphicon-lock"
                                                                           aria-hidden="true"></span></span>
                                         <input type="password" class="form-control" name="password" placeholder="*************"
@@ -67,20 +107,22 @@
 
                             <div class="row top-buffer">
 
-                                <div class="col-md-8"><a href="#" class="btn btn-default">Forgot your password?</a>
+                                <div class="col-md-8"><a href="#" class="btn btn-default btn-lg">Forgot password?</a>
                                 </div>
 
-                                <div class="col-md-4">
-                                    <!--<button type="submit" class="btn btn-primary btn-block">Sign in</button>-->
-                                    <input type="submit" value="Sign In" class="btn btn-primary btn-block" />
+                                <div class="col-md-4 text-right">
+                                    <input type="submit" value="Sign In" class="btn btn-primary btn-lg" />
                                 </div>
 
                             </div>
 
                         </form>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
+@stop
+@section('scripts')
+    <script src="https://use.typekit.net/xfk8ylv.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script>
 @stop
