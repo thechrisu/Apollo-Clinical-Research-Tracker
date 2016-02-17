@@ -2,7 +2,7 @@
 /**
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
- * @license http://opensource.org/licenses/gpl-license.php MIT License
+ * @license http://opensource.org/licenses/mit-license.php MIT License
  */
 
 
@@ -23,7 +23,7 @@ use Doctrine\ORM\EntityRepository;
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @version 0.0.2
  */
-class UserController implements GenericController
+class UserController extends GenericController
 {
     /**
      * Default User action, simply redirects to sign in screen
