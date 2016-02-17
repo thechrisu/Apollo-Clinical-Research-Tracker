@@ -9,6 +9,6 @@
 
 <h5>Error Page</h5>
 
-<h1>{{ $error }}</h1>
+<h1>{{ $status_code }}</h1>
 
-<p>{{ $error_message }}</p>
+<p>{{ $message }}</p>
