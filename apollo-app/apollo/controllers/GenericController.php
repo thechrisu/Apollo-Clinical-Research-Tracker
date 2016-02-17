@@ -7,6 +7,7 @@
 
 
 namespace Apollo\Controllers;
+use Apollo\Apollo;
 
 
 /**
@@ -14,7 +15,7 @@ namespace Apollo\Controllers;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  */
 abstract class GenericController
 {
@@ -30,8 +31,19 @@ abstract class GenericController
      * Function that returns the names of actions that accept an arbitrary amount of arguments
      *
      * @return array
+     * @since 0.0.2
      */
     public function arbitraryArgumentsActions() {
         return [];
+    }
+
+    /**
+     * Default function that is called if the requested action is not found in the controller
+     *
+     * @since 0.0.3
+     */
+    public function notFound() {
+        $request = Apollo::getInstance()->getRequest();
+        $request->error(404, 'Page not found! (Action ' . $request->getAction() . ' not found in Controller ' . $request->getController() . ')');
     }
 }
