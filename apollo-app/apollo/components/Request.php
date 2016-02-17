@@ -158,10 +158,16 @@ class Request
         $this->sendTo('', false);
     }
 
+    /**
+     * Sends the specified HTTP response code and renders the error view.
+     *
+     * @param int $status_code
+     * @param string $message
+     */
     public function error($status_code, $message)
     {
         http_response_code($status_code);
-        echo View::getView()->make('error', ['status_cide' => $status_code, 'message' => $message])->render();
+        echo View::getView()->make('error', ['status_code' => $status_code, 'message' => $message])->render();
     }
 
     /**
