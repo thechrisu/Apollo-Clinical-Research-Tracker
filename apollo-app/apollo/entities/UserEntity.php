@@ -52,6 +52,7 @@ class UserEntity
      * @Column(type="integer")
      */
     protected $org_id;
+    //TODO: Fix the ManyToOne Doctrine mapping with organisations
 
     /**
      * Boolean indicating if the user is an admin
