@@ -7,6 +7,7 @@
 
 
 namespace Apollo\Controllers;
+
 use Apollo\Apollo;
 
 
@@ -33,7 +34,8 @@ abstract class GenericController
      * @return array
      * @since 0.0.2
      */
-    public function arbitraryArgumentsActions() {
+    public function arbitraryArgumentsActions()
+    {
         return [];
     }
 
@@ -42,7 +44,8 @@ abstract class GenericController
      *
      * @since 0.0.3
      */
-    public function notFound() {
+    public function notFound()
+    {
         $request = Apollo::getInstance()->getRequest();
         $request->error(404, 'Page not found! (Action ' . $request->getAction() . ' not found in Controller ' . $request->getController() . ')');
     }
