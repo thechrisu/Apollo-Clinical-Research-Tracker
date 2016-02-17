@@ -19,7 +19,7 @@ use Doctrine\ORM\EntityRepository;
 /**
  * Class UserController
  *
- * @package Apollo\Components
+ * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @version 0.0.2
  */
