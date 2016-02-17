@@ -4,7 +4,7 @@
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
- * @license http://opensource.org/licenses/gpl-license.php MIT License
+ * @license http://opensource.org/licenses/mit-license.php MIT License
  */
 
 
@@ -24,7 +24,7 @@ use ReflectionMethod;
  * the appropriate controller.
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  */
 class Apollo
 {
@@ -74,6 +74,7 @@ class Apollo
      * Initialises the application by parsing the request and directing it to an appropriate
      * controller and an appropriate action inside said controller.
      * @access public
+     * @since 0.0.4 Improved parameter to argument conversion to allow arbitrary amount of arguments
      * @since 0.0.3 Added conversion from request parameters to function arguments
      * @since 0.0.2 Proper controller/action parsing
      * @since 0.0.1
@@ -86,7 +87,7 @@ class Apollo
                 $this->request->sendTo('user/sign-in/' . (empty($this->request->getStrippedUrl()) ? '' : '?return=' . $this->request->getStrippedUrl()), false);
             }
         }
-        //TODO: Chris will most likely complain that this looks ugly, might wanna considering refactoring
+        //TODO: Chris will most likely complain that this looks ugly, might wanna consider refactoring
         // Check that the requested controller exists
         $controller_path = __DIR__ . '/controllers/' . $this->request->getController() . 'Controller.php';
         if (file_exists($controller_path)) {
@@ -98,19 +99,25 @@ class Apollo
             if (!$this->request->hasAction()) {
                 $controller_instance->index();
             } else {
+                // Get an array of actions that accept arbitrary amount of arguments
+                $arbitrary_arguments = $controller_instance->arbitraryArgumentsActions();
                 $action_name = 'action' . $this->request->getAction();
                 // Check that the requested action exists
                 if (method_exists($controller_instance, $action_name)) {
-                    // Check how many arguments the action is expecting
-                    $method = new ReflectionMethod($controller_class, $action_name);
-                    $arguments_expected = $method->getNumberOfParameters();
-                    $arguments = [];
-                    // Convert request parameters into arguments
-                    for ($i = 0; $i < $arguments_expected; $i++) {
-                        if (count($this->request->getParameters()) > $i)
-                            $arguments[$i] = $this->request->getParameters()[$i] ?: null;
+                    if(in_array($this->request->getAction(), $arbitrary_arguments)) {
+                        call_user_func_array([$controller_instance, $action_name], $this->request->getParameters());
+                    } else {
+                        // Check how many arguments the action is expecting
+                        $method = new ReflectionMethod($controller_class, $action_name);
+                        $arguments_expected = $method->getNumberOfParameters();
+                        $arguments = [];
+                        // Convert request parameters into arguments
+                        for ($i = 0; $i < $arguments_expected; $i++) {
+                            if (count($this->request->getParameters()) > $i)
+                                $arguments[$i] = isset($this->request->getParameters()[$i]) ? $this->request->getParameters()[$i] : null;
+                        }
+                        call_user_func_array([$controller_instance, $action_name], $arguments);
                     }
-                    call_user_func_array([$controller_instance, $action_name], $arguments);
                 } else {
                     $this->error('404', 'Page not found! (Action ' . $this->request->getAction() . ' not found in Controller ' . $this->request->getController() . ')');
                 }
