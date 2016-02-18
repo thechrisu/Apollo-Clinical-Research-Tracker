@@ -7,7 +7,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.6
+ * @version 0.0.7
  */
 
 
@@ -27,11 +27,12 @@ define('APP_DIR', __DIR__);
 
 /**
  * Absolute path to the 'assets' folder
+ * @since 0.0.7 Fixed the typo in ASSET_BASE_URL
  * @since 0.0.6 Added ASSET_BASE_URL
  * @since 0.0.5
  */
 define('ASSET_DIR', APP_DIR . '/assets/');
-define('ASSET_BASE_URL', BASE_URL . 'assets/');
+define('ASSET_BASE_URL', BASE_URL . 'asset/');
 
 /**
  * Various relative paths to folder for components
