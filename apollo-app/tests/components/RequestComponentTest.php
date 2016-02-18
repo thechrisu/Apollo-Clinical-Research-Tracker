@@ -32,7 +32,8 @@ class RequestComponentTest extends PHPUnit_Framework_TestCase
             [BASE_URL . 'asd/asd/Test///', 'Asd', 'Asd', ['Test'], false, false, null],
             [BASE_URL . 'asd/asd/Test/Test2/123/', 'Asd', 'Asd', ['Test', 'Test2', '123'], true, false, null],
             [BASE_URL . 'asd/asd/Test/Test2/1$23/', 'Asd', 'Asd', ['Test', 'Test2'], false, false, null],
-            [BASE_URL . 'asd/asd/Test/Test2/123/?test=test', 'Asd', 'Asd', ['Test', 'Test2', '123'], true, false, 'test=test']
+            [BASE_URL . 'asd/asd/Test/Test2/123/?test=test', 'Asd', 'Asd', ['Test', 'Test2', '123'], true, false, 'test=test'],
+            [BASE_URL . 'asset/img/test-image.jpg', 'Asset', 'Img', ['test-image.jpg'], true, false, null]
         ];
     }
 
