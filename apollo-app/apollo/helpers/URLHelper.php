@@ -20,9 +20,21 @@ namespace Apollo\Helpers;
  */
 class URLHelper
 {
-    public static function get()
+    /**
+     * Returns the absolute url to a page with an optional trailing slash.
+     *
+     * @param string $url
+     * @param bool $trailing_slash
+     * @return string
+     */
+    public static function url($url, $trailing_slash = true)
     {
-
+        $url = URLHelper::stripBase($url);
+        if ($trailing_slash) {
+            $url = StringHelper::stripEnd($url, '/');
+            $url .= '/';
+        }
+        return BASE_URL . $url;
     }
 
     /**
