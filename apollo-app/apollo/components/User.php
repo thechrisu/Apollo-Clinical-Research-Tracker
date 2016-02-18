@@ -19,7 +19,7 @@ use Apollo\Entities\UserEntity;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  */
 class User
 {
@@ -64,6 +64,17 @@ class User
     public function isGuest()
     {
         return $this->entity == null;
+    }
+
+    /**
+     * Checks whether the user is an admin or not
+     *
+     * @return bool
+     * @since 0.0.3
+     */
+    public function isAdmin()
+    {
+        return $this->entity->isIsAdmin();
     }
 
     /**
