@@ -12,7 +12,6 @@ namespace Apollo;
 
 use Apollo\Components\Request;
 use Apollo\Components\User;
-use Apollo\Components\View;
 use Apollo\Controllers\GenericController;
 use ReflectionMethod;
 
