@@ -2,11 +2,12 @@
 /**
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
- * @license http://opensource.org/licenses/gpl-license.php MIT License
+ * @license http://opensource.org/licenses/mit-license.php MIT License
  */
 
 
 namespace Apollo\Components;
+
 use Apollo\Entities\UserEntity;
 
 
@@ -18,7 +19,7 @@ use Apollo\Entities\UserEntity;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  */
 class User
 {
@@ -37,17 +38,18 @@ class User
     /**
      * User constructor.
      * Checks if the user is logged in
+     * @since 0.0.1
      */
     public function __construct()
     {
         $fingerprint = Session::get('fingerprint');
         $this->id = Session::get('user_id');
-        if($fingerprint != null && $this->id != null) {
+        if ($fingerprint != null && $this->id != null) {
             /**
              * @var UserEntity $temp_entity
              */
             $temp_entity = DB::getEntityManager()->getRepository('\\Apollo\\Entities\\UserEntity')->find($this->id);
-            if($temp_entity != null && $fingerprint == Session::getFingerprint(md5($temp_entity->getPassword()))) {
+            if ($temp_entity != null && $fingerprint == Session::getFingerprint(md5($temp_entity->getPassword()))) {
                 $this->entity = $temp_entity;
             }
         }
@@ -57,8 +59,21 @@ class User
      * Function to check if the user is logged in
      *
      * @return bool
+     * @since 0.0.1
      */
-    public function isGuest() {
+    public function isGuest()
+    {
         return $this->entity == null;
+    }
+
+    /**
+     * Returns the name of the user
+     *
+     * @return string
+     * @since 0.0.2
+     */
+    public function getName()
+    {
+        return $this->entity->getName();
     }
 }

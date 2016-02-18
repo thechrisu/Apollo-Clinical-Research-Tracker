@@ -20,7 +20,7 @@ use Doctrine\ORM\Mapping\ManyToOne;
  *
  * @package Apollo\Entities
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  * @Entity @Table(name="users")
  */
 class UserEntity
@@ -31,6 +31,13 @@ class UserEntity
      * @Id @Column(type="integer") @GeneratedValue
      */
     protected $id;
+
+    /**
+     * Name of the user
+     * @var string
+     * @Column(type="string")
+     */
+    protected $name;
 
     /**
      * Unique user email
@@ -52,7 +59,7 @@ class UserEntity
      * @Column(type="integer")
      */
     protected $org_id;
-    //TODO: Fix the ManyToOne Doctrine mapping with organisations
+    //TODO Tim: Fix the ManyToOne Doctrine mapping with organisations
 
     /**
      * Boolean indicating if the user is an admin
@@ -88,6 +95,22 @@ class UserEntity
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     /**
