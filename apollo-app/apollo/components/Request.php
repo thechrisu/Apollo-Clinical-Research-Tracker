@@ -16,7 +16,7 @@ use Apollo\Helpers\URLHelper;
  * Class Request
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.5
+ * @version 0.0.6
  */
 class Request
 {
@@ -79,9 +79,11 @@ class Request
      * Request constructor.
      *
      * Parses the URL producing a request. $url parameter must only be used for debugging purposes.
-     * Only alphanumeric characters and dash "-" are accepted as valid values.
+     * Only alphanumeric characters and dash "-" are accepted as valid values. For parameters
+     * underscores "_" and full stops "." are allowed.
      *
      * @param string $url
+     * @since 0.0.6 Refactored url parsing, regex now allows more symbols for parameters
      * @since 0.0.4 Now properly converts lisp-case to PascalCase
      * @since 0.0.3 Added query support
      * @since 0.0.2 Added $url parameter
@@ -94,34 +96,23 @@ class Request
         $query = explode('?', $this->url);
         $this->query = count($query) > 1 ? $query[1] : null;
         $this->url_parts = URLHelper::split($query[0]);
-        //TODO: Might wanna refactor this code . . .
         for($i = 0; $i < count($this->url_parts); $i++) {
             $url_part = $this->url_parts[$i];
-            switch($i) {
-                case 0:
-                    if(preg_match('/^[A-Za-z0-9\-]+$/', $url_part) === 1) {
-                        $this->controller = StringHelper::lispCaseToPascalCase($url_part);
-                    } else {
-                        $this->valid = false;
-                        break 2;
-                    }
+            if($i < 2) {
+                if(preg_match('/^[A-Za-z0-9\-]+$/', $url_part) === 1) {
+                    $value = StringHelper::lispCaseToPascalCase($url_part);
+                    $i == 0 ? $this->controller = $value : $this->action = $value;
+                } else {
+                    $this->valid = false;
                     break;
-                case 1:
-                    if(preg_match('/^[A-Za-z0-9\-]+$/', $url_part) === 1) {
-                        $this->action = StringHelper::lispCaseToPascalCase($url_part);
-                    } else {
-                        $this->valid = false;
-                        break 2;
-                    }
+                }
+            } else {
+                if(preg_match('/^[A-Za-z0-9\-\.\_]+$/', $url_part) === 1) {
+                    array_push($this->parameters, $url_part);
+                } else {
+                    $this->valid = false;
                     break;
-                default:
-                    if(preg_match('/^[A-Za-z0-9\-]+$/', $url_part) === 1) {
-                        array_push($this->parameters, $url_part);
-                    } else {
-                        $this->valid = false;
-                        break 2;
-                    }
-                    break;
+                }
             }
         }
         if(empty($this->controller) && $this->valid) {
