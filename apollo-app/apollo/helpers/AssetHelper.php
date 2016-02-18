@@ -14,75 +14,45 @@ namespace Apollo\Helpers;
  *
  * @package Apollo\Helpers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @version 0.0.2 All function now just return urls instead of printing them out
  * @version 0.0.1
  */
 class AssetHelper
 {
     /**
-     * Prints out the absolute url of the stylesheet based on the path specified
+     * Returns the path to the stylesheet based on the provided $path
      *
      * @param string $path
+     * @return string
+     * @since 0.0.2 Changed name to "css"
      * @since 0.0.1
      */
     public static function css($path)
     {
-        echo self::getCss($path);
+        return self::getAssetFrom('css', $path . '.css');
     }
-
     /**
-     * Calls getAssetFrom on folder "css"
+     * Returns the path to the image based on the provided $path
      *
      * @param string $path
      * @return string
-     * @since 0.0.1
-     */
-    public static function getCss($path)
-    {
-        return self::getAssetFrom('css', $path . '.css');
-    }
-
-    /**
-     * Prints out the absolute url of the image based on the path specified
-     *
-     * @param string $path
+     * @since 0.0.2 Changed name to "image"
      * @since 0.0.1
      */
     public static function image($path)
-    {
-        echo self::getImg($path);
-    }
-
-    /**
-     * Calls getAssetFrom on folder "img"
-     *
-     * @param string $path
-     * @return string
-     * @since 0.0.1
-     */
-    public static function getImg($path)
     {
         return self::getAssetFrom('img', $path);
     }
 
     /**
-     * Prints out the absolute url of the script based on the path specified
-     *
-     * @param string $path
-     * @since 0.0.1
-     */
-    public static function js($path)
-    {
-        echo self::getJs($path);
-    }
-
-    /**
-     * Calls getAssetFrom on folder "js"
+     * Returns the path to the script based on the provided $path
      *
      * @param string $path
      * @return string
+     * @since 0.0.2 Changed name to "js"
      * @since 0.0.1
      */
-    public static function getJs($path)
+    public static function js($path)
     {
         return self::getAssetFrom('js', $path . '.js');
     }
@@ -90,6 +60,7 @@ class AssetHelper
     /**
      * Returns the absolute url of the asset given by the path
      *
+     * @param string $folder
      * @param string $path
      * @return string
      * @since 0.0.1
