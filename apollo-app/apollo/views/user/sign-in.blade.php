@@ -9,7 +9,7 @@
  */
 ?>
 
-@extends('layouts.default')
+@extends('layouts.basic')
 @section('head')
     <title>Sign In | Apollo</title>
     <style>
