@@ -6,8 +6,8 @@
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
- * @license http://opensource.org/licenses/gpl-license.php MIT License
- * @version 0.0.4
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ * @version 0.0.5
  */
 
 
@@ -26,9 +26,16 @@ define('BASE_URL', BASE_URL_AUTO_DETECT ? "http://$_SERVER[HTTP_HOST]/" : 'http:
 define('APP_DIR', __DIR__);
 
 /**
+ * Absolute path to the 'assets' folder
+ * @since 0.0.5
+ */
+define('ASSET_DIR', APP_DIR . '/assets/');
+
+/**
  * Various relative paths to folder for components
  * @since 0.0.3
  */
+//TODO Tim: Might wanna change this to absolute values
 define('DOCTRINE_ENTITIES_PATH', '/entities');
 define('BLADE_VIEWS_PATH', '/views');
 define('BLADE_CACHE_PATH', '/cache');
