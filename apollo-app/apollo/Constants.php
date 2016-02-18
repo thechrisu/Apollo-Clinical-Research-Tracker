@@ -7,12 +7,12 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.5
+ * @version 0.0.6
  */
 
 
 /**
- * The base url of the website with a slash "/" in the end.
+ * The base url of the website with a trailing slash "/".
  * @since 0.0.4 Added auto-detection
  * @since 0.0.1
  */
@@ -27,9 +27,11 @@ define('APP_DIR', __DIR__);
 
 /**
  * Absolute path to the 'assets' folder
+ * @since 0.0.6 Added ASSET_BASE_URL
  * @since 0.0.5
  */
 define('ASSET_DIR', APP_DIR . '/assets/');
+define('ASSET_BASE_URL', BASE_URL . 'assets/');
 
 /**
  * Various relative paths to folder for components
