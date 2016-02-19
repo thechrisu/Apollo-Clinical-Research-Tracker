@@ -23,7 +23,7 @@ use ReflectionMethod;
  * the appropriate controller.
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.6
+ * @version 0.0.7
  */
 class Apollo
 {
@@ -73,6 +73,7 @@ class Apollo
      * Initialises the application by parsing the request and directing it to an appropriate
      * controller and an appropriate action inside said controller.
      * @access public
+     * @since 0.0.7 Made index() in RecordController the default action
      * @since 0.0.6 Now uses notFound() function from the controller instead of custom error
      * @since 0.0.5 Error pages are now rendered using the Request class
      * @since 0.0.4 Improved parameter to argument conversion to allow arbitrary amount of arguments
@@ -87,6 +88,9 @@ class Apollo
             if ($this->request->getController() != 'User' || $this->request->getAction() != 'SignIn') {
                 $this->request->sendTo('user/sign-in/' . (empty($this->request->getStrippedUrl()) ? '' : '?return=' . $this->request->getStrippedUrl()), false);
             }
+        }
+        if($this->request->isIndex()) {
+            $this->request->sendTo('record/');
         }
         //TODO: Chris will most likely complain that this looks ugly, might wanna consider refactoring
         // Check that the requested controller exists
