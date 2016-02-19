@@ -104,3 +104,20 @@ To sign in you will have to insert user details into the `users` table. The only
 The output will be your desired hash, just set the `password` field in your record in the `users` table to the hash you got and you should be able to login using your password (`your-password-here` in my case).
 
 Additionally, you might have to do some Doctrine setup, but it will take forever to explain. Try googling `Doctrine getting started`.
+
+## Setting up the virtual host in XAMPP
+
+Open `httpd-vhosts.conf` in `<xampp-directory>/apache/conf/extra/` folder and add this to the end:
+
+	<VirtualHost *:80>
+	    DocumentRoot "D:/path/to/apollo-app/web/"
+	    ServerName apollo.dev
+	    ErrorLog "logs/apollo.local-error.log"
+	    CustomLog "logs/apollo.local-access.log" combined
+	    <Directory "D:/path/to/apollo-app/web/">
+		    Require all granted
+		    AllowOverride All
+	    </Directory>
+	</VirtualHost>
+
+Restart XAMPP and you should be able to access your server using the address `http://apollo.dev/`.
