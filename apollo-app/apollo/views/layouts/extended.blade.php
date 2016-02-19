@@ -20,13 +20,22 @@ use Apollo\Helpers\AssetHelper;
     @include('templates.navbar')
     <div class="container top-buffer">
         <div class="panel panel-default">
+            @if(isset($breadcrumbs))
             <div class="panel-heading">
                 <ol class="breadcrumb" id="nav-breadcrumbs">
                     <li>Apollo</li>
-                    <li><a href="record.php">Records</a></li>
-                    <li class="active"><i>Record #531</i> Charlotte Warren-Gash</li>
+                        @foreach($breadcrumbs as $breadcrumb)
+                            <li{!! $breadcrumb[2] ? ' class="active"' : '' !!}>
+                                @if($breadcrumb[1] != null)
+                                    <a href="{{ $breadcrumb[1] }}">{!! $breadcrumb[0] !!}</a>
+                                @else
+                                    {!! $breadcrumb[0] !!}
+                                @endif
+                            </li>
+                        @endforeach
                 </ol>
             </div>
+            @endif
             <div class="panel-body">
                 @yield('content')
             </div>
@@ -35,8 +44,5 @@ use Apollo\Helpers\AssetHelper;
 @stop
 @section('scripts')
     <script src="https://use.typekit.net/xfk8ylv.js"></script>
-    <script>try {
-            Typekit.load({async: true});
-        } catch (e) {
-        }</script>
+    <script>try { Typekit.load({async: true}); } catch (e) {}</script>
 @stop
