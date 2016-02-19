@@ -6,9 +6,13 @@
  * @version 0.0.1
  */
 ?>
+@extends('layouts.extended')
+@section('content')
+    <div class="jumbotron error-page">
 
-<h5>Error Page</h5>
+        <h1>{{ $status_code }}</h1>
 
-<h1>{{ $status_code }}</h1>
+        <p>{{ $message }}</p>
 
-<p>{{ $message }}</p>
+    </div>
+@stop
