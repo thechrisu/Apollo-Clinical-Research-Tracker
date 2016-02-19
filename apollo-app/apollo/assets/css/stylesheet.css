@@ -3,11 +3,7 @@
  * https://opensource.org/licenses/mit-license.php MIT License */
 body {
   background-color: #f2f2f2;
-  padding: 54px 0 0 0;
-  color: #fff; }
+  padding: 54px 0 0 0; }
 
 .top-buffer {
   margin-top: 20px; }
-
-.panel-heading .breadcrumb {
-  margin-bottom: 0; }
