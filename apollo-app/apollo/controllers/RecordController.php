@@ -16,13 +16,14 @@ use Apollo\Helpers\URLHelper;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  */
 class RecordController extends GenericController
 {
     /**
      * Shows the list of all records
      *
+     * @since 0.0.2 Now using the View::render() shorthand
      * @since 0.0.1
      */
     public function index()
