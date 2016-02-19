@@ -45,8 +45,8 @@ $menu_points = [
                        aria-expanded="false">User Settings <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         @if (Apollo::getInstance()->getUser()->isAdmin())
-                            <li class="dropdown-header">Admin Section</li>
-                            <li><a href="{{ URLHelper::url('user/manage') }}">Manage Users</a></li>
+                            <li class="dropdown-header">Admin section</li>
+                            <li><a href="{{ URLHelper::url('user/manage') }}">Manage users</a></li>
                             <li role="separator" class="divider"></li>
                         @endif
                         <li><a href="{{ URLHelper::url('user/settings') }}">Settings</a></li>
