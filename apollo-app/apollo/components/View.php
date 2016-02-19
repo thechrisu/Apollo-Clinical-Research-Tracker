@@ -2,7 +2,7 @@
 /**
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
- * @license http://opensource.org/licenses/gpl-license.php MIT License
+ * @license http://opensource.org/licenses/mit-license.php MIT License
  */
 
 
@@ -17,7 +17,7 @@ use Philo\Blade\Blade;
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @see https://github.com/PhiloNL/Laravel-Blade
- * @version 0.0.1
+ * @version 0.0.2
  */
 class View
 {
@@ -55,5 +55,21 @@ class View
     public static function getView()
     {
         return self::getBlade()->view();
+    }
+
+    /**
+     * Shorthand for rendering a page with an optional title, breadcrumbs and parameters
+     *
+     * @param string $page
+     * @param string $title
+     * @param array $breadcrumbs
+     * @param array $parameters
+     * @since 0.0.2
+     */
+    public static function render($page, $title = null, $breadcrumbs = null, $parameters = [])
+    {
+        $parameters['title'] = $title;
+        $parameters['breadcrumbs'] = $breadcrumbs;
+        echo self::getBlade()->view()->make($page, $parameters)->render();
     }
 }
