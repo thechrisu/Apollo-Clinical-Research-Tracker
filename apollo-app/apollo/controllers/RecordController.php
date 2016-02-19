@@ -30,6 +30,6 @@ class RecordController extends GenericController
         $breadcrumbs = [
             ['Records', URLHelper::url('record'), true]
         ];
-        echo View::getView()->make('record.records', ['breadcrumbs' => $breadcrumbs])->render();
+        View::render('record.records', 'Records', $breadcrumbs);
     }
 }
