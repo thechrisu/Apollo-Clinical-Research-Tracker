@@ -32,7 +32,7 @@ class AssetController extends GenericController
      */
     public function index()
     {
-        Apollo::getInstance()->getRequest()->error(403, 'Bad Request');
+        Apollo::getInstance()->getRequest()->error(400, 'Bad Request');
     }
 
     /**
@@ -58,7 +58,7 @@ class AssetController extends GenericController
      */
     public function notFound()
     {
-        Apollo::getInstance()->getRequest()->error(403, 'Bad Request: Action you have requested does not exist.');
+        Apollo::getInstance()->getRequest()->error(400, 'Bad Request: Action you have requested does not exist.');
     }
 
     /**
@@ -126,7 +126,7 @@ class AssetController extends GenericController
                 Apollo::getInstance()->getRequest()->error(404, 'The requested file was not found.');
             }
         } else {
-            Apollo::getInstance()->getRequest()->error(403, 'Bad Request: The file your requested has an invalid extension.');
+            Apollo::getInstance()->getRequest()->error(400, 'Bad Request: The file your requested has an invalid extension.');
         }
     }
 }
