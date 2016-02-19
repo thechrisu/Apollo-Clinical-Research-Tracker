@@ -92,6 +92,10 @@ class Apollo
         if($this->request->isIndex()) {
             $this->request->sendTo('record/');
         }
+        if(!$this->getRequest()->isValid()) {
+            //TODO Tim: Make this message more meaningful
+            $this->request->error(400, 'The requested URL is malformed.');
+        }
         //TODO: Chris will most likely complain that this looks ugly, might wanna consider refactoring
         // Check that the requested controller exists
         $controller_path = __DIR__ . '/controllers/' . $this->request->getController() . 'Controller.php';
