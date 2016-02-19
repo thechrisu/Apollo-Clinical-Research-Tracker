@@ -16,7 +16,7 @@ use Apollo\Helpers\URLHelper;
  * Class Request
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.6
+ * @version 0.0.7
  */
 class Request
 {
@@ -154,11 +154,17 @@ class Request
      *
      * @param int $status_code
      * @param string $message
+     * @since 0.0.7 Now using the new View::render() shorthand and die() to kill the app
+     * @since 0.0.5
      */
     public function error($status_code, $message)
     {
         http_response_code($status_code);
-        echo View::getView()->make('error', ['status_code' => $status_code, 'message' => $message])->render();
+        $breadcrumbs = [
+            ['Error #' . $status_code, null, true]
+        ];
+        View::render('error', 'Error #' . $status_code, $breadcrumbs, ['status_code' => $status_code, 'message' => $message]);
+        die();
     }
 
     /**
