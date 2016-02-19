@@ -8,6 +8,7 @@
 
 namespace Apollo\Controllers;
 use Apollo\Components\View;
+use Apollo\Helpers\URLHelper;
 
 
 /**
@@ -26,6 +27,9 @@ class RecordController extends GenericController
      */
     public function index()
     {
-        echo View::getView()->make('record.records')->render();
+        $breadcrumbs = [
+            ['Records', URLHelper::url('record'), true]
+        ];
+        echo View::getView()->make('record.records', ['breadcrumbs' => $breadcrumbs])->render();
     }
 }
