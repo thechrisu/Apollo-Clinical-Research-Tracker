@@ -44,7 +44,6 @@ class DB
             return self::$entityManager;
         } else {
             $isDevMode = true;
-            echo APP_DIR . DOCTRINE_ENTITIES_PATH;
             $config = Setup::createAnnotationMetadataConfiguration([APP_DIR . DOCTRINE_ENTITIES_PATH], $isDevMode);
             $conn = array(
                 'driver'   => 'pdo_mysql',
