@@ -21,7 +21,7 @@ use Doctrine\ORM\EntityRepository;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  */
 class UserController extends GenericController
 {
@@ -94,5 +94,18 @@ class UserController extends GenericController
     {
         Session::destroy();
         Apollo::getInstance()->getRequest()->sendToIndex();
+    }
+
+    /**
+     * Deals with user settings
+     *
+     * @since 0.0.3
+     */
+    public function actionSettings() {
+        $breadcrumbs = [
+            ['User', null, false],
+            ['Settings', null, true]
+        ];
+        View::render('user.settings', 'Settings', $breadcrumbs);
     }
 }
