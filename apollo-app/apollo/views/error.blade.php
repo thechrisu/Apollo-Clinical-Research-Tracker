@@ -12,7 +12,7 @@
 
         <h1>{{ $status_code }}</h1>
 
-        <p>{{ $message }}</p>
+        <p>{!! $message !!}</p>
 
     </div>
 @stop
