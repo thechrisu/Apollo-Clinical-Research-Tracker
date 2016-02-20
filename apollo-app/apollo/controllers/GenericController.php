@@ -36,6 +36,6 @@ abstract class GenericController
     public function notFound()
     {
         $request = Apollo::getInstance()->getRequest();
-        $request->error(404, 'Page not found! (Action ' . $request->getAction() . ' not found in Controller ' . $request->getController() . ')');
+        $request->error(404, 'Page not found! (Action <b>' . $request->getAction() . '</b> not found in Controller <b>' . $request->getController() . '</b>)');
     }
 }

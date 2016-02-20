@@ -23,7 +23,7 @@ use ReflectionMethod;
  * the appropriate controller.
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.8
+ * @version 0.0.9
  */
 class Apollo
 {
@@ -70,9 +70,12 @@ class Apollo
     }
 
     /**
-     * Initialises the application by parsing the request and directing it to an appropriate
-     * controller and an appropriate action inside said controller.
-     * @access public
+     * Initialises the application by checking if the user if authorised, if the request is valid
+     * and redirecting the user to the default page if the index is accessed.
+     *
+     * All request parsing is done in a separate function, parseRequest();
+     *
+     * @since 0.0.9 Moved request parsing to parseRequest() function, redirect to default now raises 301 code
      * @since 0.0.8 No longer provides arbitrary amount of parameters, use the Request instance instead
      * @since 0.0.7 Made index() in RecordController the default action
      * @since 0.0.6 Now uses notFound() function from the controller instead of custom error
@@ -91,46 +94,47 @@ class Apollo
             }
         }
         if ($this->request->isIndex()) {
+            http_response_code(301);
             $this->request->sendTo('record/');
         }
         if (!$this->getRequest()->isValid()) {
-            //TODO Tim: Make this message more meaningful
             $this->request->error(400, 'The requested URL is malformed.');
         }
-        //TODO: Chris will most likely complain that this looks ugly, might wanna consider refactoring
-        // Check that the requested controller exists
-        $controller_path = __DIR__ . '/controllers/' . $this->request->getController() . 'Controller.php';
-        if (file_exists($controller_path)) {
-            $controller_class = 'Apollo\\Controllers\\' . $this->request->getController() . 'Controller';
-            /**
-             * @var GenericController $controller_instance
-             */
-            $controller_instance = new $controller_class();
-            if (!$this->request->hasAction()) {
-                $controller_instance->index();
-            } else {
-                // Get an array of actions that accept arbitrary amount of arguments
-                $action_name = 'action' . $this->request->getAction();
-                // Check that the requested action exists
-                if (method_exists($controller_instance, $action_name)) {
-                    // Check how many arguments the action is expecting
-                    $method = new ReflectionMethod($controller_class, $action_name);
-                    $arguments_expected = $method->getNumberOfParameters();
-                    $arguments = [];
-                    // Convert request parameters into arguments
-                    for ($i = 0; $i < $arguments_expected; $i++) {
-                        if (count($this->request->getParameters()) > $i)
-                            $arguments[$i] = isset($this->request->getParameters()[$i]) ? $this->request->getParameters()[$i] : null;
-                    }
-                    call_user_func_array([$controller_instance, $action_name], $arguments);
-                } else {
-                    $controller_instance->notFound();
+        $this->parseRequest();
+    }
+
+    /**
+     * Parses the request by checking if the requested Controller and Action exist,
+     * as well as passing necessary arguments to the functions.
+     *
+     * @since 0.0.9
+     */
+    private function parseRequest()
+    {
+        $request = $this->getRequest();
+        $controller_name = $request->getController();
+        $controller_file_path = __DIR__ . '/controllers/' . $controller_name . 'Controller.php';
+        if (file_exists($controller_file_path)) {
+            $controller_namespace = 'Apollo\\Controllers\\' . $controller_name . 'Controller';
+            /** @var GenericController $controller */
+            $controller = new $controller_namespace();
+            $method = 'action' . $request->getAction();
+            if (!$request->hasAction()) {
+                $controller->index();
+            } elseif (method_exists($controller, $method)) {
+                $arguments_expected = (new ReflectionMethod($controller_namespace, $method))->getNumberOfParameters();
+                $arguments = [];
+                $request_parameters = $request->getParameters();
+                for ($i = 0; $i < $arguments_expected; $i++) {
+                    $arguments[$i] = isset($request_parameters[$i]) ? $request_parameters[$i] : null;
                 }
+                call_user_func_array([$controller, $method], $arguments);
+            } else {
+                $controller->notFound();
             }
         } else {
-            $this->request->error(404, 'Page not found! (Controller ' . $this->request->getController() . ' not found)');
+            $this->request->error(404, 'Page not found! (Controller <b>' . $controller_name . '</b> not found)');
         }
-
     }
 
     /**
