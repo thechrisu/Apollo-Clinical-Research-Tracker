@@ -16,7 +16,7 @@ use Apollo\Helpers\URLHelper;
  * Class Request
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.7
+ * @version 0.0.8
  */
 class Request
 {
@@ -126,16 +126,12 @@ class Request
      *
      * @param string $url
      * @param bool $trailing_slash
+     * @since 0.0.8 Now uses the url() function from the URLHelper
      * @since 0.0.2
      */
     public function sendTo($url, $trailing_slash = true)
     {
-        $url = URLHelper::stripBase($url);
-        if ($trailing_slash) {
-            $url = StringHelper::stripEnd($url, '/');
-            $url .= '/';
-        }
-        header('Location: ' . BASE_URL . $url);
+        header('Location: ' . URLHelper::url($url, $trailing_slash));
         die();
     }
 
