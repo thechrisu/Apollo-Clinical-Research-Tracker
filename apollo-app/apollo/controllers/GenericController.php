@@ -16,7 +16,7 @@ use Apollo\Apollo;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  */
 abstract class GenericController
 {
@@ -27,17 +27,6 @@ abstract class GenericController
      * @since 0.0.1
      */
     abstract public function index();
-
-    /**
-     * Function that returns the names of actions that accept an arbitrary amount of arguments
-     *
-     * @return array
-     * @since 0.0.2
-     */
-    public function arbitraryArgumentsActions()
-    {
-        return [];
-    }
 
     /**
      * Default function that is called if the requested action is not found in the controller

@@ -20,7 +20,7 @@ use finfo;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  */
 class AssetController extends GenericController
 {
@@ -33,22 +33,6 @@ class AssetController extends GenericController
     public function index()
     {
         Apollo::getInstance()->getRequest()->error(400, 'Bad Request');
-    }
-
-    /**
-     * Specifies Css, Img and Js actions as the ones accepting an arbitrary amount of arguments
-     *
-     * @return array
-     * @since 0.0.1
-     */
-    public function arbitraryArgumentsActions()
-    {
-        //TODO Tim: No longer needed, might wanna remove
-        return [
-            'Css',
-            'Img',
-            'Js',
-        ];
     }
 
     /**

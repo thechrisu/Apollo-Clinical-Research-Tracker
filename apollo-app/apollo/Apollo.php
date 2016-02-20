@@ -23,7 +23,7 @@ use ReflectionMethod;
  * the appropriate controller.
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.7
+ * @version 0.0.8
  */
 class Apollo
 {
@@ -73,6 +73,7 @@ class Apollo
      * Initialises the application by parsing the request and directing it to an appropriate
      * controller and an appropriate action inside said controller.
      * @access public
+     * @since 0.0.8 No longer provides arbitrary amount of parameters, use the Request instance instead
      * @since 0.0.7 Made index() in RecordController the default action
      * @since 0.0.6 Now uses notFound() function from the controller instead of custom error
      * @since 0.0.5 Error pages are now rendered using the Request class
@@ -89,10 +90,10 @@ class Apollo
                 $this->request->sendTo('user/sign-in/' . (empty($this->request->getStrippedUrl()) ? '' : '?return=' . $this->request->getStrippedUrl()), false);
             }
         }
-        if($this->request->isIndex()) {
+        if ($this->request->isIndex()) {
             $this->request->sendTo('record/');
         }
-        if(!$this->getRequest()->isValid()) {
+        if (!$this->getRequest()->isValid()) {
             //TODO Tim: Make this message more meaningful
             $this->request->error(400, 'The requested URL is malformed.');
         }
@@ -109,24 +110,19 @@ class Apollo
                 $controller_instance->index();
             } else {
                 // Get an array of actions that accept arbitrary amount of arguments
-                $arbitrary_arguments = $controller_instance->arbitraryArgumentsActions();
                 $action_name = 'action' . $this->request->getAction();
                 // Check that the requested action exists
                 if (method_exists($controller_instance, $action_name)) {
-                    if(in_array($this->request->getAction(), $arbitrary_arguments)) {
-                        call_user_func_array([$controller_instance, $action_name], $this->request->getParameters());
-                    } else {
-                        // Check how many arguments the action is expecting
-                        $method = new ReflectionMethod($controller_class, $action_name);
-                        $arguments_expected = $method->getNumberOfParameters();
-                        $arguments = [];
-                        // Convert request parameters into arguments
-                        for ($i = 0; $i < $arguments_expected; $i++) {
-                            if (count($this->request->getParameters()) > $i)
-                                $arguments[$i] = isset($this->request->getParameters()[$i]) ? $this->request->getParameters()[$i] : null;
-                        }
-                        call_user_func_array([$controller_instance, $action_name], $arguments);
+                    // Check how many arguments the action is expecting
+                    $method = new ReflectionMethod($controller_class, $action_name);
+                    $arguments_expected = $method->getNumberOfParameters();
+                    $arguments = [];
+                    // Convert request parameters into arguments
+                    for ($i = 0; $i < $arguments_expected; $i++) {
+                        if (count($this->request->getParameters()) > $i)
+                            $arguments[$i] = isset($this->request->getParameters()[$i]) ? $this->request->getParameters()[$i] : null;
                     }
+                    call_user_func_array([$controller_instance, $action_name], $arguments);
                 } else {
                     $controller_instance->notFound();
                 }
