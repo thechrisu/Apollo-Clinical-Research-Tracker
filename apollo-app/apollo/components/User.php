@@ -9,6 +9,7 @@
 namespace Apollo\Components;
 
 use Apollo\Entities\UserEntity;
+use Apollo\Helpers\StringHelper;
 
 
 /**
@@ -19,7 +20,7 @@ use Apollo\Entities\UserEntity;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.4
+ * @version 0.0.5
  */
 class User
 {
@@ -75,6 +76,17 @@ class User
     public function isAdmin()
     {
         return $this->entity->isIsAdmin();
+    }
+
+    /**
+     * Returns the ID of the user
+     *
+     * @return int
+     * @since 0.0.4
+     */
+    public function getId()
+    {
+        return StringHelper::leadingZeros($this->id);
     }
 
     /**
