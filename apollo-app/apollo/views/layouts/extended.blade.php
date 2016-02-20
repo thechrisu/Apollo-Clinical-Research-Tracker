@@ -22,9 +22,9 @@ use Apollo\Helpers\AssetHelper;
     <div class="container top-buffer">
         <div class="panel panel-default">
             @if(isset($breadcrumbs))
-            <div class="panel-heading">
-                <ol class="breadcrumb" id="nav-breadcrumbs">
-                    <li>{{ \Apollo\Apollo::getInstance()->getUser()->getOrganisationName() }}</li>
+                <div class="panel-heading">
+                    <ol class="breadcrumb" id="nav-breadcrumbs">
+                        <li>{{ \Apollo\Apollo::getInstance()->getUser()->getOrganisationName() }}</li>
                         @foreach($breadcrumbs as $breadcrumb)
                             <li{!! $breadcrumb[2] ? ' class="active"' : '' !!}>
                                 @if($breadcrumb[1] != null)
@@ -34,8 +34,8 @@ use Apollo\Helpers\AssetHelper;
                                 @endif
                             </li>
                         @endforeach
-                </ol>
-            </div>
+                    </ol>
+                </div>
             @endif
             <div class="panel-body">
                 @yield('content')
@@ -45,5 +45,8 @@ use Apollo\Helpers\AssetHelper;
 @stop
 @section('scripts')
     <script src="https://use.typekit.net/xfk8ylv.js"></script>
-    <script>try { Typekit.load({async: true}); } catch (e) {}</script>
+    <script>try {
+            Typekit.load({async: true});
+        } catch (e) {
+        }</script>
 @stop
