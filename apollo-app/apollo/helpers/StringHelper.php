@@ -14,7 +14,7 @@ namespace Apollo\Helpers;
  *
  * @package Apollo\Helpers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.4
+ * @version 0.0.5
  */
 class StringHelper
 {
@@ -92,6 +92,7 @@ class StringHelper
      * @param int $integer
      * @param int $amount
      * @return string
+     * @since 0.0.5
      */
     public static function leadingZeros($integer, $amount = 5)
     {
