@@ -26,7 +26,7 @@ use Apollo\Helpers\AssetHelper;
             @if(isset($breadcrumbs))
             <div class="panel-heading">
                 <ol class="breadcrumb" id="nav-breadcrumbs">
-                    <li>Apollo</li>
+                    <li>{{ \Apollo\Apollo::getInstance()->getUser()->getOrganisationName() }}</li>
                         @foreach($breadcrumbs as $breadcrumb)
                             <li{!! $breadcrumb[2] ? ' class="active"' : '' !!}>
                                 @if($breadcrumb[1] != null)
