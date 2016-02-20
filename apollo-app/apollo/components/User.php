@@ -20,7 +20,7 @@ use Apollo\Helpers\StringHelper;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.5
+ * @version 0.0.6
  */
 class User
 {
@@ -82,9 +82,21 @@ class User
      * Returns the ID of the user
      *
      * @return int
-     * @since 0.0.4
+     * @since Now just returns the integer
+     * @since 0.0.5
      */
     public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Returns the ID of the user as a string with leading zeros
+     *
+     * @return string
+     * @since 0.0.6
+     */
+    public function getDisplayId()
     {
         return StringHelper::leadingZeros($this->id);
     }
