@@ -19,7 +19,7 @@ use Apollo\Entities\UserEntity;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  */
 class User
 {
@@ -86,5 +86,16 @@ class User
     public function getName()
     {
         return $this->entity->getName();
+    }
+
+    /**
+     * Returns the name of the organisation the user belongs to
+     *
+     * @return string
+     * @since 0.0.4
+     */
+    public function getOrganisationName()
+    {
+        return $this->entity->getOrganisation()->getName();
     }
 }
