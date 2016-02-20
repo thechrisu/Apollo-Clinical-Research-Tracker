@@ -42,7 +42,7 @@ class StringHelper
     {
         $parts = explode('-', $string);
         $string = '';
-        foreach($parts as $part) {
+        foreach ($parts as $part) {
             $string .= self::capitalize($part);
         }
         return $string;
@@ -84,6 +84,18 @@ class StringHelper
 
         return preg_replace($pattern, '', $string);
 
+    }
+
+    /**
+     * Returns the integer as a string with leading zeros
+     *
+     * @param int $integer
+     * @param int $amount
+     * @return string
+     */
+    public static function leadingZeros($integer, $amount = 5)
+    {
+        return sprintf('%0' . $amount . 'd', $integer);
     }
 
 }
