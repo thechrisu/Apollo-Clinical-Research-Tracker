@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping\Id;
  *
  * @package Apollo\Entities
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  * @Entity @Table(name="organisations")
  */
 class OrganisationEntity
@@ -48,4 +48,43 @@ class OrganisationEntity
         $this->is_admin = false;
     }
 
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimezone()
+    {
+        return $this->timezone;
+    }
+
+    /**
+     * @param string $timezone
+     */
+    public function setTimezone($timezone)
+    {
+        $this->timezone = $timezone;
+    }
 }
