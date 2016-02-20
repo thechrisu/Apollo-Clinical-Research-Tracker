@@ -20,7 +20,7 @@ use Apollo\Helpers\StringHelper;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.6
+ * @version 0.0.7
  */
 class User
 {
@@ -113,6 +113,40 @@ class User
     }
 
     /**
+     * Returns the email of the user
+     *
+     * @return string
+     * @since 0.0.7
+     */
+    public function getEmail()
+    {
+        return $this->entity->getEmail();
+    }
+
+    /**
+     * Returns the ID of the organisation the user belongs to
+     *
+     * @return int
+     * @since 0.0.7
+     */
+    public function getOrganisationId()
+    {
+        return $this->entity->getOrganisation()->getId();
+    }
+
+    /**
+     * Returns the ID (with leading zeros) of the organisation the user belongs to
+     *
+     * @return string
+     * @since 0.0.7
+     */
+    public function getOrganisationDisplayId()
+    {
+        return StringHelper::leadingZeros($this->entity->getOrganisation()->getId());
+    }
+
+
+    /**
      * Returns the name of the organisation the user belongs to
      *
      * @return string
@@ -121,5 +155,16 @@ class User
     public function getOrganisationName()
     {
         return $this->entity->getOrganisation()->getName();
+    }
+
+    /**
+     * Returns the timezone of the organisation the user belongs to
+     *
+     * @return string
+     * @since 0.0.7
+     */
+    public function getOrganisationTimeZone()
+    {
+        return $this->entity->getOrganisation()->getTimezone();
     }
 }
