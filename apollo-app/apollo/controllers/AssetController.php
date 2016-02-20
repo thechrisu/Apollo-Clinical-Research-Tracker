@@ -78,6 +78,7 @@ class AssetController extends GenericController
      *
      * @param string $dir
      * @param array $allowed_extensions
+     * @since 0.0.1
      */
     private function serveFrom($dir, $allowed_extensions = []) {
         $params = Apollo::getInstance()->getRequest()->getParameters();
