@@ -2,7 +2,7 @@
 /**
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
- * @license http://opensource.org/licenses/gpl-license.php MIT License
+ * @license http://opensource.org/licenses/mit-license.php MIT License
  */
 
 
@@ -20,58 +20,57 @@ use Doctrine\ORM\Mapping\ManyToOne;
  *
  * @package Apollo\Entities
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  * @Entity @Table(name="users")
  */
 class UserEntity
 {
     /**
      * Unique user ID
-     * @var int
      * @Id @Column(type="integer") @GeneratedValue
+     * @var int
      */
     protected $id;
 
     /**
      * Name of the user
-     * @var string
      * @Column(type="string")
+     * @var string
      */
     protected $name;
 
     /**
      * Unique user email
-     * @var string
      * @Column(type="string")
+     * @var string
      */
     protected $email;
 
     /**
      * User password hash
-     * @var string
      * @Column(type="string")
+     * @var string
      */
     protected $password;
 
     /**
      * ID of the organisation that user belongs to
+     * @ManyToOne(targetEntity="OrganisationEntity")
      * @var int
-     * @Column(type="integer")
      */
-    protected $org_id;
-    //TODO Tim: Fix the ManyToOne Doctrine mapping with organisations
+    protected $organisation;
 
     /**
      * Boolean indicating if the user is an admin
-     * @var bool
      * @Column(type="boolean")
+     * @var bool
      */
     protected $is_admin;
 
     /**
      * Date that the user has registered on
-     * @var DateTime
      * @Column(type="datetime")
+     * @var DateTime
      */
     protected $registered_on;
 
@@ -87,14 +86,6 @@ class UserEntity
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param int $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
     }
 
     /**
@@ -146,19 +137,19 @@ class UserEntity
     }
 
     /**
-     * @return int
+     * @return mixed
      */
-    public function getOrgId()
+    public function getOrganisation()
     {
-        return $this->org_id;
+        return $this->organisation;
     }
 
     /**
-     * @param int $org_id
+     * @param mixed $organisation
      */
-    public function setOrgId($org_id)
+    public function setOrganisation($organisation)
     {
-        $this->org_id = $org_id;
+        $this->organisation = $organisation;
     }
 
     /**
