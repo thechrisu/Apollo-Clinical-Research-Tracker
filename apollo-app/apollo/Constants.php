@@ -12,7 +12,7 @@
 
 /**
  * Application name
- * @since 0.0.8
+ * @since 0.0.9
  */
 define('APP_NAME', 'Apollo');
 
@@ -23,6 +23,12 @@ define('APP_NAME', 'Apollo');
  */
 define('BASE_URL_AUTO_DETECT', true);
 define('BASE_URL', BASE_URL_AUTO_DETECT ? "http://$_SERVER[HTTP_HOST]/" : 'http://82.0.141.65/');
+
+/**
+ * The default controller that authorised users will be redirected to when accessing the index page
+ * @since 0.0.9
+ */
+define('DEFAULT_CONTROLLER', 'record');
 
 /**
  * Absolute path to the 'apollo' folder

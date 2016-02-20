@@ -23,7 +23,7 @@ use ReflectionMethod;
  * the appropriate controller.
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.9
+ * @version 0.1.0
  */
 class Apollo
 {
@@ -75,6 +75,7 @@ class Apollo
      *
      * All request parsing is done in a separate function, parseRequest();
      *
+     * @since 0.1.0 Now uses the DEFAULT_CONTROLLER constant
      * @since 0.0.9 Moved request parsing to parseRequest() function, redirect to default now raises 301 code
      * @since 0.0.8 No longer provides arbitrary amount of parameters, use the Request instance instead
      * @since 0.0.7 Made index() in RecordController the default action
@@ -87,7 +88,6 @@ class Apollo
      */
     public function start()
     {
-        // Redirect guest users to sign in page
         if ($this->user->isGuest()) {
             if ($this->request->getController() != 'User' || $this->request->getAction() != 'SignIn') {
                 $this->request->sendTo('user/sign-in/' . (empty($this->request->getStrippedUrl()) ? '' : '?return=' . $this->request->getStrippedUrl()), false);
@@ -95,7 +95,7 @@ class Apollo
         }
         if ($this->request->isIndex()) {
             http_response_code(301);
-            $this->request->sendTo('record/');
+            $this->request->sendTo(DEFAULT_CONTROLLER);
         }
         if (!$this->getRequest()->isValid()) {
             $this->request->error(400, 'The requested URL is malformed.');
