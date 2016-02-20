@@ -37,7 +37,7 @@ use Apollo\Helpers\AssetHelper;
                     </ol>
                 </div>
             @endif
-            <div class="panel-body">
+            <div id="main-panel" class="panel-body">
                 @yield('content')
             </div>
         </div>

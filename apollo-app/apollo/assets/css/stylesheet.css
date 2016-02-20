@@ -13,3 +13,6 @@ body {
 
 .jumbotron.error-page {
   margin-bottom: 0; }
+
+#main-panel > .panel:last-child {
+  margin-bottom: 0; }
