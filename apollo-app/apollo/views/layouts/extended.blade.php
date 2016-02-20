@@ -15,9 +15,7 @@ use Apollo\Helpers\AssetHelper;
 @section('head')
     <link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.min.css">
     <link rel="stylesheet" href="{{ AssetHelper::css('stylesheet') }}">
-    @if(isset($title))
-        <title>{{ $title }}</title>
-    @endif
+    <title>{{ !empty($title) ? $title . ' | ' . APP_NAME : APP_NAME }}</title>
 @stop
 @section('body')
     @include('templates.navbar')
