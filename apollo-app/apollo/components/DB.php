@@ -2,7 +2,7 @@
 /**
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
- * @license http://opensource.org/licenses/gpl-license.php MIT License
+ * @license http://opensource.org/licenses/mit-license.php MIT License
  */
 
 
@@ -18,7 +18,7 @@ use Doctrine\ORM\Tools\Setup;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  */
 class DB
 {
@@ -35,6 +35,7 @@ class DB
      *
      * @return EntityManager
      * @throws ORMException
+     * @since 0.0.2 Fixed a typo in the directory name
      * @since 0.0.1
      */
     public static function getEntityManager()
@@ -43,7 +44,8 @@ class DB
             return self::$entityManager;
         } else {
             $isDevMode = true;
-            $config = Setup::createAnnotationMetadataConfiguration(array(APP_DIR . DOCTRINE_ENTITIES_PATH, $isDevMode));
+            echo APP_DIR . DOCTRINE_ENTITIES_PATH;
+            $config = Setup::createAnnotationMetadataConfiguration([APP_DIR . DOCTRINE_ENTITIES_PATH], $isDevMode);
             $conn = array(
                 'driver'   => 'pdo_mysql',
                 'host'     => DB_HOST,
