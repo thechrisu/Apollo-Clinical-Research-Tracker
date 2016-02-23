@@ -1,20 +1,19 @@
 body {
     background-color: #bbc5c4;
-    /*background: url("../images/bg.png");*/
 }
 
-#sign-in-container {
+#sign-in {
     transform: translateX(-50%) translateY(-50%);
     position: absolute;
     left: 50%;
     top: 50%;
 }
 
-#sign-in-container h1 {
+#sign-in h1 {
     color: #1b617b !important;
 }
 
-#sign-in-container .btn-primary {
+#sign-in .btn-primary {
     background-color: #1b617b !important;
     border-color: #1b617b !important;
 }
@@ -25,6 +24,28 @@ body {
 
 #record .form-group {
     margin-bottom: 0 !important;
+}
+
+#record .table {
+    margin-bottom: 0px !important;
+}
+
+#edit-record input.large-font {
+    font-size: 22px !important;
+}
+
+#edit-record .small-table {
+    padding: 0 15px;
+    line-height: 30px;
+    height: 30px;
+}
+
+#fields td {
+    padding: 4px 2px !important;
+}
+
+.secondary-text {
+    color: #999;
 }
 
 .top-buffer {

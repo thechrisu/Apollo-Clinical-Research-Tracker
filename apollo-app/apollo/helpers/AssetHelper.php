@@ -1,0 +1,71 @@
+<?php
+/**
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @copyright 2016
+ * @license https://opensource.org/licenses/mit-license.php MIT License
+ */
+
+
+namespace Apollo\Helpers;
+
+
+/**
+ * Class AssetHelper
+ *
+ * @package Apollo\Helpers
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @version 0.0.2 All function now just return urls instead of printing them out
+ * @version 0.0.1
+ */
+class AssetHelper
+{
+    /**
+     * Returns the path to the stylesheet based on the provided $path
+     *
+     * @param string $path
+     * @return string
+     * @since 0.0.2 Changed name to "css"
+     * @since 0.0.1
+     */
+    public static function css($path)
+    {
+        return self::getAssetFrom('css', $path . '.css');
+    }
+    /**
+     * Returns the path to the image based on the provided $path
+     *
+     * @param string $path
+     * @return string
+     * @since 0.0.2 Changed name to "image"
+     * @since 0.0.1
+     */
+    public static function image($path)
+    {
+        return self::getAssetFrom('img', $path);
+    }
+
+    /**
+     * Returns the path to the script based on the provided $path
+     *
+     * @param string $path
+     * @return string
+     * @since 0.0.2 Changed name to "js"
+     * @since 0.0.1
+     */
+    public static function js($path)
+    {
+        return self::getAssetFrom('js', $path . '.js');
+    }
+
+    /**
+     * Returns the absolute url of the asset given by the path
+     *
+     * @param string $folder
+     * @param string $path
+     * @return string
+     * @since 0.0.1
+     */
+    private static function getAssetFrom($folder, $path) {
+        return ASSET_BASE_URL . $folder . '/' . URLHelper::stripBase($path);
+    }
+}
