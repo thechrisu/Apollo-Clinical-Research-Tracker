@@ -11,13 +11,14 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\OneToMany;
 
 /**
  * Class PersonEntity
  * @package Apollo\Entities
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  * @Entity @Table("people")
  */
 class PersonEntity
@@ -44,7 +45,7 @@ class PersonEntity
     protected $middle_name;
 
     /**
-     * Last Name of the person
+     * Last name of the person
      * @Column(type="string")
      * @var string
      */
@@ -52,14 +53,21 @@ class PersonEntity
 
 
     /**
-     * id of the organization the person is part of
+     * Organisation object
      * @ManyToOne(targetEntity="OrganisationEntity")
      * @var int
      */
     protected $organisation;
 
     /**
-     * determines if person is shown or not
+     * Array with all of the records
+     * @OneToMany(targetEntity="RecordEntity", mappedBy="person")
+     * @var RecordEntity[]
+     */
+    protected $records;
+
+    /**
+     * Determines if person is shown or not
      * @Column(type="boolean")
      * @var bool
      */
@@ -71,7 +79,7 @@ class PersonEntity
     }
 
     /**
-     * @return int;
+     * @return int
      */
     public function getId()
     {
@@ -87,7 +95,7 @@ class PersonEntity
     }
 
     /**
-     * @param $given_name
+     * @param string $given_name
      */
     public function setGivenName($given_name)
     {
@@ -103,7 +111,7 @@ class PersonEntity
     }
 
     /**
-     * @param $middle_name
+     * @param string $middle_name
      */
     public function setMiddleName($middle_name)
     {
@@ -119,7 +127,7 @@ class PersonEntity
     }
 
     /**
-     * @param $last_name
+     * @param string $last_name
      */
     public function setLastName($last_name)
     {
@@ -127,7 +135,7 @@ class PersonEntity
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getOrganisation()
     {
@@ -135,7 +143,7 @@ class PersonEntity
     }
 
     /**
-     * @param mixed $organisation
+     * @param int $organisation
      */
     public function setOrganisation($organisation)
     {
@@ -143,7 +151,23 @@ class PersonEntity
     }
 
     /**
-     * @return bool
+     * @return RecordEntity
+     */
+    public function getRecords()
+    {
+        return $this->records;
+    }
+
+    /**
+     * @param RecordEntity $record
+     */
+    public function addRecord($record)
+    {
+        $this->records[] = $record;
+    }
+
+    /**
+     * @return boolean
      */
     public function isHidden()
     {
@@ -151,11 +175,12 @@ class PersonEntity
     }
 
     /**
-     * @param $is_hidden
+     * @param boolean $is_hidden
      */
     public function setIsHidden($is_hidden)
     {
         $this->is_hidden = $is_hidden;
     }
+
 
 }

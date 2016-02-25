@@ -19,38 +19,29 @@ use Doctrine\ORM\Mapping\ManyToOne;
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @Entity @Table("data")
- * @version 0.0.3
+ * @version 0.0.4
  */
 class DataEntity
 {
     /**
-     * sets a unique id for a record
      * @Id @Column(type="integer") @GeneratedValue
      * @var int
      */
     protected $id;
 
     /**
-     * the person the record belongs to
-     * @ManyToOne(type="PersonEntity")
+     * @ManyToOne(targetEntity="RecordEntity", inversedBy="data")
      * @var int
      */
-    protected $person;
+    protected $record;
 
     /**
-     * @ManyToOne(type="OrganisationEntity")
-     * @var int
-     */
-    protected $organisation;
-
-    /**
-     * @ManyToOne(type="FieldEntity")
+     * @ManyToOne(targetEntity="FieldEntity")
      * @var int
      */
     protected $field;
 
     /**
-     * stores things of type int
      * @Column(type="integer")
      * @var int
      */
@@ -94,7 +85,7 @@ class DataEntity
 
     /**
      * @ManyToOne(targetEntity="UserEntity")
-     * @var int
+     * @var UserEntity
      */
     protected $updated_by;
 
@@ -123,33 +114,17 @@ class DataEntity
     /**
      * @return int
      */
-    public function getPerson()
+    public function getRecord()
     {
-        return $this->person;
+        return $this->record;
     }
 
     /**
-     * @param int $person
+     * @param int $record
      */
-    public function setPerson($person)
+    public function setRecord($record)
     {
-        $this->person = $person;
-    }
-
-    /**
-     * @return int
-     */
-    public function getOrganisation()
-    {
-        return $this->organisation;
-    }
-
-    /**
-     * @param int $organisation
-     */
-    public function setOrganisation($organisation)
-    {
-        $this->organisation = $organisation;
+        $this->record = $record;
     }
 
     /**
@@ -299,7 +274,7 @@ class DataEntity
     /**
      * @return boolean
      */
-    public function isIsDefault()
+    public function isDefault()
     {
         return $this->is_default;
     }

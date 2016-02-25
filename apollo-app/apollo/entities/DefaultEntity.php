@@ -1,0 +1,105 @@
+<?php
+/**
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @copyright 2016
+ * @license https://opensource.org/licenses/mit-license.php MIT License
+ */
+
+
+namespace Apollo\Entities;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\ManyToOne;
+
+
+/**
+ * Class DefaultEntity
+ *
+ * @package Apollo\Entities
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @version 0.0.1
+ * @Entity @Table("defaults")
+ */
+class DefaultEntity
+{
+    /**
+     * @Id @Column(type="integer") @GeneratedValue
+     * @var int
+     */
+    protected $id;
+
+    /**
+     * @ManyToOne(targetEntity="FieldEntity", inversedBy="defaults")
+     * @var int
+     */
+    protected $field;
+
+    /**
+     * @Column(type="integer")
+     * @var int
+     */
+    protected $order;
+
+    /**
+     * @Column(type="string")
+     * @var string
+     */
+    protected $value;
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getField()
+    {
+        return $this->field;
+    }
+
+    /**
+     * @param int $field
+     */
+    public function setField($field)
+    {
+        $this->field = $field;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrder()
+    {
+        return $this->order;
+    }
+
+    /**
+     * @param int $order
+     */
+    public function setOrder($order)
+    {
+        $this->order = $order;
+    }
+
+    /**
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
+     * @param string $value
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
+}
