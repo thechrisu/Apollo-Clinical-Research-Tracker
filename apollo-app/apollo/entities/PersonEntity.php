@@ -1,17 +1,23 @@
 <?php
 /**
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
- * @license http://opensource.org/licenses/gpl-license.php MIT License
+ * @license http://opensource.org/licenses/mit-license.php MIT License
  */
 
 namespace Apollo\Entities;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\ManyToOne;
 
 /**
  * Class PersonEntity
  * @package Apollo\Entities
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.03
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @version 0.0.2
  * @Entity @Table("people")
  */
 class PersonEntity
@@ -145,11 +151,11 @@ class PersonEntity
     }
 
     /**
-     * @param $isHidden
+     * @param $is_hidden
      */
     public function setIsHidden($is_hidden)
     {
-        $this->isHidden = $is_hidden;
+        $this->is_hidden = $is_hidden;
     }
 
 }

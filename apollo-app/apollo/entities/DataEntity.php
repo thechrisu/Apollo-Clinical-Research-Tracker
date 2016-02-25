@@ -1,16 +1,24 @@
 <?php
 /**
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
- * @license http://opensource.org/licenses/gpl-license.php MIT License
+ * @license http://opensource.org/licenses/mit-license.php MIT License
  */
 
 namespace Apollo\Entities;
+use DateTime;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\ManyToOne;
 
 /**
  * Class DataEntity
  * @package Apollo\Entities
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @Entity @Table("data")
  * @version 0.0.1
  */
 class DataEntity
@@ -27,7 +35,7 @@ class DataEntity
      * @ManyToOne(type="PersonIdentity")
      * @var int
      */
-    protected $user;
+    protected $person;
 
     /**
      * @ManyToOne(type="OrganisationEntity")
@@ -85,7 +93,7 @@ class DataEntity
     protected $last_update;
 
     /**
-     * @OneToMany(targetEntity="UserEntity")
+     * @ManyToOne(targetEntity="UserEntity")
      * @var int
      */
     protected $updated_by;
@@ -98,36 +106,66 @@ class DataEntity
 
     /**
      * DataEntity constructor.
-     * @param $user
-     * @param mixed $organisation
-     * @param $updated_by
-     * @param $field
-     * @param $is_default
      */
-    public function __construct($user, $organisation, $updated_by, $field, $is_default)
+    public function __construct()
     {
-        $this->user = $user;
-        $this->organisation = $organisation;
-        $this->field = $field;
-        $this->is_default = $is_default;
-        $this->recordChange($updated_by);
-    }
-
-    /**
-     * @param $person
-     */
-    private function recordChange($person)
-    {
-        $this->last_update = DateTime(now);
-        $this->updated_by = $person;
+        $this->is_default = false;
     }
 
     /**
      * @return int
      */
-    public function getFieldType()
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPerson()
+    {
+        return $this->person;
+    }
+
+    /**
+     * @param int $person
+     */
+    public function setPerson($person)
+    {
+        $this->person = $person;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrganisation()
+    {
+        return $this->organisation;
+    }
+
+    /**
+     * @param int $organisation
+     */
+    public function setOrganisation($organisation)
+    {
+        $this->organisation = $organisation;
+    }
+
+    /**
+     * @return int
+     */
+    public function getField()
     {
         return $this->field;
+    }
+
+    /**
+     * @param int $field
+     */
+    public function setField($field)
+    {
+        $this->field = $field;
     }
 
     /**
@@ -139,13 +177,11 @@ class DataEntity
     }
 
     /**
-     * @param $int
-     * @param $updater
+     * @param int $int
      */
-    public function setInt($int, $updater)
+    public function setInt($int)
     {
         $this->int = $int;
-        $this->recordChange($updater);
     }
 
     /**
@@ -157,13 +193,11 @@ class DataEntity
     }
 
     /**
-     * @param $varchar
-     * @param $updater
+     * @param string $varchar
      */
-    public function setVarchar($varchar, $updater)
+    public function setVarchar($varchar)
     {
         $this->varchar = $varchar;
-        $this->recordChange($updater);
     }
 
     /**
@@ -175,13 +209,11 @@ class DataEntity
     }
 
     /**
-     * @param $date_time
-     * @param $updater
+     * @param DateTime $date_time
      */
-    public function setDateTime($date_time, $updater)
+    public function setDateTime($date_time)
     {
         $this->date_time = $date_time;
-        $this->recordChange($updater);
     }
 
     /**
@@ -193,13 +225,11 @@ class DataEntity
     }
 
     /**
-     * @param $longText
-     * @param $updater
+     * @param string $long_text
      */
-    public function setLongText($longText, $updater)
+    public function setLongText($long_text)
     {
-        $this->long_text = $longText;
-        $this->recordChange($updater);
+        $this->long_text = $long_text;
     }
 
     /**
@@ -211,13 +241,11 @@ class DataEntity
     }
 
     /**
-     * @param $start_date
-     * @param $updater
+     * @param DateTime $start_date
      */
-    public function setStartDate($start_date, $updater)
+    public function setStartDate($start_date)
     {
         $this->start_date = $start_date;
-        $this->recordChange($updater);
     }
 
     /**
@@ -229,26 +257,60 @@ class DataEntity
     }
 
     /**
-     * @param $end_date
-     * @param $updater
+     * @param DateTime $end_date
      */
-    public function setEndDate($end_date, $updater)
+    public function setEndDate($end_date)
     {
         $this->end_date = $end_date;
-        $this->recordChange($updater);
     }
 
     /**
      * @return DateTime
      */
-    public function getLatestUpdate()
+    public function getLastUpdate()
     {
         return $this->last_update;
     }
 
-    public function getLatestUpdater()
+    /**
+     * @param DateTime $last_update
+     */
+    public function setLastUpdate($last_update)
+    {
+        $this->last_update = $last_update;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedBy()
     {
         return $this->updated_by;
     }
+
+    /**
+     * @param int $updated_by
+     */
+    public function setUpdatedBy($updated_by)
+    {
+        $this->updated_by = $updated_by;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIsDefault()
+    {
+        return $this->is_default;
+    }
+
+    /**
+     * @param boolean $is_default
+     */
+    public function setIsDefault($is_default)
+    {
+        $this->is_default = $is_default;
+    }
+
 
 }
