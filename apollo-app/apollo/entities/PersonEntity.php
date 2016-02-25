@@ -18,8 +18,8 @@ class PersonEntity
 {
     /**
      * Unique Person id
-     * @var int
      * @Id @Column(type="integer") @GeneratedValue
+     * @var int
      */
     protected $id;
 
@@ -47,25 +47,25 @@ class PersonEntity
 
     /**
      * id of the organization the person is part of
-     * @var int
      * @ManyToOne(targetEntity="OrganisationEntity")
+     * @var int
      */
-    protected $organization_id;
+    protected $organisation;
 
     /**
      * determines if person is shown or not
-     * @var bool
      * @Column(type="boolean")
+     * @var bool
      */
-    protected $isHidden;
+    protected $is_hidden;
 
     public function __construct()
     {
-        $this->hidden = false;
+        $this->is_hidden = false;
     }
 
     /**
-     * @return int
+     * @return int;
      */
     public function getId()
     {
@@ -121,19 +121,35 @@ class PersonEntity
     }
 
     /**
+     * @return mixed
+     */
+    public function getOrganisation()
+    {
+        return $this->organisation;
+    }
+
+    /**
+     * @param mixed $organisation
+     */
+    public function setOrganisation($organisation)
+    {
+        $this->organisation = $organisation;
+    }
+
+    /**
      * @return bool
      */
     public function isHidden()
     {
-        return $this->isHidden;
+        return $this->is_hidden;
     }
 
     /**
      * @param $isHidden
      */
-    public function setIsHidden($isHidden)
+    public function setIsHidden($is_hidden)
     {
-        $this->isHidden = $isHidden;
+        $this->isHidden = $is_hidden;
     }
 
 }
