@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping\ManyToOne;
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @Entity @Table("data")
- * @version 0.0.1
+ * @version 0.0.3
  */
 class DataEntity
 {
@@ -32,7 +32,7 @@ class DataEntity
 
     /**
      * the person the record belongs to
-     * @ManyToOne(type="PersonIdentity")
+     * @ManyToOne(type="PersonEntity")
      * @var int
      */
     protected $person;
