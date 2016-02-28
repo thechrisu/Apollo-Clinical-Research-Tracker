@@ -99,7 +99,7 @@ class Request
         for($i = 0; $i < count($this->url_parts); $i++) {
             $url_part = $this->url_parts[$i];
             if($i < 2) {
-                if(preg_match('/^[A-Za-z0-9\-]+$/', $url_part) === 1) {
+                if(URLHelper::containsValidCharacters($url_part)) {
                     $value = StringHelper::lispCaseToPascalCase($url_part);
                     $i == 0 ? $this->controller = $value : $this->action = $value;
                 } else {
@@ -107,7 +107,7 @@ class Request
                     break;
                 }
             } else {
-                if(preg_match('/^[A-Za-z0-9\-\.\_]+$/', $url_part) === 1) {
+                if(URLHelper::containsValidCharacters($url_part)) {
                     array_push($this->parameters, $url_part);
                 } else {
                     $this->valid = false;
@@ -119,6 +119,7 @@ class Request
             $this->index = true;
         }
     }
+
 
     /**
      * Redirects the user to specified url within the app. If $trailing_slash is set to false

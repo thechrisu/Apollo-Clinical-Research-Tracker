@@ -1,6 +1,7 @@
 <?php
 /**
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/gpl-license.php MIT License
  */
@@ -16,7 +17,8 @@ namespace Apollo\Helpers;
  *
  * @package Apollo\Helpers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.5
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @version 0.0.6
  */
 class URLHelper
 {
@@ -75,4 +77,14 @@ class URLHelper
         return preg_replace($pattern, '', $url);
     }
 
+    /**
+     * @param $string
+     * @return bool
+     * @since 0.0.2 made function static
+     * @since 0.0.1
+     */
+    public static function containsValidCharacters($string)
+    {
+        return preg_match('/^[A-Za-z0-9\-\.\_]+$/', $string) === 1;
+    }
 }
