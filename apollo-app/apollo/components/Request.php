@@ -99,7 +99,7 @@ class Request
         for($i = 0; $i < count($this->url_parts); $i++) {
             $url_part = $this->url_parts[$i];
             if($i < 2) {
-                if(URLHelper::containsValidCharacters($url_part)) {
+                if(preg_match('/^[A-Za-z0-9\-]+$/', $url_part) === 1) {
                     $value = StringHelper::lispCaseToPascalCase($url_part);
                     $i == 0 ? $this->controller = $value : $this->action = $value;
                 } else {
@@ -107,7 +107,7 @@ class Request
                     break;
                 }
             } else {
-                if(URLHelper::containsValidCharacters($url_part)) {
+                if(preg_match('/^[A-Za-z0-9\-\.\_]+$/', $url_part) === 1) {
                     array_push($this->parameters, $url_part);
                 } else {
                     $this->valid = false;

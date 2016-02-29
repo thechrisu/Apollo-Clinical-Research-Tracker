@@ -45,6 +45,9 @@ use Apollo\Helpers\AssetHelper;
 @stop
 @section('scripts')
     <script src="https://use.typekit.net/xfk8ylv.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.7/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.7/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser.js"></script>
     <script>try {
             Typekit.load({async: true});
         } catch (e) {
