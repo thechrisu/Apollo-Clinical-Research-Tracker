@@ -9,7 +9,7 @@
  */
 
 use Apollo\Helpers\AssetHelper;
-$organisation = "UCL";//\Apollo\Apollo::getInstance()->getUser()->getOrganisationName();
+$organisation = \Apollo\Apollo::getInstance()->getUser()->getOrganisationName();
 
 ?>
 @extends('layouts.basic')

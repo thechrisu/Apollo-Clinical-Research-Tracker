@@ -3,6 +3,7 @@
  * @copyright 2016
  * @license https://opensource.org/licenses/mit-license.php MIT License
  * @version 0.0.1
+ * TODO fix CSS
  */
 
 
@@ -62,6 +63,11 @@ var PersonTable = React.createClass({
     }
 });
 
+/**
+ * Responsible for handling the pagination and passing the data to the "dumb" PersonTable
+ * @since 0.0.1
+ * TODO add API integration, add real pagination (with nextpage/lastpage), make it more robust
+ */
 var PersonTablePagination = React.createClass({
     render: function() {
         return (

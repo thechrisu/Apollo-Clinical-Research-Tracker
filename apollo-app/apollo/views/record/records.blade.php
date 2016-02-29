@@ -2,7 +2,7 @@
 /**
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
-  * @copyright 2016
+ * @copyright 2016
  * @license https://opensource.org/licenses/mit-license.php MIT License
  * @version 0.0.2 Added link to PersonTable script
  * @version 0.0.1
