@@ -7,6 +7,7 @@
  * @version 0.0.2 Added link to PersonTable script
  * @version 0.0.1
  */
+use Apollo\Helpers\AssetHelper;
 ?>
 @extends('layouts.extended')
 @section('content')
@@ -32,19 +33,8 @@
             <a href="add.php" class="btn btn-default btn-block">Add a record</a>
         </div>
     </div>
-    <div class="table-responsive top-buffer">
-        <table class="table table-striped table-hover">
-            <thead>
-            <tr>
-                <th>First name</th>
-                <th>Surname</th>
-                <th>Email</th>
-                <th>Phone</th>
-            </tr>
-            </thead>
-            <tbody id="table-body">
-            </tbody>
-        </table>
+    <div class="table-responsive top-buffer" id="personTable">
+
     </div>
     <nav class="text-center">
         <ul class="pagination">
@@ -65,5 +55,5 @@
             </li>
         </ul>
     </nav>
-    <script src="{{ AssetHelper::js("PersonTablePagination") }}" />
+    <script type="text/babel" src="{{ AssetHelper::js("PersonTablePagination") }}" />
 @stop

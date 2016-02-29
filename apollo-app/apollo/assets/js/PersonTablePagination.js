@@ -6,13 +6,69 @@
  */
 
 
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import $ from 'jquery';
-import PersonTable from './PersonTable';
+var PersonRow = React.createClass({
+    render: function() {
+        return (
+            <tr>
+                <td>{this.props.firstname}</td>
+                <td>{this.props.lastname}</td>
+                <td>{this.props.email}</td>
+                <td>{this.props.phone}</td>
+            </tr>
+        );
+    }
+});
 
-export default class PersonTablePagination extends Component {
-    loadPeopleFromServer() {
+/**
+ * Responsible for creating one table of people
+ * @since 0.0.1
+ */
+var PersonTable = React.createClass({
+    render: function() {
+        var rows = [];
+        this.props.data.forEach(function(product) {
+            if(product.error == null && product.data != null)
+            {
+                rows.push(
+                    <PersonRow
+                        firstname={product.data.firstname}
+                        lastname={product.data.lastname}
+                        email={product.data.email}
+                        phone={product.data.phone}
+                    />
+                );
+            }
+            if(product.error != null)
+                console.log(product.error.id + ": " + product.error.description);
+            if(product.data == null)
+                console.log("Product did not get any data.");
+
+        }.bind(this));
+        return (
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>First name</th>
+                    <th>Surname</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                </tr>
+                </thead>
+                <tbody id="table-body">
+                {rows}
+                </tbody>
+            </table>
+        );
+    }
+});
+
+var PersonTablePagination = React.createClass({
+    render: function() {
+        return (
+            <PersonTable data={this.state.data} />
+        )
+    },
+    loadPeopleFromServer: function() {
         this.setState({data: [
             {
                 "error": null,
@@ -42,18 +98,18 @@ export default class PersonTablePagination extends Component {
                 }
             }
         ]})
-    };
+    },
     getInitialState() {
         return {data: []};
-    };
+    },
     componentDidMount() {
         this.loadPeopleFromServer();
         setInterval(this.loadPeopleFromServer, this.props.pollInterval);
-    };
+    }
 
-};
+});
 
 ReactDOM.render(
-    <PersonTablePagination page={} perPage={10} pollInterval={2000} />
-document.getElementById('table-body')
+    <PersonTablePagination pollInterval={2000} />,
+document.getElementById('personTable')
 );

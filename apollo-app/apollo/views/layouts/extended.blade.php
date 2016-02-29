@@ -9,10 +9,12 @@
  */
 
 use Apollo\Helpers\AssetHelper;
+$organisation = "UCL";//\Apollo\Apollo::getInstance()->getUser()->getOrganisationName();
 
 ?>
 @extends('layouts.basic')
 @section('head')
+
     <link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.min.css">
     <link rel="stylesheet" href="{{ AssetHelper::css('stylesheet') }}">
     <title>{{ !empty($title) ? $title . ' | ' . APP_NAME : APP_NAME }}</title>
@@ -24,7 +26,7 @@ use Apollo\Helpers\AssetHelper;
             @if(isset($breadcrumbs))
                 <div class="panel-heading">
                     <ol class="breadcrumb" id="nav-breadcrumbs">
-                        <li>{{ \Apollo\Apollo::getInstance()->getUser()->getOrganisationName() }}</li>
+                        <li>{{ $organization }}</li>
                         @foreach($breadcrumbs as $breadcrumb)
                             <li{!! $breadcrumb[2] ? ' class="active"' : '' !!}>
                                 @if($breadcrumb[1] != null)
