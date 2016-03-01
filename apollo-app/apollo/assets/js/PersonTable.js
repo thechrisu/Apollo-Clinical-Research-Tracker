@@ -7,6 +7,12 @@
  */
 
 
+/**
+ * Responsible for one row only
+ * @since 0.0.1
+ */
+import { Router, Route, Link } from 'react-router'
+
 var PersonRow = React.createClass({
     render: function() {
         return (
@@ -29,8 +35,9 @@ var PersonRow = React.createClass({
  */
 var PersonTable = React.createClass({
     render: function() {
+        console.log(this.props.url)
         var rows = [];
-        this.props.data.forEach(function(product) {
+        this.state.data.forEach(function(product) {
             if(product.error == null && product.data != null)
             {
                 rows.push(
@@ -64,54 +71,19 @@ var PersonTable = React.createClass({
                 </tbody>
             </table>
         );
-    }
-});
-
-
-/**
- * Responsible for handling the pagination and passing the data to the "dumb" PersonTable
- * @since 0.0.1
- * TODO Chris: add API integration, add real pagination (with nextpage/lastpage), make it more robust
- */
-var PersonTablePagination = React.createClass({
-    render: function() {
-        return (
-            <PersonTable data={this.state.data} />
-        )
     },
     loadPeopleFromServer: function() {
-        this.setState({data: [
-            {
-                "error": null,
-                "data": {
-                    "firstname": "Peter",
-                    "lastname": "Parker",
-                    "email": "spider@man.com",
-                    "phone": "+1 23456789",
-                    "id": 532
-                }
-            },
-            {
-                "error": null,
-                "data": {
-                    "firstname": "Christoph",
-                    "lastname": "Ulshoefer",
-                    "email": "christophsulshoefer@gmail.com",
-                    "phone": "0133723666",
-                    "id": 1337
-                }
-            },
-            {
-                "error": null,
-                "data": {
-                    "firstname": "Dummy",
-                    "lastname": "Person",
-                    "email": "lorem@ipsum.com",
-                    "phone": "+4 5125218051",
-                    "id": 7001
-                }
-            }
-        ]})
+        $.ajax({
+            url: this.props.url,
+            dataType: 'json',
+            type: 'GET',
+            success: function(data) {
+                this.setState({data: data});
+            }.bind(this),
+            error: function(xhr, status, err) {
+                console.error(this.props.url, status, err.toString());
+            }.bind(this)
+        });
     },
     getInitialState() {
         return {data: []};
@@ -122,7 +94,13 @@ var PersonTablePagination = React.createClass({
     }
 });
 
+
+/**
+ * Responsible for handling the pagination and passing the data to the "dumb" PersonTable
+ * @since 0.0.1
+ * TODO Chris: add API integration,
+ */
 ReactDOM.render(
-    <PersonTablePagination pollInterval={2000} />,
+    <PersonTable pollInterval={2000} url="/api/get/records/1/"/>,
 document.getElementById('personTable')
 );

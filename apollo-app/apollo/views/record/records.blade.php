@@ -43,7 +43,7 @@ use Apollo\Helpers\AssetHelper;
                 </a>
             </li>
             <li class="active"><a href="#">1</a></li>
-            <li><a href="#">2</a></li>
+            <li><a href="">2</a></li>
             <li><a href="#">3</a></li>
             <li><a href="#">4</a></li>
             <li><a href="#">5</a></li>
@@ -57,5 +57,5 @@ use Apollo\Helpers\AssetHelper;
 @stop
 @section('scripts')
     @parent
-    <script type="text/babel" src="{{ AssetHelper::js("PersonTablePagination") }}"></script>
+    <script type="text/babel" src="{{ AssetHelper::js("PersonTable") }}"></script>
 @stop
