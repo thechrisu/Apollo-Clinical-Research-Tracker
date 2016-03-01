@@ -47,9 +47,6 @@ class ApiController extends GenericController
      * Action to handle get requests
      *
      * @param string $table
-     * @param string $order
-     * @param string $page
-     * @param string $search
      * @since 0.0.2 Refactored completely, added arguments
      * @since 0.0.1
      */
@@ -66,8 +63,6 @@ class ApiController extends GenericController
         }
         $data = [];
         $data['error'] = null;
-
-        echo '<pre>';
 
         $org_id = Apollo::getInstance()->getUser()->getOrganisationId();
         $sort = isset($_GET['sort']) ? intval($_GET['sort']) : 1;
