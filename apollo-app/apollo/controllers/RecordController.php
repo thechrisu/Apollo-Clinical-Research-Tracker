@@ -18,7 +18,7 @@ use Apollo\Helpers\URLHelper;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  */
 class RecordController extends GenericController
 {
@@ -39,13 +39,13 @@ class RecordController extends GenericController
     /**
      * Shows one particular record
      *
-     * @since 0.0.1
+     * @since 0.0.3
      */
     public function actionView($personId)
     {
         $breadcrumbs = [
-            ['Person', URLHelper::url('record/view/' . $personId . '/1'), true]
+            ['Person', URLHelper::url('record/view/' . $personId), true]
         ];
-        View::render('record.viewRecord', 'View Person', $breadcrumbs);
+        View::render('record.record', 'View Record', $breadcrumbs);
     }
 }
