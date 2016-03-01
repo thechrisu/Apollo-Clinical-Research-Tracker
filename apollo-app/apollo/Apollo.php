@@ -3,6 +3,7 @@
  * Main Apollo application class file
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
  */
@@ -23,7 +24,8 @@ use ReflectionMethod;
  * the appropriate controller.
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.1.0
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @version 0.1.1
  */
 class Apollo
 {
@@ -107,22 +109,22 @@ class Apollo
      * Parses the request by checking if the requested Controller and Action exist,
      * as well as passing necessary arguments to the functions.
      *
+     * @since 0.1.1 Refactored, create performAction() function
      * @since 0.0.9
      */
     private function parseRequest()
     {
-        $request = $this->getRequest();
-        $controller_name = $request->getController();
+        $controller_name = $this->request->getController();
         $controller_file_path = __DIR__ . '/controllers/' . $controller_name . 'Controller.php';
         if (file_exists($controller_file_path)) {
             $controller_namespace = 'Apollo\\Controllers\\' . $controller_name . 'Controller';
             /** @var GenericController $controller */
             $controller = new $controller_namespace();
-            $method = 'action' . $request->getAction();
-            if (!$request->hasAction()) {
+            $method = 'action' . $this->request->getAction();
+            if (!$this->request->hasAction()) {
                 $controller->index();
             } elseif (method_exists($controller, $method)) {
-                $this->performAction($controller_namespace, $controller, $request, $method);
+                $this->performAction($controller_namespace, $controller, $method);
             } else {
                 $controller->notFound();
             }
@@ -133,16 +135,17 @@ class Apollo
 
     /**
      * Calls the appropriate method in the appropriate Controller to carry out the appropriate action, specified by the URL
-     * @param $controller_namespace
-     * @param $controller
-     * @param $request
-     * @param $method
+     *
+     * @param string $controller_namespace
+     * @param GenericController $controller
+     * @param string $method
+     * @since 0.1.1
      */
-    private function performAction($controller_namespace, $controller, $request, $method)
+    private function performAction($controller_namespace, $controller, $method)
     {
         $arguments_expected = (new ReflectionMethod($controller_namespace, $method))->getNumberOfParameters();
         $arguments = [];
-        $request_parameters = $request->getParameters();
+        $request_parameters = $this->request->getParameters();
         for ($i = 0; $i < $arguments_expected; $i++) {
             if ($i >= count($request_parameters)) break;
             $arguments[$i] = isset($request_parameters[$i]) ? $request_parameters[$i] : null;
