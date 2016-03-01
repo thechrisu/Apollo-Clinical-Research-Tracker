@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping\OneToMany;
  * @package Apollo\Entities
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  * @Entity @Table("people")
  */
 class PersonEntity
@@ -71,7 +71,7 @@ class PersonEntity
      * @Column(type="boolean")
      * @var bool
      */
-    protected $is_hidden;
+    protected $is_hidden = false;
 
     public function __construct()
     {
