@@ -53,34 +53,56 @@ class ApiController extends GenericController
      * @since 0.0.2 Refactored completely, added arguments
      * @since 0.0.1
      */
-    public function actionGet($table = null, $order = null, $page = null, $search = null)
+    public function actionGet($table = null)
     {
         $request = Apollo::getInstance()->getRequest();
         $table = strtolower($table);
         if (empty($table)) {
             $request->error(400, 'No table name specified.');
             return;
-        }
-        if (!in_array($table, ['records'])) {
+        } else if (!in_array($table, ['records'])) {
             $request->error(400, 'Invalid table requested.');
             return;
         }
-        echo '<pre>';
         $data = [];
         $data['error'] = null;
-        $people = DB::getEntityManager()->createQuery('SELECT u.id, u.given_name, u.last_name FROM Apollo\\Entities\\PersonEntity u');
-        $people = $people->getResult();
-        $record = DB::getEntityManager()->createQuery('SELECT u.id FROM Apollo\\Entities\\RecordEntity u');
-        $record = $record->getResult()[0]['id'];
-        $phone = DB::getEntityManager()->createQuery("SELECT u.varchar FROM Apollo\\Entities\\DataEntity u WHERE u.record = :record_id AND u.field = 1");
-        $phone->setParameter('record_id', $record);
-        $phone = $phone->getResult()[0]['varchar'];
-        $email = DB::getEntityManager()->createQuery("SELECT u.varchar FROM Apollo\\Entities\\DataEntity u WHERE u.record = :record_id AND u.field = 2");
-        $email->setParameter('record_id', $record);
-        $email = $email->getResult()[0]['varchar'];
-        $people[0]['phone'] = $phone;
-        $people[0]['email'] = $email;
-        $data['data'] = $people;
+
+        echo '<pre>';
+
+        $org_id = Apollo::getInstance()->getUser()->getOrganisationId();
+        $sort = isset($_GET['sort']) ? intval($_GET['sort']) : 1;
+        $sorting = "u.w";
+        switch($sort) {
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+        }
+        $people_query = $people = DB::getEntityManager()
+            ->createQuery('SELECT u.id, u.given_name, u.last_name FROM Apollo\\Entities\\PersonEntity u WHERE u.organisation = :organisation AND u.is_hidden = 0');
+        $people_query->setParameter('organisation', $org_id);
+        $all_people = $people_query->getResult();
+        $data['count'] = count($all_people);
+        $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+        if($page < 1) $page = 1;
+        $upper_bound = $page * 10;
+        for($i = 10 * ($page - 1); $i < ($upper_bound > $data['count'] ? $data['count'] : $upper_bound); $i++) {
+            $record = $all_people[$i];
+            $recordID = DB::getEntityManager()
+                ->createQuery('SELECT u.id FROM Apollo\\Entities\\RecordEntity u WHERE u.is_hidden = 0 ORDER BY u.created_on DESC');
+            $recordID = $recordID->getResult()[0]['id'];
+            $phone = DB::getEntityManager()->createQuery("SELECT u.varchar FROM Apollo\\Entities\\DataEntity u WHERE u.record = :record_id AND u.field = 1");
+            $phone->setParameter('record_id', $recordID);
+            $phone = $phone->getResult()[0]['varchar'];
+            $email = DB::getEntityManager()->createQuery("SELECT u.varchar FROM Apollo\\Entities\\DataEntity u WHERE u.record = :record_id AND u.field = 2");
+            $email->setParameter('record_id', $recordID);
+            $email = $email->getResult()[0]['varchar'];
+            $record['email'] = $email;
+            $record['phone'] = $phone;
+            $data['data'][] = $record;
+        }
         echo json_encode($data);
     }
 }
