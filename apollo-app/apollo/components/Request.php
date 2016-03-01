@@ -1,6 +1,7 @@
 <?php
 /**
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
  */
@@ -17,7 +18,7 @@ use Apollo\Helpers\URLHelper;
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.8
+ * @version 0.0.9
  */
 class Request
 {
@@ -84,7 +85,7 @@ class Request
      * underscores "_" and full stops "." are allowed.
      *
      * @param string $url
-     * @since 0.0.7 extracted addBaseParameter
+     * @since 0.0.9 Extracted addBaseParameter()
      * @since 0.0.6 Refactored url parsing, regex now allows more symbols for parameters
      * @since 0.0.4 Now properly converts lisp-case to PascalCase
      * @since 0.0.3 Added query support
@@ -123,9 +124,10 @@ class Request
 
     /**
      * Adds the parameter to the appropriate object
-     * @param $index
-     * @param $url_part
-     * @since 0.0.1
+     *
+     * @param int $index
+     * @param string $url_part
+     * @since 0.0.9
      */
     private function addBaseParameter($index, $url_part){
         $paramValue = StringHelper::lispCaseToPascalCase($url_part);

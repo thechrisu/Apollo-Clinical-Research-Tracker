@@ -176,5 +176,4 @@ class Apollo
     {
         return $this->user;
     }
-
 }
