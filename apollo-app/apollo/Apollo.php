@@ -126,6 +126,7 @@ class Apollo
                 $arguments = [];
                 $request_parameters = $request->getParameters();
                 for ($i = 0; $i < $arguments_expected; $i++) {
+                    if($i >= count($request_parameters)) break;
                     $arguments[$i] = isset($request_parameters[$i]) ? $request_parameters[$i] : null;
                 }
                 call_user_func_array([$controller, $method], $arguments);

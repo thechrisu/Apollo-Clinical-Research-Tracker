@@ -4,8 +4,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.2 Added link to PersonTable script
- * @version 0.0.1
+ * @version 0.0.3
  */
 use Apollo\Helpers\AssetHelper;
 ?>
@@ -55,5 +54,8 @@ use Apollo\Helpers\AssetHelper;
             </li>
         </ul>
     </nav>
-    <script type="text/babel" src="{{ AssetHelper::js("PersonTablePagination") }}" />
+@stop
+@section('scripts')
+    @parent
+    <script type="text/babel" src="{{ AssetHelper::js("PersonTablePagination") }}"></script>
 @stop

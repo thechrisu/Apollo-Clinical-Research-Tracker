@@ -3,13 +3,15 @@
  * Layout to be used in pages visible to authorised users
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.1
+ * @version 0.0.3
  */
 
+use Apollo\Apollo;
 use Apollo\Helpers\AssetHelper;
-$organisation = \Apollo\Apollo::getInstance()->getUser()->getOrganisationName();
+$organisation = Apollo::getInstance()->getUser()->getOrganisationName();
 
 ?>
 @extends('layouts.basic')
@@ -26,7 +28,7 @@ $organisation = \Apollo\Apollo::getInstance()->getUser()->getOrganisationName();
             @if(isset($breadcrumbs))
                 <div class="panel-heading">
                     <ol class="breadcrumb" id="nav-breadcrumbs">
-                        <li>{{ $organization }}</li>
+                        <li>{{ $organisation }}</li>
                         @foreach($breadcrumbs as $breadcrumb)
                             <li{!! $breadcrumb[2] ? ' class="active"' : '' !!}>
                                 @if($breadcrumb[1] != null)
@@ -46,12 +48,7 @@ $organisation = \Apollo\Apollo::getInstance()->getUser()->getOrganisationName();
     </div>
 @stop
 @section('scripts')
-    <script src="https://use.typekit.net/xfk8ylv.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.7/react.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.7/react-dom.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser.js"></script>
-    <script>try {
-            Typekit.load({async: true});
-        } catch (e) {
-        }</script>
 @stop

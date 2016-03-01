@@ -1,9 +1,9 @@
 /**
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.1
- * TODO fix CSS
+ * @version 0.0.2
  */
 
 
@@ -24,6 +24,7 @@ var PersonRow = React.createClass({
 });
 /**
  * Responsible for creating one table of people
+ * @since 0.0.2 Changed class to className to fix CSS
  * @since 0.0.1
  */
 var PersonTable = React.createClass({
@@ -70,7 +71,7 @@ var PersonTable = React.createClass({
 /**
  * Responsible for handling the pagination and passing the data to the "dumb" PersonTable
  * @since 0.0.1
- * TODO add API integration, add real pagination (with nextpage/lastpage), make it more robust
+ * TODO Chris: add API integration, add real pagination (with nextpage/lastpage), make it more robust
  */
 var PersonTablePagination = React.createClass({
     render: function() {

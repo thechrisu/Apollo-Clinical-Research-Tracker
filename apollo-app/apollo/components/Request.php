@@ -120,7 +120,6 @@ class Request
         }
     }
 
-
     /**
      * Redirects the user to specified url within the app. If $trailing_slash is set to false
      * the trailing slash will not be added, but existing trailing slashes won't be removed

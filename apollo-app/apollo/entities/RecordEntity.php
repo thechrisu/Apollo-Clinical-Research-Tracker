@@ -20,7 +20,7 @@ use Doctrine\ORM\Mapping\OneToMany;
  *
  * @package Apollo\Entities
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  * @Entity @Table("records")
  */
 class RecordEntity
@@ -86,14 +86,13 @@ class RecordEntity
      * @Column(type="boolean")
      * @var bool
      */
-    protected $is_hidden;
+    protected $is_hidden = false;
 
     /**
      * RecordEntity constructor.
      */
     public function __construct()
     {
-        $this->is_hidden = false;
     }
 
 

@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping\OneToMany;
  *
  * @package Apollo\Entities
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  * @Entity @Table("fields")
  */
 class FieldEntity
@@ -54,7 +54,7 @@ class FieldEntity
      * @Column(type="boolean")
      * @var bool
      */
-    protected $has_default;
+    protected $has_default = false;
 
     /**
      * @OneToMany(targetEntity="DefaultEntity", mappedBy="field")
@@ -67,31 +67,27 @@ class FieldEntity
      * @Column(type="boolean")
      * @var bool
      */
-    protected $allow_other;
+    protected $allow_other = false;
 
     /**
      * Determines whether the field allows default values
      * @Column(type="boolean")
      * @var bool
      */
-    protected $is_multiple;
+    protected $is_multiple = false;
 
     /**
      * Determines if record is shown or not
      * @Column(type="boolean")
      * @var bool
      */
-    protected $is_hidden;
+    protected $is_hidden = false;
 
     /**
      * FieldEntity constructor.
      */
     public function __construct()
     {
-        $this->has_default = false;
-        $this->allow_other = false;
-        $this->is_multiple = false;
-        $this->is_hidden = false;
     }
 
 
