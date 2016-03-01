@@ -11,7 +11,6 @@
  * Responsible for one row only
  * @since 0.0.1
  */
-import { Router, Route, Link } from 'react-router'
 
 var PersonRow = React.createClass({
     render: function() {
@@ -35,27 +34,33 @@ var PersonRow = React.createClass({
  */
 var PersonTable = React.createClass({
     render: function() {
-        console.log(this.props.url)
+        console.log(this.props.url);
         var rows = [];
-        this.state.data.forEach(function(product) {
-            if(product.error == null && product.data != null)
-            {
-                rows.push(
-                    <PersonRow
-                        firstname={product.data.firstname}
-                        lastname={product.data.lastname}
-                        email={product.data.email}
-                        phone={product.data.phone}
-                        id={product.data.id}
-                    />
-                );
+        if (this.state.error != null) {
+            console.error(this.state.error.id + ": " + this.state.error.description);
+        } else if (this.state.data == null) {
+            console.error("Product did not get any data.");
+        } else if (this.state.data.data == null) {
+            console.error("Although successfully received JSON, data not defined");
+        } else {
+            if (this.state.data.data != null) {
+                for (var i = 0; i < this.state.data.data.length; i++) {
+                    var product = this.state.data.data[i];
+                    if (product == null) {
+                        console.error("Product unexpectedly not found");
+                    }
+                    rows.push(
+                        <PersonRow
+                            firstname={product.given_name}
+                            lastname={product.last_name}
+                            email={product.email}
+                            phone={product.phone}
+                            id={product.id}
+                        />
+                    );
+                }
             }
-            if(product.error != null)
-                console.log(product.error.id + ": " + product.error.description);
-            if(product.data == null)
-                console.log("Product did not get any data.");
-
-        }.bind(this));
+        }
         return (
             <table className="table table-striped table-hover">
                 <thead>
@@ -73,22 +78,24 @@ var PersonTable = React.createClass({
         );
     },
     loadPeopleFromServer: function() {
+        console.log(this.props.url);
         $.ajax({
             url: this.props.url,
             dataType: 'json',
             type: 'GET',
             success: function(data) {
                 this.setState({data: data});
+                console.log(this.state.data);
             }.bind(this),
             error: function(xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
             }.bind(this)
         });
     },
-    getInitialState() {
+    getInitialState: function() {
         return {data: []};
     },
-    componentDidMount() {
+    componentDidMount: function() {
         this.loadPeopleFromServer();
         setInterval(this.loadPeopleFromServer, this.props.pollInterval);
     }
