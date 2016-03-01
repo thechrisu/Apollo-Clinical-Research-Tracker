@@ -122,20 +122,32 @@ class Apollo
             if (!$request->hasAction()) {
                 $controller->index();
             } elseif (method_exists($controller, $method)) {
-                $arguments_expected = (new ReflectionMethod($controller_namespace, $method))->getNumberOfParameters();
-                $arguments = [];
-                $request_parameters = $request->getParameters();
-                for ($i = 0; $i < $arguments_expected; $i++) {
-                    if($i >= count($request_parameters)) break;
-                    $arguments[$i] = isset($request_parameters[$i]) ? $request_parameters[$i] : null;
-                }
-                call_user_func_array([$controller, $method], $arguments);
+                $this->performAction($controller_namespace, $controller, $request, $method);
             } else {
                 $controller->notFound();
             }
         } else {
             $this->request->error(404, 'Page not found! (Controller <b>' . $controller_name . '</b> not found)');
         }
+    }
+
+    /**
+     * Calls the appropriate method in the appropriate Controller to carry out the appropriate action, specified by the URL
+     * @param $controller_namespace
+     * @param $controller
+     * @param $request
+     * @param $method
+     */
+    private function performAction($controller_namespace, $controller, $request, $method)
+    {
+        $arguments_expected = (new ReflectionMethod($controller_namespace, $method))->getNumberOfParameters();
+        $arguments = [];
+        $request_parameters = $request->getParameters();
+        for ($i = 0; $i < $arguments_expected; $i++) {
+            if ($i >= count($request_parameters)) break;
+            $arguments[$i] = isset($request_parameters[$i]) ? $request_parameters[$i] : null;
+        }
+        call_user_func_array([$controller, $method], $arguments);
     }
 
     /**
@@ -161,4 +173,5 @@ class Apollo
     {
         return $this->user;
     }
+
 }

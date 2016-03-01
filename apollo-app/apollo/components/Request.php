@@ -16,6 +16,7 @@ use Apollo\Helpers\URLHelper;
  * Class Request
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @version 0.0.8
  */
 class Request
@@ -83,6 +84,7 @@ class Request
      * underscores "_" and full stops "." are allowed.
      *
      * @param string $url
+     * @since 0.0.7 extracted addBaseParameter
      * @since 0.0.6 Refactored url parsing, regex now allows more symbols for parameters
      * @since 0.0.4 Now properly converts lisp-case to PascalCase
      * @since 0.0.3 Added query support
@@ -100,8 +102,7 @@ class Request
             $url_part = $this->url_parts[$i];
             if($i < 2) {
                 if(preg_match('/^[A-Za-z0-9\-]+$/', $url_part) === 1) {
-                    $value = StringHelper::lispCaseToPascalCase($url_part);
-                    $i == 0 ? $this->controller = $value : $this->action = $value;
+                    $this->addBaseParameter($i, $url_part);
                 } else {
                     $this->valid = false;
                     break;
@@ -117,6 +118,21 @@ class Request
         }
         if(empty($this->controller) && $this->valid) {
             $this->index = true;
+        }
+    }
+
+    /**
+     * Adds the parameter to the appropriate object
+     * @param $index
+     * @param $url_part
+     * @since 0.0.1
+     */
+    private function addBaseParameter($index, $url_part){
+        $paramValue = StringHelper::lispCaseToPascalCase($url_part);
+        if ($index == 0){
+            $this->controller = $paramValue;
+        } else {
+            $this->action = $paramValue;
         }
     }
 
