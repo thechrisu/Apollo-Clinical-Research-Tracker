@@ -3,9 +3,10 @@
  * Layout to be used in pages visible to authorised users
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.1
+ * @version 0.0.3
  */
 
 use Apollo\Apollo;
