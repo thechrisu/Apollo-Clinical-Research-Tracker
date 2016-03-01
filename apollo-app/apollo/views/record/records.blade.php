@@ -55,5 +55,8 @@ use Apollo\Helpers\AssetHelper;
             </li>
         </ul>
     </nav>
-    <script type="text/babel" src="{{ AssetHelper::js("PersonTablePagination") }}" />
+@stop
+@section('scripts')
+    @parent
+    <script type="text/babel" src="{{ AssetHelper::js("PersonTablePagination") }}"></script>
 @stop
