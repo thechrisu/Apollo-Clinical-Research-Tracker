@@ -10,16 +10,18 @@
 var PersonRow = React.createClass({
     render: function() {
         return (
-            <tr>
+            <tr onClick={this.handleClick}>
                 <td>{this.props.firstname}</td>
                 <td>{this.props.lastname}</td>
                 <td>{this.props.email}</td>
                 <td>{this.props.phone}</td>
             </tr>
         );
+    },
+    handleClick: function(event) {
+        window.location.href='records/' + this.props.id;
     }
 });
-
 /**
  * Responsible for creating one table of people
  * @since 0.0.1
@@ -36,6 +38,7 @@ var PersonTable = React.createClass({
                         lastname={product.data.lastname}
                         email={product.data.email}
                         phone={product.data.phone}
+                        id={product.data.id}
                     />
                 );
             }
@@ -46,7 +49,7 @@ var PersonTable = React.createClass({
 
         }.bind(this));
         return (
-            <table class="table table-striped table-hover">
+            <table className="table table-striped table-hover">
                 <thead>
                 <tr>
                     <th>First name</th>
@@ -62,6 +65,7 @@ var PersonTable = React.createClass({
         );
     }
 });
+
 
 /**
  * Responsible for handling the pagination and passing the data to the "dumb" PersonTable
@@ -82,7 +86,8 @@ var PersonTablePagination = React.createClass({
                     "firstname": "Peter",
                     "lastname": "Parker",
                     "email": "spider@man.com",
-                    "phone": "+1 23456789"
+                    "phone": "+1 23456789",
+                    "id": 532
                 }
             },
             {
@@ -91,7 +96,8 @@ var PersonTablePagination = React.createClass({
                     "firstname": "Christoph",
                     "lastname": "Ulshoefer",
                     "email": "christophsulshoefer@gmail.com",
-                    "phone": "0133723666"
+                    "phone": "0133723666",
+                    "id": 1337
                 }
             },
             {
@@ -100,7 +106,8 @@ var PersonTablePagination = React.createClass({
                     "firstname": "Dummy",
                     "lastname": "Person",
                     "email": "lorem@ipsum.com",
-                    "phone": "+4 5125218051"
+                    "phone": "+4 5125218051",
+                    "id": 7001
                 }
             }
         ]})
@@ -112,7 +119,6 @@ var PersonTablePagination = React.createClass({
         this.loadPeopleFromServer();
         setInterval(this.loadPeopleFromServer, this.props.pollInterval);
     }
-
 });
 
 ReactDOM.render(
