@@ -65,7 +65,7 @@ class View
      * @param string $title
      * @param array $breadcrumbs
      * @param array $parameters
-     * @since 0.0.3 finally made use of the getView() method
+     * @since 0.0.3 Finally made use of the getView() method
      * @since 0.0.2
      */
     public static function render($page, $title = null, $breadcrumbs = null, $parameters = [])
