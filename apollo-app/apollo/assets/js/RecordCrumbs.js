@@ -12,16 +12,7 @@
 var PersonCrumbs = React.createClass({
     render: function(){
         return(
-            <div className="panel-heading">
-                <a href="edit.php" className="btn btn-primary btn-sm pull-right"><span className="glyphicon glyphicon-pencil"
-                                                                                   aria-hidden="true"></span> &nbsp;&nbsp;&nbsp;Edit
-                    this record</a>
-                <ol className="breadcrumb" id="nav-breadcrumbs">
-                    <li>Apollo</li>
-                    <li><a href="record.php">Records</a></li>
-                    <li className="active"><i>Record #531</i> Charlotte Warren-Gash</li>
-                </ol>
-            </div>
+
         );
     },
     loadRecordsFromServer: function() {

@@ -9,7 +9,6 @@ use Apollo\Helpers\AssetHelper;
 ?>
 @extends('layouts.extended')
 @section('content')
-
     <div class="alert alert-success alert-dismissable">
 
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -30,6 +29,5 @@ use Apollo\Helpers\AssetHelper;
 @stop
 @section('scripts')
     @parent
-    <script type="text/babel" src="{{ AssetHelper::js("RecordCrumbs") }}"></script>
-    <script type="text/babel" src="{{ AssetHelper::js("RecordView") }}"></script>
+    <script src="{{ AssetHelper::js('app/record/single') }}"></script>
 @stop

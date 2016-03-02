@@ -28,7 +28,7 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
             @if(isset($breadcrumbs))
                 <div class="panel-heading" id="breadcrumbHeader">
                     <ol class="breadcrumb" id="nav-breadcrumbs">
-                        <li>{{ $organisation }}</li>
+                        <li id="organisation">{{ $organisation }}</li>
                         @foreach($breadcrumbs as $breadcrumb)
                             <li{!! $breadcrumb[2] ? ' class="active"' : '' !!}>
                                 @if($breadcrumb[1] != null)
