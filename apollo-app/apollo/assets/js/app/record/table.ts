@@ -1,11 +1,20 @@
 ///<reference path="../ajax.ts"/>
 
 $(document).ready(function() {
+    var pagination = $('#pagination');
+    pagination.pagination({
+            items: 0,
+            itemsOnPage: 10,
+            onPageClick: function(page, event) {
+                updateTable(page);
+            }
+        });
     updateTable(1);
     function updateTable(page: number) {
         ajaxGet(location.origin + '/api/get/records/?page=' + page, function(data) {
             var table = $('#table-body');
             table.html('');
+            pagination.pagination('updateItems', data.count);
             for(var i = 0; i < data.data.length; i++) {
                 var record = data.data[i];
                 var tr = $('<tr style="cursor: pointer" class="record-tr" data-id="' + record.id +'"></tr>');
@@ -19,11 +28,6 @@ $(document).ready(function() {
             alert('Error! ' + message);
         });
     }
-    $('#pagination').on('click', 'a', function() {
-        var that = $(this);
-        var _page = parseInt(that.text());
-        updateTable(_page);
-    });
     $('#table-body').on('click', '.record-tr', function() {
         var that = $(this);
         window.location = location.origin + '/record/view/' + that.data('id') + '/';
