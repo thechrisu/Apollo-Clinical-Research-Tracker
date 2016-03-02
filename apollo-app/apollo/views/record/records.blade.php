@@ -7,6 +7,7 @@
  * @version 0.0.3
  */
 use Apollo\Helpers\AssetHelper;
+
 ?>
 @extends('layouts.extended')
 @section('content')
@@ -32,18 +33,29 @@ use Apollo\Helpers\AssetHelper;
             <a href="add.php" class="btn btn-default btn-block">Add a record</a>
         </div>
     </div>
-    <div class="table-responsive top-buffer" id="personTable">
-
+    <div class="table-responsive top-buffer">
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th>Given name</th>
+                <th>Last name</th>
+                <th>Email</th>
+                <th>Phone</th>
+            </tr>
+            </thead>
+            <tbody id="table-body">
+            </tbody>
+        </table>
     </div>
     <nav class="text-center">
-        <ul class="pagination">
+        <ul class="pagination" id="pagination">
             <li>
                 <a href="#" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             <li class="active"><a href="#">1</a></li>
-            <li><a href="">2</a></li>
+            <li><a href="#">2</a></li>
             <li><a href="#">3</a></li>
             <li><a href="#">4</a></li>
             <li><a href="#">5</a></li>
@@ -57,5 +69,5 @@ use Apollo\Helpers\AssetHelper;
 @stop
 @section('scripts')
     @parent
-    <script type="text/babel" src="{{ AssetHelper::js("PersonTable") }}"></script>
+    <script src="{{ AssetHelper::js('record/table') }}"></script>
 @stop
