@@ -87,7 +87,8 @@ class ApiController extends GenericController
         for($i = 10 * ($page - 1); $i < ($upper_bound > $data['count'] ? $data['count'] : $upper_bound); $i++) {
             $record = $all_people[$i];
             $recordID = DB::getEntityManager()
-                ->createQuery('SELECT u.id FROM Apollo\\Entities\\RecordEntity u WHERE u.is_hidden = 0 ORDER BY u.created_on DESC');
+                ->createQuery('SELECT u.id FROM Apollo\\Entities\\RecordEntity u WHERE u.person = :person_id AND u.is_hidden = 0 ORDER BY u.created_on DESC');
+            $recordID->setParameter('person_id', $record['id']);
             $recordID = $recordID->getResult()[0]['id'];
             $phone = DB::getEntityManager()->createQuery("SELECT u._varchar FROM Apollo\\Entities\\DataEntity u WHERE u.record = :record_id AND u.field = 1");
             $phone->setParameter('record_id', $recordID);
