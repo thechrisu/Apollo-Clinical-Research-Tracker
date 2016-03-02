@@ -31,13 +31,13 @@ class DataEntity
 
     /**
      * @ManyToOne(targetEntity="RecordEntity", inversedBy="data")
-     * @var int
+     * @var RecordEntity
      */
     protected $record;
 
     /**
      * @ManyToOne(targetEntity="FieldEntity")
-     * @var int
+     * @var FieldEntity
      */
     protected $field;
 
@@ -81,7 +81,7 @@ class DataEntity
      * @Column(type="datetime")
      * @var DateTime
      */
-    protected $last_update;
+    protected $updated_on;
 
     /**
      * @ManyToOne(targetEntity="UserEntity")
@@ -112,7 +112,7 @@ class DataEntity
     }
 
     /**
-     * @return int
+     * @return RecordEntity
      */
     public function getRecord()
     {
@@ -120,7 +120,7 @@ class DataEntity
     }
 
     /**
-     * @param int $record
+     * @param RecordEntity $record
      */
     public function setRecord($record)
     {
@@ -128,7 +128,7 @@ class DataEntity
     }
 
     /**
-     * @return int
+     * @return FieldEntity
      */
     public function getField()
     {
@@ -136,7 +136,7 @@ class DataEntity
     }
 
     /**
-     * @param int $field
+     * @param FieldEntity $field
      */
     public function setField($field)
     {
@@ -256,7 +256,7 @@ class DataEntity
     }
 
     /**
-     * @return int
+     * @return UserEntity
      */
     public function getUpdatedBy()
     {
@@ -264,7 +264,7 @@ class DataEntity
     }
 
     /**
-     * @param int $updated_by
+     * @param UserEntity $updated_by
      */
     public function setUpdatedBy($updated_by)
     {
