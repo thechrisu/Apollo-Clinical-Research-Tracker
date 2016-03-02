@@ -55,7 +55,7 @@ class PersonEntity
     /**
      * Organisation object
      * @ManyToOne(targetEntity="OrganisationEntity")
-     * @var int
+     * @var OrganisationEntity
      */
     protected $organisation;
 
