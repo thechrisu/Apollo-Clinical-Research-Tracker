@@ -1,3 +1,9 @@
+/**
+ * Performs a GET request to the specified URL, executes the specified functions
+ * @param url
+ * @param successCallback
+ * @param errorCallback
+ */
 function ajaxGet(url, successCallback, errorCallback) {
     $.ajax({
         url: url,
@@ -15,4 +21,25 @@ function ajaxGet(url, successCallback, errorCallback) {
             errorCallback(err.toString());
         }.bind(this)
     });
+}
+/**
+ * Mimics a GET request, with the data already provided as a function argument. The idea is to provide a quick way of
+ * testing views with dummy data if the API is not ready yet.
+ * Note that his function requires an "error" object set to null to execute the successCallback.
+ * Also note that this function should never be called in production code
+ * @param data
+ * @param successCallback
+ * @param errorCallback
+ */
+function fakeajaxGet(data, successCallback, errorCallback) {
+    //var data = JSON.parse(toDecode);
+    call(data);
+    function call(data) {
+        if (data.error == null) {
+            successCallback(data);
+        }
+        else {
+            errorCallback(data.error.description);
+        }
+    }
 }
