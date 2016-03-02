@@ -7,6 +7,7 @@
 
 /**
  * Responsible for displaying a single record.
+ * TODO: Implement rest of details, fix display (should do nice columns)
  */
 
 obj: fakeJSON_obj = {
@@ -17,7 +18,7 @@ obj: fakeJSON_obj = {
         "email": "iLove@moneypenny.co.uk",
         "phone": "+44 007",
         "record_number": 7,
-        "record_name": "Her majesty's secret weapon",
+        "record_name": "Record name",
         "record_ids": [1, 2, 3, 4, 7, 1729],
         "record_names": ["something", "something other", "secret", "GOSH", "top secret", "joke"]
     },
@@ -76,27 +77,10 @@ $(document).ready(function () {
     fakeajaxGet(fakeJSON, function (data) {
         console.log("Success");
         var fullName = data.essential.given_name + ' ' + data.essential.last_name;
-        updateBreadcrumbs(fullName, data.essential.record_number, data.essential.record_name, data.essential.record_names, data.essential.record_ids);
+        updateBreadcrumbs(fullName, data.essential.record_name, data.essential.record_names, data.essential.record_ids);
+        displayEssentialInfo(data.essential);
       /*  to parse
 
-      <div class="row">
-        <div class="col-md-3">
-        <img src="images/record.png" class="img-thumbnail">
-        </div>
-        <div class="col-md-5">
-            <h3>Charlotte
-            <small>First Name</small>
-        </h3>
-        <h3>Warren-Gash
-        <small>Surname</small>
-        </h3>
-        <h3>c.warren-gash@ucl.ac.uk
-            <small>Email</small>
-        </h3>
-        <h3>07894 664 278
-        <small>Phone</small>
-        </h3>
-        </div>
         <div class="col-md-4">
             <h3>
                 <small>Address:</small>
@@ -309,19 +293,20 @@ $(document).ready(function () {
 
     });
 
-    function updateBreadcrumbs(personName, recordId, recordName, recordNames, recordIds) {
-        setTitle(personName, recordId);
+    function updateBreadcrumbs(personName, recordName, recordNames, recordIds) {
+        setTitle(personName, recordName);
         var bc = $('#nav-breadcrumbs');
         //bc.html('');
         bc.append("<li>" + personName + "</li>");
         var links = getLinks(recordNames, recordIds, path);
         var dd = getDropdownWithItems(links);
         bc.append(dd);
-        bc.append("<h1>" + recordName + "</h1>");
+        bc.append('<br>');
+        bc.append("<h1 style='display: inline'>" + recordName + "</h1><h6 style='display: inline'>" + personName + "</h6>");
     };
 
     function getRecordFromServer(recordId) {
-
+        //TODO put the ajax request in here, extract the logic in it into separate functions
     };
 
     function getDropdownWithItems(items) {
@@ -338,14 +323,16 @@ $(document).ready(function () {
         return dropdown;
     };
 
-    function setTitle(personName, personId) {
-        document.title = "Record #" + personId + " | " + personName;
-    };
+    function displayEssentialInfo(data){
+        var g = $('#recordGeneric');
+        g.append("<div className='col-md-4'><h3>" + data.given_name + ' ' + data.last_name + "</h3></div><small>Name</small>");
+        g.append("<div className='col-md-3'><h3>" + data.email + "</h3></div><small>email</small>");
+        g.append("<div className='col-md-3'><h3>" + data.phone + "</h3></div><small>phone</small>");
+        g.append("<div className='col-md-2'><h3>" + data.record_name + "</h3></div><small>record name</small>");
+    }
 
-    function getOrgName() {
-        var orgLi = $('#organisation');
-        var orgLiHTML = orgLi.html();
-        return orgLiHTML.toString();
+    function setTitle(personName, recordName) {
+        document.title = personName + ' | ' + recordName;
     };
 
     function getLinks(names, recordItems, path) {
