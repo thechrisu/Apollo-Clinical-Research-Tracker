@@ -20,7 +20,7 @@ use Doctrine\ORM\Mapping\OneToMany;
  *
  * @package Apollo\Entities
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  * @Entity @Table("records")
  */
 class RecordEntity
@@ -35,7 +35,7 @@ class RecordEntity
     /**
      * The person the record belongs to
      * @ManyToOne(targetEntity="PersonEntity", inversedBy="records")
-     * @var int
+     * @var PersonEntity
      */
     protected $person;
 
@@ -73,7 +73,7 @@ class RecordEntity
      * @Column(type="datetime")
      * @var DateTime
      */
-    protected $last_update;
+    protected $updated_on;
 
     /**
      * @ManyToOne(targetEntity="UserEntity")
@@ -95,7 +95,6 @@ class RecordEntity
     {
     }
 
-
     /**
      * @return int
      */
@@ -105,7 +104,7 @@ class RecordEntity
     }
 
     /**
-     * @return int
+     * @return PersonEntity
      */
     public function getPerson()
     {
@@ -113,7 +112,7 @@ class RecordEntity
     }
 
     /**
-     * @param int $person
+     * @param PersonEntity $person
      */
     public function setPerson($person)
     {
@@ -203,17 +202,17 @@ class RecordEntity
     /**
      * @return DateTime
      */
-    public function getLastUpdate()
+    public function getUpdatedOn()
     {
-        return $this->last_update;
+        return $this->updated_on;
     }
 
     /**
-     * @param DateTime $last_update
+     * @param DateTime $updated_on
      */
-    public function setLastUpdate($last_update)
+    public function setUpdatedOn($updated_on)
     {
-        $this->last_update = $last_update;
+        $this->updated_on = $updated_on;
     }
 
     /**

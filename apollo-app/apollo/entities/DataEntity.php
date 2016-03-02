@@ -31,13 +31,13 @@ class DataEntity
 
     /**
      * @ManyToOne(targetEntity="RecordEntity", inversedBy="data")
-     * @var int
+     * @var RecordEntity
      */
     protected $record;
 
     /**
      * @ManyToOne(targetEntity="FieldEntity")
-     * @var int
+     * @var FieldEntity
      */
     protected $field;
 
@@ -45,25 +45,25 @@ class DataEntity
      * @Column(type="integer")
      * @var int
      */
-    protected $int;
+    protected $_int;
 
     /**
      * @Column(type="string")
      * @var string
      */
-    protected $varchar;
+    protected $_varchar;
 
     /**
      * @Column(type="datetime")
      * @var DateTime
      */
-    protected $date_time;
+    protected $_date_time;
 
     /**
      * @Column(type="text")
      * @var string
      */
-    protected $long_text;
+    protected $_long_text;
 
     /**
      * @Column(type="datetime")
@@ -81,7 +81,7 @@ class DataEntity
      * @Column(type="datetime")
      * @var DateTime
      */
-    protected $last_update;
+    protected $updated_on;
 
     /**
      * @ManyToOne(targetEntity="UserEntity")
@@ -93,14 +93,20 @@ class DataEntity
      * @Column(type="boolean")
      * @var bool
      */
-    protected $is_default;
+    protected $is_default = false;
 
     /**
      * DataEntity constructor.
      */
     public function __construct()
     {
-        $this->is_default = false;
+        $date = new DateTime();
+        $this->_int = 0;
+        $this->_date_time = $date;
+        $this->_long_text = "";
+        $this->start_date = $date;
+        $this->end_date = $date;
+        $this->updated_on = $date;
     }
 
     /**
@@ -112,7 +118,7 @@ class DataEntity
     }
 
     /**
-     * @return int
+     * @return RecordEntity
      */
     public function getRecord()
     {
@@ -120,7 +126,7 @@ class DataEntity
     }
 
     /**
-     * @param int $record
+     * @param RecordEntity $record
      */
     public function setRecord($record)
     {
@@ -128,7 +134,7 @@ class DataEntity
     }
 
     /**
-     * @return int
+     * @return FieldEntity
      */
     public function getField()
     {
@@ -136,7 +142,7 @@ class DataEntity
     }
 
     /**
-     * @param int $field
+     * @param FieldEntity $field
      */
     public function setField($field)
     {
@@ -148,15 +154,15 @@ class DataEntity
      */
     public function getInt()
     {
-        return $this->int;
+        return $this->_int;
     }
 
     /**
-     * @param int $int
+     * @param int $_int
      */
-    public function setInt($int)
+    public function setInt($_int)
     {
-        $this->int = $int;
+        $this->_int = $_int;
     }
 
     /**
@@ -164,15 +170,15 @@ class DataEntity
      */
     public function getVarchar()
     {
-        return $this->varchar;
+        return $this->_varchar;
     }
 
     /**
-     * @param string $varchar
+     * @param string $_varchar
      */
-    public function setVarchar($varchar)
+    public function setVarchar($_varchar)
     {
-        $this->varchar = $varchar;
+        $this->_varchar = $_varchar;
     }
 
     /**
@@ -180,15 +186,15 @@ class DataEntity
      */
     public function getDateTime()
     {
-        return $this->date_time;
+        return $this->_date_time;
     }
 
     /**
-     * @param DateTime $date_time
+     * @param DateTime $_date_time
      */
-    public function setDateTime($date_time)
+    public function setDateTime($_date_time)
     {
-        $this->date_time = $date_time;
+        $this->_date_time = $_date_time;
     }
 
     /**
@@ -196,15 +202,15 @@ class DataEntity
      */
     public function getLongText()
     {
-        return $this->long_text;
+        return $this->_long_text;
     }
 
     /**
-     * @param string $long_text
+     * @param string $_long_text
      */
-    public function setLongText($long_text)
+    public function setLongText($_long_text)
     {
-        $this->long_text = $long_text;
+        $this->_long_text = $_long_text;
     }
 
     /**
@@ -242,21 +248,21 @@ class DataEntity
     /**
      * @return DateTime
      */
-    public function getLastUpdate()
+    public function getUpdatedOn()
     {
-        return $this->last_update;
+        return $this->updated_on;
     }
 
     /**
-     * @param DateTime $last_update
+     * @param DateTime $updated_on
      */
-    public function setLastUpdate($last_update)
+    public function setUpdatedOn($updated_on)
     {
-        $this->last_update = $last_update;
+        $this->updated_on = $updated_on;
     }
 
     /**
-     * @return int
+     * @return UserEntity
      */
     public function getUpdatedBy()
     {
@@ -264,7 +270,7 @@ class DataEntity
     }
 
     /**
-     * @param int $updated_by
+     * @param UserEntity $updated_by
      */
     public function setUpdatedBy($updated_by)
     {
