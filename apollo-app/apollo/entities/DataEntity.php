@@ -242,17 +242,17 @@ class DataEntity
     /**
      * @return DateTime
      */
-    public function getLastUpdate()
+    public function getUpdatedOn()
     {
-        return $this->last_update;
+        return $this->updated_on;
     }
 
     /**
-     * @param DateTime $last_update
+     * @param DateTime $updated_on
      */
-    public function setLastUpdate($last_update)
+    public function setUpdatedOn($updated_on)
     {
-        $this->last_update = $last_update;
+        $this->updated_on = $updated_on;
     }
 
     /**
