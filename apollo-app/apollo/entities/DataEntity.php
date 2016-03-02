@@ -93,14 +93,19 @@ class DataEntity
      * @Column(type="boolean")
      * @var bool
      */
-    protected $is_default;
+    protected $is_default = false;
 
     /**
      * DataEntity constructor.
      */
     public function __construct()
     {
-        $this->is_default = false;
+        $date = new DateTime();
+        $this->int = 0;
+        $this->date_time = $date;
+        $this->start_date = $date;
+        $this->end_date = $date;
+        $this->updated_on = $date;
     }
 
     /**
