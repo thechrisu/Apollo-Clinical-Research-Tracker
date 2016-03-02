@@ -1,16 +1,26 @@
 ///<reference path="../ajax.ts"/>
+///<reference path="../scripts.ts"/>
+/**
+ * Scripts file containing functions related to modal windows
+ *
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @copyright 2016
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ * @version 0.0.2
+ */
 $(document).ready(function () {
     var pagination = $('#pagination');
     pagination.pagination({
         items: 0,
         itemsOnPage: 10,
         onPageClick: function (page, event) {
+            event.preventDefault();
             updateTable(page);
         }
     });
     updateTable(1);
     function updateTable(page) {
-        ajaxGet(location.origin + '/api/get/records/?page=' + page, function (data) {
+        AJAX.get(url('api/get/records/?page=' + page, false), function (data) {
             var table = $('#table-body');
             table.html('');
             pagination.pagination('updateItems', data.count);
@@ -24,11 +34,11 @@ $(document).ready(function () {
                 table.append(tr);
             }
         }, function (message) {
-            alert('Error! ' + message);
+            error('An error has occurred during the loading of the list of records. Please reload the page or contact the administrator.');
         });
     }
     $('#table-body').on('click', '.record-tr', function () {
         var that = $(this);
-        window.location = location.origin + '/record/view/' + that.data('id') + '/';
+        location.href = url('record/view/' + that.data('id'));
     });
 });

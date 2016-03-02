@@ -46,6 +46,23 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="error-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">An error has occrurred</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="error-message"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Dismiss</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 @stop
 @section('scripts')
     <script src="{{ AssetHelper::js('app/scripts') }}"></script>
