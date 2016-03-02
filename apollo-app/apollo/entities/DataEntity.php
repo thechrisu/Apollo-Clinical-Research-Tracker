@@ -45,25 +45,25 @@ class DataEntity
      * @Column(type="integer")
      * @var int
      */
-    protected $int;
+    protected $_int;
 
     /**
      * @Column(type="string")
      * @var string
      */
-    protected $varchar;
+    protected $_varchar;
 
     /**
      * @Column(type="datetime")
      * @var DateTime
      */
-    protected $date_time;
+    protected $_date_time;
 
     /**
      * @Column(type="text")
      * @var string
      */
-    protected $long_text;
+    protected $_long_text;
 
     /**
      * @Column(type="datetime")
@@ -101,8 +101,9 @@ class DataEntity
     public function __construct()
     {
         $date = new DateTime();
-        $this->int = 0;
-        $this->date_time = $date;
+        $this->_int = 0;
+        $this->_date_time = $date;
+        $this->_long_text = "";
         $this->start_date = $date;
         $this->end_date = $date;
         $this->updated_on = $date;
@@ -153,15 +154,15 @@ class DataEntity
      */
     public function getInt()
     {
-        return $this->int;
+        return $this->_int;
     }
 
     /**
-     * @param int $int
+     * @param int $_int
      */
-    public function setInt($int)
+    public function setInt($_int)
     {
-        $this->int = $int;
+        $this->_int = $_int;
     }
 
     /**
@@ -169,15 +170,15 @@ class DataEntity
      */
     public function getVarchar()
     {
-        return $this->varchar;
+        return $this->_varchar;
     }
 
     /**
-     * @param string $varchar
+     * @param string $_varchar
      */
-    public function setVarchar($varchar)
+    public function setVarchar($_varchar)
     {
-        $this->varchar = $varchar;
+        $this->_varchar = $_varchar;
     }
 
     /**
@@ -185,15 +186,15 @@ class DataEntity
      */
     public function getDateTime()
     {
-        return $this->date_time;
+        return $this->_date_time;
     }
 
     /**
-     * @param DateTime $date_time
+     * @param DateTime $_date_time
      */
-    public function setDateTime($date_time)
+    public function setDateTime($_date_time)
     {
-        $this->date_time = $date_time;
+        $this->_date_time = $_date_time;
     }
 
     /**
@@ -201,15 +202,15 @@ class DataEntity
      */
     public function getLongText()
     {
-        return $this->long_text;
+        return $this->_long_text;
     }
 
     /**
-     * @param string $long_text
+     * @param string $_long_text
      */
-    public function setLongText($long_text)
+    public function setLongText($_long_text)
     {
-        $this->long_text = $long_text;
+        $this->_long_text = $_long_text;
     }
 
     /**
