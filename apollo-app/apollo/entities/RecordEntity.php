@@ -35,7 +35,7 @@ class RecordEntity
     /**
      * The person the record belongs to
      * @ManyToOne(targetEntity="PersonEntity", inversedBy="records")
-     * @var int
+     * @var PersonEntity
      */
     protected $person;
 
@@ -105,7 +105,7 @@ class RecordEntity
     }
 
     /**
-     * @return int
+     * @return PersonEntity
      */
     public function getPerson()
     {
@@ -113,7 +113,7 @@ class RecordEntity
     }
 
     /**
-     * @param int $person
+     * @param PersonEntity $person
      */
     public function setPerson($person)
     {
