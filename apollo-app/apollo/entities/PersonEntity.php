@@ -135,7 +135,7 @@ class PersonEntity
     }
 
     /**
-     * @return int
+     * @return OrganisationEntity
      */
     public function getOrganisation()
     {
@@ -143,7 +143,7 @@ class PersonEntity
     }
 
     /**
-     * @param int $organisation
+     * @param OrganisationEntity $organisation
      */
     public function setOrganisation($organisation)
     {
