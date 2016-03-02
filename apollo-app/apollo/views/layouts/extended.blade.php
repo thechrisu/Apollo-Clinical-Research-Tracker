@@ -50,6 +50,7 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
 @section('scripts')
     <script src="{{ AssetHelper::js('app/scripts') }}"></script>
     <script src="{{ AssetHelper::js('app/ajax') }}"></script>
+    <script src="{{ AssetHelper::js('plugins/jquery.simplePagination') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.7/react.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.7/react-dom.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser.js"></script>
