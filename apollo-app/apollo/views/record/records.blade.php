@@ -69,5 +69,5 @@ use Apollo\Helpers\AssetHelper;
 @stop
 @section('scripts')
     @parent
-    <script src="{{ AssetHelper::js('record/table') }}"></script>
+    <script src="{{ AssetHelper::js('app/record/table') }}"></script>
 @stop
