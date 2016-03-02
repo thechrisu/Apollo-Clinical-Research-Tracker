@@ -4,7 +4,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.3
+ * @version 0.0.4
  */
 use Apollo\Helpers\AssetHelper;
 
@@ -17,8 +17,8 @@ use Apollo\Helpers\AssetHelper;
         <li role="presentation"><a href="#">Recently added</a></li>
         <li role="presentation"><a href="#">Recently updated</a></li>
     </ul>
-    <div class="row top-buffer">
-        <div class="col-md-8">
+    <div class="row">
+        <div class="col-lg-8 col-md-6 col-sx-12 top-buffer">
             <div class="input-group">
                         <span class="input-group-addon" id="basic-addon2"><span
                                     class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
@@ -26,10 +26,10 @@ use Apollo\Helpers\AssetHelper;
                        aria-label="Quick Search">
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-lg-2 col-md-3 col-sm-6 col-sx-12 top-buffer">
             <a href="search.php" class="btn btn-default btn-block">Advanced search</a>
         </div>
-        <div class="col-md-2">
+        <div class="col-lg-2 col-md-3 col-sm-6 col-sx-12 top-buffer">
             <a href="add.php" class="btn btn-default btn-block">Add a record</a>
         </div>
     </div>
