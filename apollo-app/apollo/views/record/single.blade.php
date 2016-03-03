@@ -10,18 +10,6 @@ use Apollo\Helpers\AssetHelper;
 ?>
 @extends('layouts.extended')
 @section('content')
-    <div class="alert alert-success alert-dismissable">
-
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-
-        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-
-        &nbsp;&nbsp;&nbsp;&nbsp;You have successfully updated the record #531 belonging to Charlotte
-        Warren-Gash.
-
-    </div>
 
     <div className="panel-body">
         <div className="row" id="recordGeneric">
