@@ -21,7 +21,7 @@ $(document).ready(function () {
     });
     updateTable(1);
     function updateTable(page:number) {
-        AJAX.get(url('api/get/records/?page=' + page, false), function (data) {
+        AJAX.get(url('get/records/?page=' + page, false), function (data) {
             var table = $('#table-body');
             table.html('');
             pagination.pagination('updateItems', data.count);
@@ -35,7 +35,7 @@ $(document).ready(function () {
                 table.append(tr);
             }
         }, function (message:string) {
-            error('An error has occurred during the loading of the list of records. Please reload the page or contact the administrator.');
+            error('An error has occurred during the loading of the list of records. Please reload the page or contact the administrator. Error message: ' + message);
         });
     }
 

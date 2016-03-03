@@ -9,8 +9,11 @@
 namespace Apollo\Controllers;
 
 use Apollo\Apollo;
+use Apollo\Entities\PersonEntity;
 use Apollo\Components\DB;
 use Apollo\Components\Person;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Query\Expr\Join;
 
 
 /**
@@ -44,21 +47,51 @@ class GetController extends GenericController
         $em = DB::getEntityManager();
         $data = $this->parseRequest(['page' => 1, 'sort' => 1, 'search' => null]);
         $page = $data['page'] > 0 ? $data['page'] : 1;
-        $sort = '';
-        switch ($data['sort']) {
-            case 2:
-                $sort = '';
-                break;
-        }
 
         $peopleRepo = $em->getRepository(Person::getEntityNamespace());
-        $peopleQB = $peopleRepo->createQueryBuilder('p');
-        $peopleQB->leftJoin('p.records', 'r');
-        $peopleQB->where('p.organisation = ' . Apollo::getInstance()->getUser()->getOrganisationId());
-        $peopleQB->where('p.is_hidden = 1');
+        $peopleQB = $peopleRepo->createQueryBuilder('person');
+        $peopleQB->innerJoin('person.records', 'record');
+        $peopleQB->where('person.organisation = ' . Apollo::getInstance()->getUser()->getOrganisationId());
+        $peopleQB->andWhere('person.is_hidden = 0');
+        switch ($data['sort']) {
+            // Recently added
+            case 2:
+                $peopleQB->orderBy('record.created_on', 'DESC');
+                break;
+            // Recently updated
+            case 3:
+                $peopleQB->orderBy('record.updated_on', 'DESC');
+                break;
+            // All records
+            default:
+                $peopleQB->orderBy('person.given_name', 'ASC');
+                $peopleQB->addOrderBy('person.middle_name', 'ASC');
+                $peopleQB->addOrderBy('person.last_name', 'ASC');
+        }
         $peopleQuery = $peopleQB->getQuery();
-        echo '<pre>';
-        var_dump($peopleQuery->getResult());
+        $people =  $peopleQuery->getResult();
+        $response['error'] = null;
+        $response['count'] = count($people);
+        /**
+         * @var PersonEntity $person
+         */
+        for($i = 10 * ($page - 1); $i < min($response['count'], $page * 10); $i++) {
+            $person = $people[$i];
+            $responsePerson = [];
+            $personRecords = $person->getRecords();
+            if(count($personRecords) < 1) {
+                $response['error'] = ['id' => 1, 'description' => 'Person #' . $person->getId() . ' has 0 records!'];
+            } else {
+                $recentRecord = $person->getRecords()[0];
+                $responsePerson['id'] = $recentRecord->getId();
+                $responsePerson['given_name'] = $person->getGivenName();
+                $responsePerson['last_name'] = $person->getLastName();
+                $responsePerson['phone'] = $recentRecord->getData()[0]->getVarchar();
+                $responsePerson['email'] = $recentRecord->getData()[1]->getVarchar();
+                $response['data'][] = $responsePerson;
+            }
+        }gfi
+        echo json_encode($response);
     }
 
     /**
