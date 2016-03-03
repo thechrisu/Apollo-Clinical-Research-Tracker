@@ -6,21 +6,24 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.2
+ * @version 0.0.3
  */
 $(document).ready(function () {
     var pagination = $('#pagination');
+    var page = 1;
+    var sort = 1;
     pagination.pagination({
         items: 0,
         itemsOnPage: 10,
-        onPageClick: function (page, event) {
+        onPageClick: function (_page, event) {
             event.preventDefault();
-            updateTable(page);
+            page = _page;
+            updateTable();
         }
     });
-    updateTable(1);
-    function updateTable(page) {
-        AJAX.get(url('get/records/?page=' + page, false), function (data) {
+    updateTable();
+    function updateTable() {
+        AJAX.get(url('get/records/?page=' + page + '&sort=' + sort, false), function (data) {
             var table = $('#table-body');
             table.html('');
             pagination.pagination('updateItems', data.count);
@@ -37,6 +40,13 @@ $(document).ready(function () {
             error('An error has occurred during the loading of the list of records. Please reload the page or contact the administrator. Error message: ' + message);
         });
     }
+    $('#sort-tabs').on('click', '.sort-tab', function () {
+        var that = $(this);
+        $('.sort-tab').removeClass('active');
+        that.addClass('active');
+        sort = that.data('sort');
+        updateTable();
+    });
     $('#table-body').on('click', '.record-tr', function () {
         var that = $(this);
         location.href = url('record/view/' + that.data('id'));

@@ -4,18 +4,17 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.4
+ * @version 0.0.5
  */
 use Apollo\Helpers\AssetHelper;
 
 ?>
 @extends('layouts.extended')
 @section('content')
-    <ul class="nav nav-tabs">
-        <li role="presentation"><a href="#">All Records</a></li>
-        <li role="presentation" class="active"><a href="#">Most viewed</a></li>
-        <li role="presentation"><a href="#">Recently added</a></li>
-        <li role="presentation"><a href="#">Recently updated</a></li>
+    <ul class="nav nav-tabs" id="sort-tabs">
+        <li role="presentation" class="sort-tab active" data-sort="1"><a href="#">All Records</a></li>
+        <li role="presentation" class="sort-tab" data-sort="2"><a href="#">Recently added</a></li>
+        <li role="presentation" class="sort-tab" data-sort="3"><a href="#">Recently updated</a></li>
     </ul>
     <div class="row">
         <div class="col-lg-8 col-md-6 col-sx-12 top-buffer">
