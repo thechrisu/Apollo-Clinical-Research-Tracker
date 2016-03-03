@@ -16,28 +16,28 @@
       {
         "name": "Supervisor",
         "type": "String",
-        "has_default": false,
+        "defaults": null,
         "allow_other": true,
         "values": "M"
       },
       {
         "name": "Cars",
         "type": "StringAr",
-        "has_default": false,
+        "defaults": null,
         "allow_other": true,
         "values": "Aston Martin DB5"
       },
       {
         "name": "Funding Source",
         "type": "String",
-        "has_default": true,
+        "defaults": null,
         "allow_other": true,
         "values": "M"
       },
       {
         "name": "Payband",
         "type": "String",
-        "has_default": true,
+        "defaults": ["0", "1", "2", "3", "4", "5", "6", "7"],
         "allow_other": false,
         "values": "7"
       },
