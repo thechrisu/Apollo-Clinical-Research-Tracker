@@ -1,0 +1,74 @@
+{
+  "error": null,
+  "data": {
+    "essential": {
+      "given_name": "James",
+      "last_name": "Bond",
+      "email": "iLove@moneypenny.co.uk",
+      "phone": "+44 007",
+      "record_number": 7,
+      "record_name": "Her majesty's secret weapon",
+      "record_ids": [1, 2, 3, 4, 7, 1729],
+      "record_names": ["something", "something other", "secret", "GOSH", "top secret", "joke"]
+    },
+    "numberOfFields": 8,
+    "fields": [
+      {
+        "name": "Supervisor",
+        "type": "String",
+        "has_default": false,
+        "allow_other": true,
+        "values": "M"
+      },
+      {
+        "name": "Cars",
+        "type": "StringAr",
+        "has_default": false,
+        "allow_other": true,
+        "values": "Aston Martin DB5"
+      },
+      {
+        "name": "Funding Source",
+        "type": "String",
+        "has_default": true,
+        "allow_other": true,
+        "values": "M"
+      },
+      {
+        "name": "Payband",
+        "type": "String",
+        "has_default": true,
+        "allow_other": false,
+        "values": "7"
+      },
+      {
+        "name": "References",
+        "type": "Text",
+        "has_default": false,
+        "allow_other": false,
+        "values": "Mister Bond is one of our nicest employees. In fact, he even developed new applications in conjunction with Q. He is always punctual"
+      },
+      {
+        "name": "Specialty",
+        "type": "String",
+        "has_default": false,
+        "allow_other": false,
+        "values": "Making cheesy comments"
+      },
+      {
+        "name": "Start Date",
+        "type": "Date",
+        "has_default": false,
+        "allow_other": false,
+        "values": 1456940959
+      },
+      {
+        "name": "End Date",
+        "type": "Date",
+        "has_default": false,
+        "allow_other": false,
+        "values": 1456941022
+      }
+    ]
+  }
+}

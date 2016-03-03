@@ -1,3 +1,6 @@
+///<reference path="../ajax.ts"/>
+///<reference path="../scripts.ts"/>
+
 /**
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
@@ -7,7 +10,7 @@
 
 /**
  * Responsible for displaying a single record.
- * TODO: Implement rest of details, fix display (should do nice columns)
+ * TODO: Implement rest of details, fix display (should do nice columns), add success update message
  */
 
 obj: fakeJSON_obj = {
