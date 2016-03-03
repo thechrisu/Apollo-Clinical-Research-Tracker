@@ -70,7 +70,7 @@ $(document).ready(function () {
     var path = window.location.pathname;
     var recordNumber = getEnding(path);
     getRecordFromServer(recordNumber);
-    fakeajaxGet(fakeJSON, function (data) {
+    AJAX.fakeGet(fakeJSON, function (data) {
         var fullName = data.essential.given_name + ' ' + data.essential.last_name;
         updateBreadcrumbs(fullName, data.essential.record_name, data.essential.record_names, data.essential.record_ids);
         displayEssentialInfo(data.essential);
