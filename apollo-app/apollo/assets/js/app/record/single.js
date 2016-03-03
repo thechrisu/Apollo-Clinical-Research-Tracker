@@ -86,12 +86,18 @@ $(document).ready(function () {
         //bc.html('');
         bc.append("<li>" + personName + "</li>");
         var links = getLinks(recordNames, recordIds);
+        bc.append(getEditButton());
         var dd = getDropdownWithItems(links);
         bc.append(dd);
         bc.append('<br>');
         bc.append("<h1 style='display: inline'>" + recordName + "</h1><h6 style='display: inline'>" + personName + "</h6>");
     }
     ;
+    function getEditButton() {
+        var symbol = $("<span class='glyphicon glyphicon-pencil' aria-hidden='true'></span>");
+        var link = $("<a href=\"" + window.location.origin + "\/record\/edit\/" + getEnding(window.location.pathname) + "\" class='btn' />").append(symbol);
+        return link;
+    }
     function getRecordFromServer(recordId) {
         //TODO put the ajax request in here, extract the logic in it into separate functions
     }
@@ -205,7 +211,7 @@ $(document).ready(function () {
     function getLinks(names, recordItems) {
         var as = [];
         for (var i = 0; i < names.length; i++) {
-            as.push("<a href=\"" + window.location.origin + "/record/view/" + recordItems[i] + "\"/>" + names[i] + "</a>");
+            as.push("<a href=\"" + window.location.origin + "\/record\/view\/" + recordItems[i] + "\">" + names[i] + "</a>");
         }
         return as;
     }
