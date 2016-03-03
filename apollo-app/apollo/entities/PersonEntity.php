@@ -12,13 +12,14 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
+use Doctrine\ORM\Mapping\OrderBy;
 
 /**
  * Class PersonEntity
  * @package Apollo\Entities
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.4
+ * @version 0.0.5
  * @Entity @Table("people")
  */
 class PersonEntity
@@ -62,6 +63,7 @@ class PersonEntity
     /**
      * Array with all of the records
      * @OneToMany(targetEntity="RecordEntity", mappedBy="person")
+     * @OrderBy({"start_date" = "DESC"})
      * @var RecordEntity[]
      */
     protected $records;
@@ -151,7 +153,7 @@ class PersonEntity
     }
 
     /**
-     * @return RecordEntity
+     * @return RecordEntity[]
      */
     public function getRecords()
     {

@@ -14,7 +14,6 @@ namespace Apollo\Helpers;
  *
  * @package Apollo\Helpers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2 All function now just return urls instead of printing them out
  * @version 0.0.1
  */
 class AssetHelper
@@ -36,10 +35,11 @@ class AssetHelper
      *
      * @param string $path
      * @return string
-     * @since 0.0.2 Changed name to "image"
+     * @since 0.0.3 Changed name to img
+     * @since 0.0.2 Changed name to image
      * @since 0.0.1
      */
-    public static function image($path)
+    public static function img($path)
     {
         return self::getAssetFrom('img', $path);
     }

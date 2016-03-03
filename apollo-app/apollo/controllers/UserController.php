@@ -21,7 +21,7 @@ use Doctrine\ORM\EntityRepository;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  */
 class UserController extends GenericController
 {
@@ -39,6 +39,7 @@ class UserController extends GenericController
     /**
      * Action to handle the sign in, both the view and the POST request
      *
+     * @since 0.0.4 Now sends the 401 header
      * @since 0.0.1
      */
     public function actionSignIn()
@@ -81,7 +82,7 @@ class UserController extends GenericController
                 ];
             }
         }
-
+        http_response_code(401);
         echo View::getView()->make('user.sign-in', ['data' => $data])->render();
     }
 
