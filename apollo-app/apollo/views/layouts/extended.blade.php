@@ -17,8 +17,9 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
 @extends('layouts.basic')
 @section('head')
 
-    <link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ AssetHelper::css('stylesheet') }}">
+    <link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.min.css" />
+    <link rel="stylesheet" href="{{ AssetHelper::css('stylesheet') }}" />
+    <link rel="icon" type="image/png" href="{{ AssetHelper::img('favicon.png') }}" />
     <title>{{ !empty($title) ? $title . ' | ' . APP_NAME : APP_NAME }}</title>
 @stop
 @section('body')
