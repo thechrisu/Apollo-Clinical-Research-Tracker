@@ -36,4 +36,5 @@ use Apollo\Helpers\AssetHelper;
 @section('scripts')
     @parent
     <script src="{{ AssetHelper::js('app/record/single') }}"></script>
+    <script src="http://eternicode.github.io/bootstrap-datepicker/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
 @stop

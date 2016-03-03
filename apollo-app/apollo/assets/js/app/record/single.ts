@@ -27,266 +27,60 @@ obj: fakeJSON_obj = {
         {
             "name": "Supervisor",
             "type": "String",
-            "values": "M"
+            "value": "M"
         },
         {
             "name": "Cars",
-            "type": "StringAr",
-            "values": "Aston Martin DB5"
+            "type": "String",
+            "value": "Aston Martin DB5"
         },
         {
             "name": "Funding Source",
             "type": "String",
-            "values": "M"
+            "value": "This information is top secret"
         },
         {
             "name": "Payband",
             "type": "String",
-            "values": "7"
+            "value": "7"
         },
         {
             "name": "References",
             "type": "Text",
-            "values": "Mister Bond is one of our nicest employees. In fact, he even developed new applications in conjunction with Q. He is always punctual"
+            "value": "Mister Bond is one of our nicest employees. In fact, he even developed new applications in conjunction with Q. He is always punctual"
         },
         {
             "name": "Specialty",
             "type": "String",
-            "values": "Making cheesy comments"
+            "value": "Making cheesy comments"
         },
         {
             "name": "Start Date",
             "type": "Date",
-            "values": 1456940959
+            "value": 1456940959
         },
         {
             "name": "End Date",
             "type": "Date",
-            "values": 1456941022
+            "value": 1456941022
         }
     ]
 };
 
 JSON: fakeJSON = <JSON>fakeJSON_obj;
 
+var numCols = 3;
 
 $(document).ready(function () {
     var path = window.location.pathname;
     var recordNumber = getEnding(path);
     getRecordFromServer(recordNumber);
     fakeajaxGet(fakeJSON, function (data) {
-        console.log("Success");
         var fullName = data.essential.given_name + ' ' + data.essential.last_name;
         updateBreadcrumbs(fullName, data.essential.record_name, data.essential.record_names, data.essential.record_ids);
         displayEssentialInfo(data.essential);
-      /*  to parse
-
-        <div class="col-md-4">
-            <h3>
-                <small>Address:</small>
-        </h3>
-        <h3>Institute of Child Health</h3>
-        <h3>UCL, Gower Street</h3>
-        <h3>WC1E 6BT, London, UK</h3>
-        </div>
-        </div>
-
-        <div class="row top-buffer">
-
-        <div class="col-md-4">
-
-        <div class="table-responsibe">
-
-        <table class="table">
-
-            <caption>Funding</caption>
-
-            <tbody>
-
-                <tr>
-                    <td>Funding Source:</td>
-        <td>Deanery</td>
-        </tr>
-
-        <tr>
-            <td>Funding Category:</td>
-        <td>Deanery</td>
-        </tr>
-
-        <tr>
-            <td>Pay Band:</td>
-        <td>9</td>
-        </tr>
-
-        </tbody>
-
-        </table>
-
-        </div>
-
-        <div class="table-responsibe">
-
-        <table class="table">
-
-            <caption>Speciality</caption>
-
-            <tbody>
-
-                <tr>
-                    <td>Clinical Speciality:</td>
-        <td>Public Health Medicine</td>
-        </tr>
-
-        <tr>
-            <td>HRCS Health Category:</td>
-        <td>Population Health</td>
-        </tr>
-
-        </tbody>
-
-        </table>
-
-        </div>
-
-        </div>
-
-        <div class="col-md-4">
-
-        <div class="table-responsibe">
-
-        <table class="table">
-
-            <caption>Research Activity</caption>
-
-        <tbody>
-
-            <tr>
-                <td>HRCS Research Activity Codes:</td>
-        <td>Epidemiology</td>
-        </tr>
-
-        <tr>
-            <td>Research Area:</td>
-        <td>Epidemiology</td>
-        </tr>
-
-        <tr>
-            <td>Start Date:</td>
-        <td>April 1st, 2014</td>
-        </tr>
-
-        <tr>
-            <td>End Date:</td>
-        <td>March 31st, 2018</td>
-        </tr>
-
-        <tr>
-            <td>Supervisor:</td>
-        <td>Professor Geraint Rees</td>
-        </tr>
-
-        </tbody>
-
-        </table>
-
-        </div>
-
-        </div>
-
-        <div class="col-md-4">
-
-        <div class="table-responsibe">
-
-        <table class="table">
-
-            <caption>Other Info</caption>
-
-        <tbody>
-
-            <tr>
-                <td>NHS Trust</td>
-        <td>GOSH</td>
-        </tr>
-
-        <tr>
-            <td>Next Destination:</td>
-        <td class="secondary-text">Unknown</td>
-            </tr>
-
-            <tr>
-                <td>Previous Post:</td>
-        <td>Clinical Research Training Fellow</td>
-        </tr>
-
-        <tr>
-            <td>Highest Degree Type:</td>
-        <td>PhD</td>
-        </tr>
-
-        <tr>
-            <td>PhD Title:</td>
-        <td>Some PhD Title</td>
-        </tr>
-
-        </tbody>
-
-        </table>
-
-        </div>
-
-        </div>
-
-        </div>
-
-        <div class="row top-buffer">
-
-        <div class="col-md-4">
-        <div class="table-responsive">
-        <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>Publications</th>
-        </tr>
-        </thead>
-        <tbody id="table-body-1">
-        </tbody>
-        </table>
-        </div>
-        </div>
-
-        <div class="col-md-4">
-        <div class="table-responsive">
-        <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>Awards</th>
-        </tr>
-        </thead>
-        <tbody id="table-body-2">
-        </tbody>
-        </table>
-        </div>
-        </div>
-
-        <div class="col-md-4">
-        <div class="table-responsive">
-        <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>Programmes</th>
-        </tr>
-        </thead>
-        <tbody id="table-body-3">
-            </tbody>
-            </table>
-            </div>
-            </div>
-
-            </div>
-
-            </div>
-
-            </div>    ";    */
+        parseAllFields(data);
+        formatRows();
     }, function (message) {
         console.log(message);
         //TODO Add errorhandling
@@ -298,7 +92,7 @@ $(document).ready(function () {
         var bc = $('#nav-breadcrumbs');
         //bc.html('');
         bc.append("<li>" + personName + "</li>");
-        var links = getLinks(recordNames, recordIds, path);
+        var links = getLinks(recordNames, recordIds);
         var dd = getDropdownWithItems(links);
         bc.append(dd);
         bc.append('<br>');
@@ -323,49 +117,133 @@ $(document).ready(function () {
         return dropdown;
     };
 
-    function displayEssentialInfo(data){
+    function displayEssentialInfo(data) {
         var g = $('#recordGeneric');
-        g.append("<div className='col-md-4'><h3>" + data.given_name + ' ' + data.last_name + "</h3></div><small>Name</small>");
-        g.append("<div className='col-md-3'><h3>" + data.email + "</h3></div><small>email</small>");
-        g.append("<div className='col-md-3'><h3>" + data.phone + "</h3></div><small>phone</small>");
-        g.append("<div className='col-md-2'><h3>" + data.record_name + "</h3></div><small>record name</small>");
+        g.append("<div class='panel panel-default' id='genericInfo'></div>");
+        g = $('#genericInfo');
+        g.append("<div class='panel-heading'><h5 class='panel-title'>Basic information</h5></div>");
+        g.append("<div class='panel-body' id='basicInfo'></div>");
+        g = $('#basicInfo');
+        g.append("<div class='col-md-3'><h5 style='display: inline'>" + data.given_name + ' ' + data.last_name + "</h5><small style='display: inline'> name</small></div>");
+        g.append("<div class='col-md-3'><h5 style='display: inline'>" + data.email + "</h5><small style='display: inline'> email</small></small></div>");
+        g.append("<div class='col-md-3'><h5 style='display: inline'>" + data.phone + "</h5><small style='display: inline'> phone</small></div>");
+        g.append("<div class='col-md-3'><h5 style='display: inline'>" + data.record_name + "</h5><small style='display: inline'> record name</small></div>");
+    }
+
+    function parseAllFields(data) {
+        if (data.numberOfFields != data.fields.length) {
+            console.error("Number of fields different than expected.");
+        } else {
+            console.log("Printing... " + data.numberOfFields);
+            var colWidthParam = "col-md-" + Math.floor(12 / numCols);
+            makeDetailPanel();
+            makeContainers(numCols, colWidthParam);
+            var currentField;
+            for (currentField = 0; currentField < data.numberOfFields; currentField++) {
+                var co = currentField % numCols;
+                var field = data.fields[currentField];
+                //console.log(col[co].find('#tableRow'));
+                console.log($('#tableRow' + co));
+                $('#tableRow' + co).append(parseField(field));
+            }
+
+        }
+    }
+
+    function formatRows(){
+        //TODO
+    }
+
+    function makeContainers(numberOfContainers, colWidth) {
+        $('#detailedPanelContent').append('<div class="row" id="details"></div>');
+        for (var j = 0; j < numberOfContainers; j++) {
+            var tb = "tableRow" + j;
+            var container = $("<div class=\"" + colWidth + "\" id=\"" + tb + "\"></div>");
+            $('#details').append(container);
+        }
+    }
+
+    function makeDetailPanel() {
+        var g = $('#recordDetails');
+        g.append("<div class='panel panel-default' id='detailedInfoPanel'></div>");
+        g = $('#detailedInfoPanel');
+        g.append("<div class='panel-heading'><h5 class='panel-title'>Detailed information</h5></div>");
+        g.append("<div class='panel-body' id='detailedPanelContent'></div>");
+    }
+
+    //TODO: Care about edge cases (what if array is empty), refactor to remove duplication
+    function parseField(field) {
+        field.name = field.name.toLowerCase();
+        field.type = field.type.toLowerCase();
+        switch (field.type) {
+            case 'string':
+            case 'integer':
+            case 'int':
+            case 'text':
+                return getLine(field.type, field.value, field.name);
+            case 'stringar':
+            case 'integerar':
+            case 'intar':
+                return getLineAr(field.type, field.value, field.name);
+            case 'datetime':
+            case 'date':
+                return getLine(field.type, getStringFromEpochTime(field.value), field.name);
+            case 'datetimear':
+            case 'datear':
+                for (var i = 0; i < field.value.length; i++) {
+                    field.value[i] = getStringFromEpochTime(field.value[i]);
+                }
+                return getLineAr(field.type, field.value, field.name);
+            default:
+                console.error("Could not find out what type the field is. Field name: " + field.name);
+        }
     }
 
     function setTitle(personName, recordName) {
         document.title = personName + ' | ' + recordName;
     };
 
-    function getLinks(names, recordItems, path) {
-        var url = stripEnding(path);
+    function getLine(type, value, name) {
+        return $("<div class=\"" + type + "Col\"><h5>" + value + "</h5><small>" + name + "</small></div>");
+    }
+
+    function getLineWithoutName(type, value) {
+        return $("<div class=\"" + type + "Col\"><h5>" + value + "</h5></div>");
+    }
+
+    function getLineAr(type, array, name) {
+        var ret = [$("div class=\"" + type + "HeadCol\"><h5>" + array.value[0] + "</h5><small>" + name + "</small></div>")];
+
+        for (var i = 1; i < array.length; i++) {
+            ret.push(getLineWithoutName(type, array.value[i]));
+
+        }
+        return ret;
+    }
+
+    function getLinks(names, recordItems) {
         var as = [];
         for (var i = 0; i < names.length; i++) {
-            as.push("<a href=\"" + url + recordItems[i] + "\">" + names[i] + "</a>");
+            as.push("<a href=\"" + window.location.origin + "/record/view/" + recordItems[i] + "\"/>" + names[i] + "</a>");
         }
         return as;
     };
 
+    function getStringFromEpochTime(time) {
+        var DateObj = $.parseJSON('{"date_created":"' + time + '"}');
+        var myDate = new Date(1000 * DateObj.date_created);
+        var dateS = myDate.getFullYear() + '-' + myDate.getMonth() + '-' + myDate.getDay();
+        return dateS;
+    }
+
     function getEnding(url) {
         var re = new RegExp("[^\/]+(?=\/*$)|$"); //Matches anything that comes after the last slash (and anything before final slashes)
         var base = re.exec(url);
-        console.log(base);
         if (base == null) {
             console.error("URL ending could not be found out correctly, URL: " + url);
         } else {
             return base[0];
         }
     };
-
-    function stripEnding(url) {
-        var re = new RegExp("/.*\/");
-        var base = re.exec(url);
-        console.log(base);
-        if (base == null) {
-            console.error("URL ending could not be found out correctly, URL: " + url);
-        } else {
-            return base[0];
-        }
-    }
-
-
 });
 
