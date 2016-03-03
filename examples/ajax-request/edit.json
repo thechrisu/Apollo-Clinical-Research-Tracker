@@ -36,10 +36,10 @@
       },
       {
         "name": "Payband",
-        "type": "String",
-        "defaults": ["0", "1", "2", "3", "4", "5", "6", "7"],
+        "type": "Integer",
+        "defaults": [0, 1, 2, 3, 4, 5, 6, 7],
         "allow_other": false,
-        "values": "7"
+        "values": 7
       },
       {
         "name": "References",

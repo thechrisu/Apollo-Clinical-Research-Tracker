@@ -77,6 +77,8 @@ var numCols = 3;
 $(document).ready(function () {
     var path = window.location.pathname;
     var recordNumber = getEnding(path);
+    var loader = $('#loader');
+    loader.fadeIn(200);
     getRecordFromServer(recordNumber);
     AJAX.fakeGet(fakeJSON, function (data) {
         var fullName = data.essential.given_name + ' ' + data.essential.last_name;
@@ -84,6 +86,7 @@ $(document).ready(function () {
         displayEssentialInfo(data.essential);
         parseAllFields(data);
         formatRows();
+        loader.fadeOut(200);
     }, function (message) {
         console.log(message);
         //TODO Add errorhandling
@@ -100,7 +103,7 @@ $(document).ready(function () {
         var dd = getDropdownWithItems(links);
         bc.append(dd);
         bc.append('<br>');
-        bc.append("<h1 style='display: inline'>" + recordName + "</h1><h6 style='display: inline'>" + personName + "</h6>");
+        bc.append("<h1 style='display: inline'>\"" + recordName + "\"</h1><h6 style='display: inline'>" + personName + "</h6>");
     };
 
     function getEditButton(){

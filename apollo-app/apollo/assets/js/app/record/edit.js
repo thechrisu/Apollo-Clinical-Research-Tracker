@@ -4,7 +4,6 @@
  * @license https://opensource.org/licenses/mit-license.php MIT License
  * @version 0.0.1
  */
-
 obj: fakeJSON_obj = {
     "error": null,
     "data": {
@@ -79,12 +78,8 @@ obj: fakeJSON_obj = {
         ]
     }
 };
-
-
-JSON: fakeJSON = <JSON>fakeJSON_obj;
-
+JSON: fakeJSON = fakeJSON_obj;
 var numCols = 2;
-
 $(document).ready(function () {
     var path = window.location.pathname;
     var recordNumber = getEnding(path);
@@ -104,9 +99,7 @@ $(document).ready(function () {
     }, function (message) {
         console.log(message);
         //TODO Add errorhandling
-
     });
-
     function updateBreadcrumbs(personName, recordName) {
         setTitle(personName, recordName);
         var bc = $('#nav-breadcrumbs');
@@ -116,14 +109,13 @@ $(document).ready(function () {
         bc.append(getDoneButton());
         bc.append('<br>');
         bc.append("<h1 style='display: inline'>Editing \"" + recordName + "\"</h1><h6 style='display: inline'>" + personName + "</h6>");
-    };
-
-    function getDoneButton(){
+    }
+    ;
+    function getDoneButton() {
         var symbol = $("<span class='glyphicon glyphicon-ok' aria-hidden='true'></span>");
         var link = $("<a href=\"" + window.location.origin + "/record/view/" + getEnding(window.location.pathname) + "\" class='btn' />").append(symbol);
         return link;
     }
-
     function displayEssentialInfo(data) {
         var g = $('#recordGeneric');
         g.append("<div class='panel panel-default' id='genericInfo'></div>");
@@ -136,11 +128,11 @@ $(document).ready(function () {
         g.append("<div class='col-md-3'><h5 style='display: inline'>" + data.phone + "</h5><small style='display: inline'> phone</small></div>");
         g.append("<div class='col-md-3'><h5 style='display: inline'>" + data.record_name + "</h5><small style='display: inline'> record name</small></div>");
     }
-
     function parseAllFields(data) {
         if (data.numberOfFields != data.fields.length) {
             console.error("Number of fields different than expected.");
-        } else {
+        }
+        else {
             console.log("Printing... " + data.numberOfFields);
             var colWidthParam = "col-md-" + Math.floor(12 / numCols);
             makeDetailPanel();
@@ -153,18 +145,15 @@ $(document).ready(function () {
                 console.log($('#tableRow' + co));
                 $('#tableRow' + co).append(parseField(field));
             }
-
         }
     }
-
     function getRecordFromServer(recordId) {
         //TODO put the ajax request in here, extract the logic in it into separate functions
-    };
-
-    function formatRows(){
+    }
+    ;
+    function formatRows() {
         //TODO
     }
-
     function makeContainers(numberOfContainers, colWidth) {
         $('#detailedPanelContent').append('<div class="row" id="details"></div>');
         for (var j = 0; j < numberOfContainers; j++) {
@@ -173,7 +162,6 @@ $(document).ready(function () {
             $('#details').append(container);
         }
     }
-
     function makeDetailPanel() {
         var g = $('#recordDetails');
         g.append("<div class='panel panel-default' id='detailedInfoPanel'></div>");
@@ -181,44 +169,41 @@ $(document).ready(function () {
         g.append("<div class='panel-heading'><h5 class='panel-title'>Detailed information</h5></div>");
         g.append("<div class='panel-body' id='detailedPanelContent'></div>");
     }
-
     //TODO: Care about edge cases (what if array is empty), refactor to remove duplication
     function parseField(field) {
-     /*   "name": "Specialty",
-            "type": "String",
-            "has_default": false,
-            "allow_other": false,
-            "values": "Making cheesy comments"*/
-        if(field.has_default){
-            
+        /*   "name": "Specialty",
+               "type": "String",
+               "has_default": false,
+               "allow_other": false,
+               "values": "Making cheesy comments"*/
+        if (field.has_default) {
         }
-/*        field.name = field.name.toLowerCase();
-        field.type = field.type.toLowerCase();
-        switch (field.type) {
-            case 'string':
-            case 'integer':
-            case 'int':
-            case 'text':
-
-                return getLine(field.type, field.value, field.name);
-            case 'stringar':
-            case 'integerar':
-            case 'intar':
-                return getLineAr(field.type, field.value, field.name);
-            case 'datetime':
-            case 'date':
-                return getLine(field.type, getStringFromEpochTime(field.value), field.name);
-            case 'datetimear':
-            case 'datear':
-                for (var i = 0; i < field.value.length; i++) {
-                    field.value[i] = getStringFromEpochTime(field.value[i]);
-                }
-                return getLineAr(field.type, field.value, field.name);
-            default:
-                console.error("Could not find out what type the field is. Field name: " + field.name);
-        }*/
+        /*        field.name = field.name.toLowerCase();
+                field.type = field.type.toLowerCase();
+                switch (field.type) {
+                    case 'string':
+                    case 'integer':
+                    case 'int':
+                    case 'text':
+        
+                        return getLine(field.type, field.value, field.name);
+                    case 'stringar':
+                    case 'integerar':
+                    case 'intar':
+                        return getLineAr(field.type, field.value, field.name);
+                    case 'datetime':
+                    case 'date':
+                        return getLine(field.type, getStringFromEpochTime(field.value), field.name);
+                    case 'datetimear':
+                    case 'datear':
+                        for (var i = 0; i < field.value.length; i++) {
+                            field.value[i] = getStringFromEpochTime(field.value[i]);
+                        }
+                        return getLineAr(field.type, field.value, field.name);
+                    default:
+                        console.error("Could not find out what type the field is. Field name: " + field.name);
+                }*/
     }
-
     function getCalendar(unixtime, fieldName) {
         var realTime = getStringFromEpochTime(unixtime);
         var container = $('<div class="input-group date" data-provide="datepicker" id=\"' + fieldName + 'Picker\">');
@@ -230,43 +215,38 @@ $(document).ready(function () {
         container.append(container);
         return container;
     }
-
     function setTitle(personName, recordName) {
         document.title = "Editing " + personName + ' | ' + recordName;
-    };
-
+    }
+    ;
     function getLine(type, value, name) {
         return $("<div class=\"" + type + "Col\"><h5>" + value + "</h5><small>" + name + "</small></div>");
     }
-
     function getLineWithoutName(type, value) {
         return $("<div class=\"" + type + "Col\"><h5>" + value + "</h5></div>");
     }
-
     function getLineAr(type, array, name) {
         var ret = [$("div class=\"" + type + "HeadCol\"><h5>" + array.value[0] + "</h5><small>" + name + "</small></div>")];
-
         for (var i = 1; i < array.length; i++) {
             ret.push(getLineWithoutName(type, array.value[i]));
-
         }
         return ret;
     }
-
     function getStringFromEpochTime(time) {
         var DateObj = $.parseJSON('{"date_created":"' + time + '"}');
         var myDate = new Date(1000 * DateObj.date_created);
         var dateS = myDate.getMonth() + '/' + myDate.getDay() + '/' + myDate.getFullYear();
         return dateS;
     }
-
     function getEnding(url) {
         var re = new RegExp("[^\/]+(?=\/*$)|$"); //Matches anything that comes after the last slash (and anything before final slashes)
         var base = re.exec(url);
         if (base == null) {
             console.error("URL ending could not be found out correctly, URL: " + url);
-        } else {
+        }
+        else {
             return base[0];
         }
-    };
+    }
+    ;
 });
