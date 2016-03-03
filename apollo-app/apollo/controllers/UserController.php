@@ -81,7 +81,7 @@ class UserController extends GenericController
                 ];
             }
         }
-
+        http_response_code(401);
         echo View::getView()->make('user.sign-in', ['data' => $data])->render();
     }
 
