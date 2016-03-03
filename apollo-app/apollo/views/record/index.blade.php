@@ -7,6 +7,7 @@
  * @version 0.0.5
  */
 use Apollo\Helpers\AssetHelper;
+use Apollo\Helpers\URLHelper;
 
 ?>
 @extends('layouts.extended')
@@ -26,10 +27,10 @@ use Apollo\Helpers\AssetHelper;
             </div>
         </div>
         <div class="col-lg-2 col-md-3 col-sm-6 col-sx-12 top-buffer">
-            <a href="search.php" class="btn btn-default btn-block">Advanced search</a>
+            <a href="{{ URLHelper::url('record/search') }}" class="btn btn-default btn-block">Advanced search</a>
         </div>
         <div class="col-lg-2 col-md-3 col-sm-6 col-sx-12 top-buffer">
-            <a href="add.php" class="btn btn-default btn-block">Add a record</a>
+            <a href="#" id="add-record" class="btn btn-default btn-block">Add a record</a>
         </div>
     </div>
     <div class="table-responsive top-buffer">
@@ -62,5 +63,5 @@ use Apollo\Helpers\AssetHelper;
 @stop
 @section('scripts')
     @parent
-    <script src="{{ AssetHelper::js('app/record/table') }}"></script>
+    <script src="{{ AssetHelper::js('app/record/index') }}"></script>
 @stop
