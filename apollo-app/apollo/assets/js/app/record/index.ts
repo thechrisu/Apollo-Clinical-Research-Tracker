@@ -30,13 +30,19 @@ $(document).ready(function () {
             var table = $('#table-body');
             table.html('');
             pagination.pagination('updateItems', data.count);
-            for (var i = 0; i < data.data.length; i++) {
-                var record = data.data[i];
-                var tr = $('<tr style="cursor: pointer" class="record-tr" data-id="' + record.id + '"></tr>');
-                tr.append('<td>' + record.given_name + '</td>');
-                tr.append('<td>' + record.last_name + '</td>');
-                tr.append('<td>' + record.email + '</td>');
-                tr.append('<td>' + record.phone + '</td>');
+            if(data.count > 0) {
+                for (var i = 0; i < data.data.length; i++) {
+                    var record = data.data[i];
+                    var tr = $('<tr style="cursor: pointer" class="record-tr" data-id="' + record.id + '"></tr>');
+                    tr.append('<td>' + record.given_name + '</td>');
+                    tr.append('<td>' + record.last_name + '</td>');
+                    tr.append('<td>' + record.email + '</td>');
+                    tr.append('<td>' + record.phone + '</td>');
+                    table.append(tr);
+                }
+            } else {
+                var tr = $('<tr></tr>');
+                tr.append('<td colspan="4" class="text-center"><b>Nothing to display...</b></td>');
                 table.append(tr);
             }
             loader.fadeOut(200);
