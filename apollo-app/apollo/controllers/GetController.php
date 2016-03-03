@@ -90,7 +90,7 @@ class GetController extends GenericController
                 $responsePerson['email'] = $recentRecord->getData()[1]->getVarchar();
                 $response['data'][] = $responsePerson;
             }
-        }gfi
+        }
         echo json_encode($response);
     }
 
