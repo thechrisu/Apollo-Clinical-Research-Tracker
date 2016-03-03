@@ -46,7 +46,7 @@ class RecordController extends GenericController
     public function actionView($personId)
     {
         $breadcrumbs = [
-            ['Records', URLHelper::url('record/view/' . $personId), true]
+            ['Records', URLHelper::url('record/'), true]
         ];
         View::render('record.single', 'View Record', $breadcrumbs);
     }

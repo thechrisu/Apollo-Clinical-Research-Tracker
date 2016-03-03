@@ -1,8 +1,8 @@
 {
   "error": null,
   "data": {
-    "firstname": "Ethel",
-    "surname": "Parker",
+    "given_name": "Ethel",
+    "last_name": "Parker",
     "email": "cu@relahi.net",
     "phone": "(743) 123 654"
   }
