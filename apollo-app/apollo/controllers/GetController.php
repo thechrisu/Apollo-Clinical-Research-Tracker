@@ -68,6 +68,17 @@ class GetController extends GenericController
                 $peopleQB->addOrderBy('person.middle_name', 'ASC');
                 $peopleQB->addOrderBy('person.last_name', 'ASC');
         }
+        if(!empty($data['search'])) {
+            // TODO: Fix Doctrine bug where setParameter() won't work
+            //$searchString = '`' . mysql_real_escape_string($data['search']) . '`';
+            $peopleQB->andWhere($peopleQB->expr()->orX(
+                $peopleQB->expr()->like('person.given_name', ':search'),
+                $peopleQB->expr()->like('person.middle_name', ':search'),
+                $peopleQB->expr()->like('person.last_name', ':search')
+            ));
+            $peopleQB->setParameter('search', '%' . $data['search'] . '%');
+        } else {
+        }
         $peopleQuery = $peopleQB->getQuery();
         $people =  $peopleQuery->getResult();
         $response['error'] = null;

@@ -12,6 +12,7 @@
 $(document).ready(function () {
     var pagination = $('#pagination');
     var loader = $('#loader');
+    var search = '';
     var page = 1;
     var sort = 1;
     pagination.pagination({
@@ -26,7 +27,7 @@ $(document).ready(function () {
     updateTable();
     function updateTable() {
         loader.fadeIn(200);
-        AJAX.get(url('get/records/?page=' + page + '&sort=' + sort, false), function (data) {
+        AJAX.get(url('get/records/?page=' + page + '&sort=' + sort + '&search=' + encodeURIComponent(search), false), function (data) {
             var table = $('#table-body');
             table.html('');
             pagination.pagination('updateItems', data.count);
@@ -61,5 +62,13 @@ $(document).ready(function () {
         e.preventDefault();
         var that = $(this);
         location.href = url('record/view/' + that.data('id'));
+    });
+    var timer = null;
+    $('#records-search').keyup(function() {
+        clearTimeout(timer);
+        search = $(this).val();
+        timer = setTimeout(function() {
+            updateTable();
+        }, 600);
     });
 });

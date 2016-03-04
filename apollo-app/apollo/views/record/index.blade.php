@@ -22,7 +22,7 @@ use Apollo\Helpers\URLHelper;
             <div class="input-group">
                         <span class="input-group-addon" id="basic-addon2"><span
                                     class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
-                <input type="text" class="form-control" placeholder="Search through the records..."
+                <input type="text" class="form-control" id="records-search" placeholder="Search through the records..."
                        aria-label="Quick Search">
             </div>
         </div>
