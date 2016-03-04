@@ -1,9 +1,10 @@
 <?php
 /**
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/gpl-license.php MIT License
- * @version 0.0.2
+ * @version 0.0.3
  */
 use Apollo\Helpers\AssetHelper;
 
@@ -20,11 +21,11 @@ use Apollo\Helpers\AssetHelper;
             <div class="line-5"></div>
         </div>
     </div>
-    <div className="panel-body">
-        <div className="row" id="recordGeneric">
+    <div class="panel-body">
+        <div class="row" id="recordGeneric">
 
         </div>
-        <div className="row" id="recordDetails">
+        <div class="row" id="recordDetails">
 
         </div>
     </div>
@@ -33,5 +34,4 @@ use Apollo\Helpers\AssetHelper;
 @section('scripts')
     @parent
     <script src="{{ AssetHelper::js('app/record/single') }}"></script>
-    <script src="http://eternicode.github.io/bootstrap-datepicker/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
 @stop
