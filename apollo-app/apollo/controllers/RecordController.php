@@ -54,7 +54,7 @@ class RecordController extends GenericController
             Apollo::getInstance()->getRequest()->error(400, 'Invalid record ID!');
         }
         $breadcrumbs = [
-            ['Records', URLHelper::url('record/'), true]
+            ['Records', URLHelper::url('record'), true]
         ];
         View::render('record.single', 'View Record', $breadcrumbs);
     }
@@ -72,14 +72,16 @@ class RecordController extends GenericController
             Apollo::getInstance()->getRequest()->error(400, 'Invalid record ID!');
         }
         $breadcrumbs = [
-            ['Records', URLHelper::url('record/'), true]
+            ['Records', URLHelper::url('record'), true]
         ];
         View::render('record.edit', 'Edit Record', $breadcrumbs);
     }
 
     public function actionExample() {
         $breadcrumbs = [
-            ['Records', URLHelper::url('record/'), true]
+            ['Records', URLHelper::url('record'), true],
+            ['James Bond', null, false],
+            ['Record Name (#1337)', null, true]
         ];
         View::render('record.example', 'View Record', $breadcrumbs);
     }

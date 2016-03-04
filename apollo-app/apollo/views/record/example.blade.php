@@ -12,54 +12,120 @@ use Apollo\Helpers\URLHelper;
 ?>
 @extends('layouts.extended')
 @section('content')
-    <ul class="nav nav-tabs" id="sort-tabs">
-        <li role="presentation" class="sort-tab active" data-sort="1"><a href="#">All Records</a></li>
-        <li role="presentation" class="sort-tab" data-sort="2"><a href="#">Recently added</a></li>
-        <li role="presentation" class="sort-tab" data-sort="3"><a href="#">Recently updated</a></li>
-    </ul>
-    <div class="row">
-        <div class="col-lg-8 col-md-6 col-sx-12 top-buffer">
-            <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon2"><span
-                                    class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
-                <input type="text" class="form-control" id="records-search" placeholder="Search through the records..."
-                       aria-label="Quick Search">
-            </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <p class="pull-right">Record actions:
+                <a href="#" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-pencil"
+                                                                 aria-hidden="true"></span> Edit</a>
+                <a href="#" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove"
+                                                                aria-hidden="true"></span>
+                    Delete</a>
+            </p>
+            <p>Essential information</p>
         </div>
-        <div class="col-lg-2 col-md-3 col-sm-6 col-sx-12 top-buffer">
-            <a href="{{ URLHelper::url('record/search') }}" class="btn btn-default btn-block">Advanced search</a>
-        </div>
-        <div class="col-lg-2 col-md-3 col-sm-6 col-sx-12 top-buffer">
-            <a href="#" id="add-record" class="btn btn-default btn-block">Add a record</a>
+        <div class="panel-body">
+
         </div>
     </div>
-    <div class="table-responsive top-buffer">
-        <div class="loader-container" id="loader">
-            <div class="loader">
-                <div class="line-1"></div>
-                <div class="line-2"></div>
-                <div class="line-3"></div>
-                <div class="line-4"></div>
-                <div class="line-5"></div>
+
+    <div class="row top-buffer">
+
+        <div class="col-md-4">
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <td>
+                            <small>Supervisor</small>
+                        </td>
+                        <td><strong>Nelson Mandela</strong></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <small>Car</small>
+                        </td>
+                        <td><b>Aston Martin DB5</b></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <small>Funding Source</small>
+                        </td>
+                        <td><strong>Top Secret</strong></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <small>References</small>
+                        </td>
+                        <td><b>Mister Bond is one of our nicest employees. In fact, he even developed new applications
+                                in conjunction with Q. He is always punctual.</b></td>
+                    </tr>
+                </table>
             </div>
         </div>
-        <table class="table table-striped table-hover">
-            <thead>
-            <tr>
-                <th>Given name</th>
-                <th>Last name</th>
-                <th>Email</th>
-                <th>Phone</th>
-            </tr>
-            </thead>
-            <tbody id="table-body">
-            </tbody>
-        </table>
+
+        <div class="col-md-4">
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <td>
+                            <small>Car</small>
+                        </td>
+                        <td><b>Aston Martin DB5</b></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <small>Supervisor</small>
+                        </td>
+                        <td><strong>Nelson Mandela</strong></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <small>Speciality</small>
+                        </td>
+                        <td><b>Making cheesy comments</b></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <small>Funding Source</small>
+                        </td>
+                        <td><strong>Top Secret</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <td>
+                            <small>Funding Source</small>
+                        </td>
+                        <td><strong>Top Secret</strong></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <small>Car</small>
+                        </td>
+                        <td><b>Aston Martin DB5</b></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <small>Speciality</small>
+                        </td>
+                        <td><b>Making cheesy comments</b></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <small>Supervisor</small>
+                        </td>
+                        <td><strong>Nelson Mandela</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
     </div>
-    <nav class="text-center">
-        <ul class="pagination" id="pagination">
-        </ul>
-    </nav>
 @stop
 @section('scripts')
     @parent
