@@ -47,8 +47,11 @@ body {
     transform: scaleY(1); }
   50% {
     transform: scaleY(2); } }
-.table-responsive {
+.table-responsive, .panel-body {
   position: relative; }
+
+.panel-body .loader-container {
+  margin: -15px 0 0 -15px; }
 
 .panel-heading .breadcrumb {
   margin-bottom: 0; }

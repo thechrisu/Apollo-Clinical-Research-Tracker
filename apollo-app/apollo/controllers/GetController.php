@@ -12,8 +12,6 @@ use Apollo\Apollo;
 use Apollo\Entities\PersonEntity;
 use Apollo\Components\DB;
 use Apollo\Components\Person;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Query\Expr\Join;
 
 
 /**
@@ -23,7 +21,7 @@ use Doctrine\ORM\Query\Expr\Join;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  */
 class GetController extends GenericController
 {
@@ -40,6 +38,7 @@ class GetController extends GenericController
     /**
      * Returns the records
      *
+     * @since 0.0.2 Implemented quick search
      * @since 0.0.1
      */
     public function actionRecords()
@@ -69,8 +68,6 @@ class GetController extends GenericController
                 $peopleQB->addOrderBy('person.last_name', 'ASC');
         }
         if(!empty($data['search'])) {
-            // TODO: Fix Doctrine bug where setParameter() won't work
-            //$searchString = '`' . mysql_real_escape_string($data['search']) . '`';
             $peopleQB->andWhere($peopleQB->expr()->orX(
                 $peopleQB->expr()->like('person.given_name', ':search'),
                 $peopleQB->expr()->like('person.middle_name', ':search'),

@@ -1,3 +1,5 @@
+///<reference path="../ajax.ts"/>
+///<reference path="../scripts.ts"/>
 /**
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
@@ -103,7 +105,7 @@ $(document).ready(function () {
     function updateBreadcrumbs(personName, recordName) {
         setTitle(personName, recordName);
         var bc = $('#nav-breadcrumbs');
-        var personURL = window.location.origin + "/record/view/" + getEnding(window.location.pathname);
+        var personURL = url("/record/view/" + getEnding(window.location.pathname));
         bc.append("<li>" + personName + "</a></li>");
         bc.append("<li class='active'><a href=\"" + personURL + "\">" + recordName + "</a></li>");
         bc.append(getDoneButton());
@@ -113,7 +115,7 @@ $(document).ready(function () {
     ;
     function getDoneButton() {
         var symbol = $("<span class='glyphicon glyphicon-ok' aria-hidden='true'></span>");
-        var link = $("<a href=\"" + window.location.origin + "/record/view/" + getEnding(window.location.pathname) + "\" class='btn' />").append(symbol);
+        var link = $('<a href="' + url("/record/view/" + getEnding(window.location.pathname)) + '" class="btn" />').append(symbol);
         return link;
     }
     function displayEssentialInfo(data) {

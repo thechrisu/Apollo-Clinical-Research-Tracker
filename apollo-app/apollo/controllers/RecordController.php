@@ -8,6 +8,8 @@
 
 
 namespace Apollo\Controllers;
+
+use Apollo\Apollo;
 use Apollo\Components\View;
 use Apollo\Helpers\URLHelper;
 
@@ -18,7 +20,7 @@ use Apollo\Helpers\URLHelper;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.4
+ * @version 0.0.5
  */
 class RecordController extends GenericController
 {
@@ -40,18 +42,35 @@ class RecordController extends GenericController
     /**
      * Shows one particular record
      *
-     * @since 0.0.4 Changed filenames
+     * @param string $record_id
+     * @since 0.0.5 Added a check for record ID validity
+     * @since 0.0.4 Changed file names
      * @since 0.0.3
      */
-    public function actionView($personId)
+    public function actionView($record_id = null)
     {
+        $record_id = intval($record_id);
+        if($record_id < 1) {
+            Apollo::getInstance()->getRequest()->error(400, 'Invalid record ID!');
+        }
         $breadcrumbs = [
             ['Records', URLHelper::url('record/'), true]
         ];
         View::render('record.single', 'View Record', $breadcrumbs);
     }
 
-    public function actionEdit($recordId){
+    /**
+     * Renders the edit view for a particular record
+     *
+     * @param string $record_id
+     * @since 0.0.5 Added a check for record ID validity
+     */
+    public function actionEdit($record_id = null)
+    {
+        $record_id = intval($record_id);
+        if($record_id < 1) {
+            Apollo::getInstance()->getRequest()->error(400, 'Invalid record ID!');
+        }
         $breadcrumbs = [
             ['Records', URLHelper::url('record/'), true]
         ];
