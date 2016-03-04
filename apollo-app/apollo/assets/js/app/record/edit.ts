@@ -1,6 +1,3 @@
-///<reference path="../ajax.ts"/>
-///<reference path="../scripts.ts"/>
-
 /**
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
@@ -8,71 +5,85 @@
  * @version 0.0.1
  */
 
-/**
- * Responsible for displaying a single record.
- * TODO: Implement rest of details, fix display (should do nice columns), add success update message
- */
-
 obj: fakeJSON_obj = {
     "error": null,
-    "essential": {
-        "given_name": "James",
-        "last_name": "Bond",
-        "email": "iLove@moneypenny.co.uk",
-        "phone": "+44 007",
-        "record_number": 7,
-        "record_name": "Record name",
-        "record_ids": [1, 2, 3, 4, 7, 1729],
-        "record_names": ["something", "something other", "secret", "GOSH", "top secret", "joke"]
-    },
-    "numberOfFields": 8,
-    "fields": [
-        {
-            "name": "Supervisor",
-            "type": "String",
-            "value": "M"
+    "data": {
+        "essential": {
+            "given_name": "James",
+            "last_name": "Bond",
+            "email": "iLove@moneypenny.co.uk",
+            "phone": "+44 007",
+            "record_number": 7,
+            "record_name": "Her majesty's secret weapon",
+            "record_ids": [1, 2, 3, 4, 7, 1729],
+            "record_names": ["something", "something other", "secret", "GOSH", "top secret", "joke"]
         },
-        {
-            "name": "Cars",
-            "type": "String",
-            "value": "Aston Martin DB5"
-        },
-        {
-            "name": "Funding Source",
-            "type": "String",
-            "value": "This information is top secret"
-        },
-        {
-            "name": "Payband",
-            "type": "String",
-            "value": "7"
-        },
-        {
-            "name": "References",
-            "type": "Text",
-            "value": "Mister Bond is one of our nicest employees. In fact, he even developed new applications in conjunction with Q. He is always punctual"
-        },
-        {
-            "name": "Specialty",
-            "type": "String",
-            "value": "Making cheesy comments"
-        },
-        {
-            "name": "Start Date",
-            "type": "Date",
-            "value": 1456940959
-        },
-        {
-            "name": "End Date",
-            "type": "Date",
-            "value": 1456941022
-        }
-    ]
+        "numberOfFields": 8,
+        "fields": [
+            {
+                "name": "Supervisor",
+                "type": "String",
+                "defaults": null,
+                "allow_other": true,
+                "values": "M"
+            },
+            {
+                "name": "Cars",
+                "type": "StringAr",
+                "defaults": null,
+                "allow_other": true,
+                "values": "Aston Martin DB5"
+            },
+            {
+                "name": "Funding Source",
+                "type": "String",
+                "defaults": null,
+                "allow_other": true,
+                "values": "M"
+            },
+            {
+                "name": "Payband",
+                "type": "Integer",
+                "defaults": [0, 1, 2, 3, 4, 5, 6, 7],
+                "allow_other": false,
+                "values": 7
+            },
+            {
+                "name": "References",
+                "type": "Text",
+                "has_default": false,
+                "allow_other": false,
+                "values": "Mister Bond is one of our nicest employees. In fact, he even developed new applications in conjunction with Q. He is always punctual"
+            },
+            {
+                "name": "Specialty",
+                "type": "String",
+                "has_default": false,
+                "allow_other": false,
+                "values": "Making cheesy comments"
+            },
+            {
+                "name": "Start Date",
+                "type": "Date",
+                "has_default": false,
+                "allow_other": false,
+                "values": 1456940959
+            },
+            {
+                "name": "End Date",
+                "type": "Date",
+                "has_default": false,
+                "allow_other": false,
+                "values": 1456941022
+            }
+        ]
+    }
 };
+
 
 JSON: fakeJSON = <JSON>fakeJSON_obj;
 
-var numCols = 3;
+var numCols = 2;
 
 $(document).ready(function () {
     var path = window.location.pathname;
@@ -81,11 +92,14 @@ $(document).ready(function () {
     loader.fadeIn(200);
     getRecordFromServer(recordNumber);
     AJAX.fakeGet(fakeJSON, function (data) {
+        var data = data.data;
         var fullName = data.essential.given_name + ' ' + data.essential.last_name;
-        updateBreadcrumbs(fullName, data.essential.record_name, data.essential.record_names, data.essential.record_ids);
+        updateBreadcrumbs(fullName, data.essential.record_name);
         displayEssentialInfo(data.essential);
-        parseAllFields(data);
-        formatRows();
+        var cal = getCalendar(data.fields[6].values, data.fields[6].name);
+        $('#recordDetails').append(cal);
+        //parseAllFields(data);
+        //formatRows();
         loader.fadeOut(200);
     }, function (message) {
         console.log(message);
@@ -93,42 +107,22 @@ $(document).ready(function () {
 
     });
 
-    function updateBreadcrumbs(personName, recordName, recordNames, recordIds) {
+    function updateBreadcrumbs(personName, recordName) {
         setTitle(personName, recordName);
         var bc = $('#nav-breadcrumbs');
-        //bc.html('');
-        bc.append("<li>" + personName + "</li>");
-        var links = getLinks(recordNames, recordIds);
-        bc.append(getEditButton());
-        var dd = getDropdownWithItems(links);
-        bc.append(dd);
+        var personURL = window.location.origin + "/record/view/" + getEnding(window.location.pathname);
+        bc.append("<li>" + personName + "</a></li>");
+        bc.append("<li class='active'><a href=\"" + personURL + "\">" + recordName + "</a></li>");
+        bc.append(getDoneButton());
         bc.append('<br>');
-        bc.append("<h1 style='display: inline'>\"" + recordName + "\"</h1><h6 style='display: inline'>" + personName + "</h6>");
+        bc.append("<h1 style='display: inline'>Editing \"" + recordName + "\"</h1><h6 style='display: inline'>" + personName + "</h6>");
     };
 
-    function getEditButton(){
-        var symbol = $("<span class='glyphicon glyphicon-pencil' aria-hidden='true'></span>");
-        var link = $("<a href=\"" + window.location.origin + "\/record\/edit\/" + getEnding(window.location.pathname) + "\" class='btn' />").append(symbol);
+    function getDoneButton(){
+        var symbol = $("<span class='glyphicon glyphicon-ok' aria-hidden='true'></span>");
+        var link = $("<a href=\"" + window.location.origin + "/record/view/" + getEnding(window.location.pathname) + "\" class='btn' />").append(symbol);
         return link;
     }
-
-    function getRecordFromServer(recordId) {
-        //TODO put the ajax request in here, extract the logic in it into separate functions
-    };
-
-    function getDropdownWithItems(items) {
-        var itemList = "";
-        for (var i = 0; i < items.length; i++) {
-            itemList += "<li>" + items[i] + "</li>";
-        }
-        var dropdown = $('<div class="btn-group pull-right"> \
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> \
-            Browse Records <span class="caret"></span> \
-        </button> \
-        <ul class="dropdown-menu" role="menu" id="dropdown-elems">' + itemList + '</ul></div>');
-
-        return dropdown;
-    };
 
     function displayEssentialInfo(data) {
         var g = $('#recordGeneric');
@@ -163,6 +157,10 @@ $(document).ready(function () {
         }
     }
 
+    function getRecordFromServer(recordId) {
+        //TODO put the ajax request in here, extract the logic in it into separate functions
+    };
+
     function formatRows(){
         //TODO
     }
@@ -186,13 +184,22 @@ $(document).ready(function () {
 
     //TODO: Care about edge cases (what if array is empty), refactor to remove duplication
     function parseField(field) {
-        field.name = field.name.toLowerCase();
+     /*   "name": "Specialty",
+            "type": "String",
+            "has_default": false,
+            "allow_other": false,
+            "values": "Making cheesy comments"*/
+        if(field.has_default){
+            
+        }
+/*        field.name = field.name.toLowerCase();
         field.type = field.type.toLowerCase();
         switch (field.type) {
             case 'string':
             case 'integer':
             case 'int':
             case 'text':
+
                 return getLine(field.type, field.value, field.name);
             case 'stringar':
             case 'integerar':
@@ -209,11 +216,23 @@ $(document).ready(function () {
                 return getLineAr(field.type, field.value, field.name);
             default:
                 console.error("Could not find out what type the field is. Field name: " + field.name);
-        }
+        }*/
+    }
+
+    function getCalendar(unixtime, fieldName) {
+        var realTime = getStringFromEpochTime(unixtime);
+        var container = $('<div class="input-group date" data-provide="datepicker" id=\"' + fieldName + 'Picker\">');
+        var input = $('<input class="form-control small-table" type="text" placeholder=\"' + fieldName + '\" value=\"' + realTime + '\">');
+        container.append(input);
+        var cal = $('<div class="input-group-addon small-table" style="height: 14px !important; line-height: 14px !important;">');
+        var openIcon = $('<span class="glyphicon glyphicon-th small-table" style="font-size: 12px !important; height: 14px !important; line-height: 14px !important;"></span>');
+        cal.append(openIcon);
+        container.append(container);
+        return container;
     }
 
     function setTitle(personName, recordName) {
-        document.title = personName + ' | ' + recordName;
+        document.title = "Editing " + personName + ' | ' + recordName;
     };
 
     function getLine(type, value, name) {
@@ -234,18 +253,10 @@ $(document).ready(function () {
         return ret;
     }
 
-    function getLinks(names, recordItems) {
-        var as = [];
-        for (var i = 0; i < names.length; i++) {
-            as.push("<a href=\"" + window.location.origin + "\/record\/view\/" + recordItems[i] + "\">" + names[i] + "</a>");
-        }
-        return as;
-    };
-
     function getStringFromEpochTime(time) {
         var DateObj = $.parseJSON('{"date_created":"' + time + '"}');
         var myDate = new Date(1000 * DateObj.date_created);
-        var dateS = myDate.getFullYear() + '-' + myDate.getMonth() + '-' + myDate.getDay();
+        var dateS = myDate.getMonth() + '/' + myDate.getDay() + '/' + myDate.getFullYear();
         return dateS;
     }
 
@@ -259,4 +270,3 @@ $(document).ready(function () {
         }
     };
 });
-

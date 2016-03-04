@@ -1,3 +1,5 @@
+///<reference path="../ajax.ts"/>
+///<reference path="../scripts.ts"/>
 /**
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
@@ -6,7 +8,7 @@
  */
 /**
  * Responsible for displaying a single record.
- * TODO: Implement rest of details, fix display (should do nice columns)
+ * TODO: Implement rest of details, fix display (should do nice columns), add success update message
  */
 obj: fakeJSON_obj = {
     "error": null,
@@ -69,13 +71,16 @@ var numCols = 3;
 $(document).ready(function () {
     var path = window.location.pathname;
     var recordNumber = getEnding(path);
+    var loader = $('#loader');
+    loader.fadeIn(200);
     getRecordFromServer(recordNumber);
-    fakeajaxGet(fakeJSON, function (data) {
+    AJAX.fakeGet(fakeJSON, function (data) {
         var fullName = data.essential.given_name + ' ' + data.essential.last_name;
         updateBreadcrumbs(fullName, data.essential.record_name, data.essential.record_names, data.essential.record_ids);
         displayEssentialInfo(data.essential);
         parseAllFields(data);
         formatRows();
+        loader.fadeOut(200);
     }, function (message) {
         console.log(message);
         //TODO Add errorhandling
@@ -90,7 +95,7 @@ $(document).ready(function () {
         var dd = getDropdownWithItems(links);
         bc.append(dd);
         bc.append('<br>');
-        bc.append("<h1 style='display: inline'>" + recordName + "</h1><h6 style='display: inline'>" + personName + "</h6>");
+        bc.append("<h1 style='display: inline'>\"" + recordName + "\"</h1><h6 style='display: inline'>" + personName + "</h6>");
     }
     ;
     function getEditButton() {
