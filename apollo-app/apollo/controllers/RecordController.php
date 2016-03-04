@@ -76,4 +76,11 @@ class RecordController extends GenericController
         ];
         View::render('record.edit', 'Edit Record', $breadcrumbs);
     }
+
+    public function actionExample() {
+        $breadcrumbs = [
+            ['Records', URLHelper::url('record/'), true]
+        ];
+        View::render('record.example', 'View Record', $breadcrumbs);
+    }
 }
