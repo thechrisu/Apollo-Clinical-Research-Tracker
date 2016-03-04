@@ -2,9 +2,10 @@
 ///<reference path="../scripts.ts"/>
 /**
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.1
+ * @version 0.0.2
  */
 /**
  * Responsible for displaying a single record.
@@ -14,6 +15,7 @@ obj: fakeJSON_obj = {
     "error": null,
     "essential": {
         "given_name": "James",
+        "middle_name": "Middle",
         "last_name": "Bond",
         "email": "iLove@moneypenny.co.uk",
         "phone": "+44 007",
@@ -100,7 +102,7 @@ $(document).ready(function () {
     ;
     function getEditButton() {
         var symbol = $("<span class='glyphicon glyphicon-pencil' aria-hidden='true'></span>");
-        var link = $("<a href=\"" + window.location.origin + "\/record\/edit\/" + getEnding(window.location.pathname) + "\" class='btn' />").append(symbol);
+        var link = $('<a href="' + window.location.origin + '/record/edit/' + getEnding(window.location.pathname) + '" class="btn btn-default">Edit</a>').prepend(symbol);
         return link;
     }
     function getRecordFromServer(recordId) {
