@@ -1,5 +1,6 @@
 ///<reference path="../ajax.ts"/>
 ///<reference path="../scripts.ts"/>
+///<reference path="../jquery.d.ts"/>
 /**
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
@@ -7,7 +8,7 @@
  * @version 0.0.1
  */
 
-obj: fakeJSON_obj = {
+var fakeJSON_obj = {
     "error": null,
     "data": {
         "essential": {
@@ -83,7 +84,7 @@ obj: fakeJSON_obj = {
 };
 
 
-JSON: fakeJSON = <JSON>fakeJSON_obj;
+var fakeJSON = <JSON> fakeJSON_obj;
 
 var numCols = 2;
 

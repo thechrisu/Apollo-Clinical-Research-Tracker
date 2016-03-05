@@ -1,3 +1,4 @@
+///<reference path="jquery.d.ts"/>
 /**
  * Class AJAX
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>

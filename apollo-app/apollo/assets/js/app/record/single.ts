@@ -1,5 +1,6 @@
 ///<reference path="../ajax.ts"/>
 ///<reference path="../scripts.ts"/>
+///<reference path="../jquery.d.ts"/>
 
 /**
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
@@ -14,7 +15,7 @@
  * TODO: Implement rest of details, fix display (should do nice columns), add success update message
  */
 
-obj: fakeJSON_obj = {
+var fakeJSON_obj = {
     "error": null,
     "essential": {
         "given_name": "James",
@@ -72,7 +73,7 @@ obj: fakeJSON_obj = {
     ]
 };
 
-JSON: fakeJSON = <JSON>fakeJSON_obj;
+var fakeJSON = <JSON>fakeJSON_obj;
 
 var numCols = 3;
 

@@ -1,5 +1,6 @@
 ///<reference path="../ajax.ts"/>
 ///<reference path="../scripts.ts"/>
+///<reference path="../jquery.d.ts"/>
 /**
  * Scripts file containing functions related to modal windows
  *
