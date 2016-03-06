@@ -114,6 +114,7 @@ class GetController extends GenericController
             "middle_name" => "Houka",
             "last_name" => "Bond",
             "email" => "james.bond@mi6.gov.uk",
+            "address" => ["85 Albert Embankment", "London, SE1 7TP"],
             "phone" => "+44 0000 007",
             "record_id" => 1,
             "record_name" => "Main",
