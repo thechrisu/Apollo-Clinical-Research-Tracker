@@ -67,11 +67,23 @@ var LoaderManager = (function () {
         target.prepend(container);
         return id;
     };
-    LoaderManager.showLoader = function (id) {
-        this.loaders[id].fadeIn(200);
+    LoaderManager.showLoader = function (id, callback) {
+        if (callback === void 0) { callback = null; }
+        if (callback == null) {
+            this.loaders[id].fadeIn(200);
+        }
+        else {
+            this.loaders[id].fadeIn(200, callback);
+        }
     };
-    LoaderManager.hideLoader = function (id) {
-        this.loaders[id].fadeOut(200);
+    LoaderManager.hideLoader = function (id, callback) {
+        if (callback === void 0) { callback = null; }
+        if (callback == null) {
+            this.loaders[id].fadeOut(200);
+        }
+        else {
+            this.loaders[id].fadeOut(200, callback);
+        }
     };
     LoaderManager.destroyLoader = function (id) {
         this.loaders[id].remove();

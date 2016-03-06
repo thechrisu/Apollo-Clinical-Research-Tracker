@@ -78,12 +78,20 @@ class LoaderManager {
         return id;
     }
 
-    public static showLoader(id:number) {
-        this.loaders[id].fadeIn(200);
+    public static showLoader(id:number, callback:Function = null) {
+        if(callback == null) {
+            this.loaders[id].fadeIn(200);
+        } else {
+            this.loaders[id].fadeIn(200, callback);
+        }
     }
 
-    public static hideLoader(id:number) {
-        this.loaders[id].fadeOut(200);
+    public static hideLoader(id:number, callback:Function = null) {
+        if(callback == null) {
+            this.loaders[id].fadeOut(200);
+        } else {
+            this.loaders[id].fadeOut(200, callback);
+        }
     }
 
     public static destroyLoader(id:number) {
