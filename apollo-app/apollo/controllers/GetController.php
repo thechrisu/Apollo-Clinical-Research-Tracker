@@ -21,7 +21,7 @@ use Apollo\Components\Person;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  */
 class GetController extends GenericController
 {
@@ -100,6 +100,49 @@ class GetController extends GenericController
             }
         }
         echo json_encode($response);
+    }
+
+    /**
+     * Returns dummy record data
+     *
+     * @since 0.0.3
+     */
+    public function actionRecord() {
+        $data['error'] = null;
+        $data['essential'] = [
+            "given_name" => "James",
+            "middle_name" => "Houka",
+            "last_name" => "Bond",
+            "email" => "james.bond@mi6.gov.uk",
+            "phone" => "+44 0000 007",
+            "record_id" => 1,
+            "record_name" => "Main",
+            "record_ids" => [2, 3, 4, 5],
+            "record_names" => ['Second', 'Third', 'Fourth', 'Fifth']
+        ];
+        $data['data'] = [
+            [
+                "name" => "Supervisor",
+                "type" => 2,
+                "value" => "M&Ms"
+            ],
+            [
+                "name" => "Car",
+                "type" => 2,
+                "value" => "Aston Martin DB5"
+            ],
+            [
+                "name" => "References",
+                "type" => 4,
+                "value" => "Mister Bond is one of our nicest employees. In fact, he even developed new applications in conjunction with Q. He is always punctual."
+            ],
+            [
+                "name" => "Birthday",
+                "type" => 3,
+                "value" => "1834-02-22 02:00:00"
+            ]
+        ];
+        echo json_encode($data);
     }
 
     /**
