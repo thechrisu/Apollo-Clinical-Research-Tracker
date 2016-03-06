@@ -5,7 +5,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.4
+ * @version 0.0.5
  */
 /**
  * Util class
@@ -46,6 +46,39 @@ var Util = (function () {
         modal.modal('show');
     };
     return Util;
+})();
+/**
+ * Deals with loaders
+ * @since 0.0.5
+ */
+var LoaderManager = (function () {
+    function LoaderManager() {
+    }
+    LoaderManager.createLoader = function (target) {
+        var loader = $('<div class="loader"></div>');
+        for (var i = 0; i < 5; i++) {
+            loader.append($('<div class="line-' + (i + 1) + '"></div>'));
+        }
+        var id = LoaderManager.newId();
+        var container = $('<div class="loader-container loader-' + id + '" style="display: none">');
+        this.loaders[id] = container;
+        target.prepend(container);
+    };
+    LoaderManager.showLoader = function (id) {
+        this.loaders[id].fadeIn(200);
+    };
+    LoaderManager.hideLoader = function (id) {
+        this.loaders[id].fadeOut(200);
+    };
+    LoaderManager.destroyLoader = function (id) {
+        this.loaders[id].remove();
+        delete this.loaders[id];
+    };
+    LoaderManager.newId = function () {
+        return ++this.counter;
+    };
+    LoaderManager.counter = 0;
+    return LoaderManager;
 })();
 /**
  * Sets the base url
