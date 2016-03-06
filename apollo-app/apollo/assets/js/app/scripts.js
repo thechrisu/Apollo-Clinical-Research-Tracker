@@ -5,7 +5,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.5
+ * @version 0.0.6
  */
 /**
  * Util class
@@ -44,6 +44,17 @@ var Util = (function () {
             messageContainer.html(message);
         });
         modal.modal('show');
+    };
+    /**
+     * Converts MySQL date time string into JS' Date object
+     *
+     * @param sqlDate
+     * @returns {Date}
+     * @since 0.0.6
+     */
+    Util.parseSQLDate = function (sqlDate) {
+        var parts = sqlDate.split(/[- :]/);
+        return new Date(+parts[0], +parts[1] - 1, +parts[2], +parts[3], +parts[4], +parts[5]);
     };
     return Util;
 })();

@@ -5,7 +5,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.5
+ * @version 0.0.6
  */
 
 /**
@@ -29,7 +29,7 @@ class Util {
      * @returns {string}
      * @since 0.0.4
      */
-    public static url(url:string, trailingSlash:boolean = true) {
+    public static url(url:string, trailingSlash:boolean = true):string {
         if (url.substr(0, 1) != '/') {
             url = '/' + url;
         }
@@ -53,6 +53,19 @@ class Util {
         });
         modal.modal('show');
     }
+
+    /**
+     * Converts MySQL date time string into JS' Date object
+     *
+     * @param sqlDate
+     * @returns {Date}
+     * @since 0.0.6
+     */
+    public static parseSQLDate(sqlDate: string) : Date {
+        var parts = sqlDate.split(/[- :]/);
+        return new Date(+parts[0], +parts[1] - 1, +parts[2], +parts[3], +parts[4], +parts[5]);
+    }
+
 }
 
 /**
@@ -78,7 +91,7 @@ class LoaderManager {
     }
 
     public static showLoader(id:number, callback:Function = null) {
-        if(callback == null) {
+        if (callback == null) {
             this.loaders[id].fadeIn(200);
         } else {
             this.loaders[id].fadeIn(200, callback);
@@ -86,7 +99,7 @@ class LoaderManager {
     }
 
     public static hideLoader(id:number, callback:Function = null) {
-        if(callback == null) {
+        if (callback == null) {
             this.loaders[id].fadeOut(200);
         } else {
             this.loaders[id].fadeOut(200, callback);

@@ -124,7 +124,7 @@ class ColumnRow {
         } else {
             var rowHTML = $('<tr></tr>');
             rowHTML.append($('<td>' + this.decorateKey(this.key) + '</td>'));
-            rowHTML.append($('<td>' + this.decorateValue(this.value) + '</td>'));
+            rowHTML.append($('<td>' + this.decorateValue(<string> this.value) + '</td>'));
             target.append(rowHTML);
         }
     }

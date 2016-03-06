@@ -8,7 +8,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.4
+ * @version 0.0.1
  */
 var SingleView = (function () {
     function SingleView() {
