@@ -26,6 +26,69 @@ use Apollo\Helpers\URLHelper;
         </div>
         <div class="panel-body">
 
+            <div class="row top-buffer">
+
+                <div class="col-md-4">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tr>
+                                <td>
+                                    <small>Given Name</small>
+                                </td>
+                                <td><strong>James</strong></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <small>Middle Name</small>
+                                </td>
+                                <td><b>Houka</b></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <small>Last Name</small>
+                                </td>
+                                <td><strong>Bond</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tr>
+                                <td>
+                                    <small>Email</small>
+                                </td>
+                                <td><strong>james.bond@mi6.gov.uk</strong></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <small>Phone</small>
+                                </td>
+                                <td><b>+44 0000 007</b></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tr>
+                                <td rowspan="2">
+                                    <small>Address</small>
+                                </td>
+                                <td><strong>85 Albert Embankment</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>London, SE1 7TP</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 
@@ -129,5 +192,5 @@ use Apollo\Helpers\URLHelper;
 @stop
 @section('scripts')
     @parent
-    <script src="{{ AssetHelper::js('app/record/index') }}"></script>
+    <script src="{{ AssetHelper::js('app/record/single.view') }}"></script>
 @stop
