@@ -5,7 +5,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.6
+ * @version 0.0.7
  */
 
 /**
@@ -61,9 +61,32 @@ class Util {
      * @returns {Date}
      * @since 0.0.6
      */
-    public static parseSQLDate(sqlDate: string) : Date {
+    public static parseSQLDate(sqlDate:string):Date {
         var parts = sqlDate.split(/[- :]/);
         return new Date(+parts[0], +parts[1] - 1, +parts[2], +parts[3], +parts[4], +parts[5]);
+    }
+
+    /**
+     * Formats JS Date to the following format:
+     * January 1st, 1970
+     *
+     * @param date
+     * @returns {string}
+     * @since 0.0.7
+     */
+    public static formatDate(date:Date):string {
+        var months = [
+            "January", "February", "March",
+            "April", "May", "June", "July",
+            "August", "September", "October",
+            "November", "December"
+        ];
+        var day = date.getDate().toString().slice(-1);
+        var daySuffix = 'th';
+        if (day == '1') daySuffix = 'st';
+        if (day == '2') daySuffix = 'nd';
+        if (day == '3') daySuffix = 'rd';
+        return months[date.getMonth()] + ' ' + date.getDate() + daySuffix + ', ' + date.getFullYear();
     }
 
 }

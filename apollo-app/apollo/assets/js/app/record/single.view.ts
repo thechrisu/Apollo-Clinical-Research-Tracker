@@ -74,7 +74,11 @@ class SingleView {
             var columnManager = new ColumnManager('#fields', 3, count);
             for(var i = 0; i < count; i++) {
                 var field = data[i];
-                columnManager.add(new ColumnRow(field.name, field.value));
+                var value = field.value;
+                if(field.type == 3) {
+                    value = Util.formatDate(Util.parseSQLDate(<string> value));
+                }
+                columnManager.add(new ColumnRow(field.name, value));
             }
             columnManager.render(false);
             LoaderManager.hideLoader(loader, function () {
