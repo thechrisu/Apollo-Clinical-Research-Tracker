@@ -33,16 +33,7 @@ use Apollo\Helpers\URLHelper;
             <a href="#" id="add-record" class="btn btn-default btn-block">Add a record</a>
         </div>
     </div>
-    <div class="table-responsive top-buffer">
-        <div class="loader-container" id="loader">
-            <div class="loader">
-                <div class="line-1"></div>
-                <div class="line-2"></div>
-                <div class="line-3"></div>
-                <div class="line-4"></div>
-                <div class="line-5"></div>
-            </div>
-        </div>
+    <div class="table-responsive top-buffer loader-ready">
         <table class="table table-striped table-hover">
             <thead>
             <tr>

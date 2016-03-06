@@ -71,6 +71,8 @@ class LoaderManager {
         }
         var id = LoaderManager.newId();
         var container = $('<div class="loader-container loader-' + id + '" style="display: none">');
+        container.append(loader);
+        this.loaders = {};
         this.loaders[id] = container;
         target.prepend(container);
         return id;

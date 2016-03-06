@@ -12,7 +12,7 @@
 
 $(document).ready(function () {
     var pagination = $('#pagination');
-    var loader = $('#loader');
+    var loader = LoaderManager.createLoader($('.table-responsive.loader-ready'));
     var search = '';
     var page = 1;
     var sort = 1;
@@ -27,8 +27,8 @@ $(document).ready(function () {
     });
     updateTable();
     function updateTable() {
-        loader.fadeIn(200);
-        AJAX.get(url('get/records/?page=' + page + '&sort=' + sort + '&search=' + encodeURIComponent(search), false), function (data) {
+        LoaderManager.showLoader(loader);
+        AJAX.get(Util.url('get/records/?page=' + page + '&sort=' + sort + '&search=' + encodeURIComponent(search), false), function (data) {
             var table = $('#table-body');
             table.html('');
             pagination.pagination('updateItems', data.count);
@@ -47,9 +47,9 @@ $(document).ready(function () {
                 tr.append('<td colspan="4" class="text-center"><b>Nothing to display...</b></td>');
                 table.append(tr);
             }
-            loader.fadeOut(200);
+            LoaderManager.hideLoader(loader);
         }, function (message:string) {
-            error('An error has occurred during the loading of the list of records. Please reload the page or contact the administrator. Error message: ' + message);
+            Util.error('An error has occurred during the loading of the list of records. Please reload the page or contact the administrator. Error message: ' + message);
         });
     }
     $('#sort-tabs').on('click', '.sort-tab', function() {
