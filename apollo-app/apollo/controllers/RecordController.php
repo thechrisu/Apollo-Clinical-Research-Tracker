@@ -20,7 +20,7 @@ use Apollo\Helpers\URLHelper;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.5
+ * @version 0.0.6
  */
 class RecordController extends GenericController
 {
@@ -43,6 +43,7 @@ class RecordController extends GenericController
      * Shows one particular record
      *
      * @param string $record_id
+     * @since 0.0.6 New breadcrumb structure
      * @since 0.0.5 Added a check for record ID validity
      * @since 0.0.4 Changed file names
      * @since 0.0.3
@@ -54,7 +55,9 @@ class RecordController extends GenericController
             Apollo::getInstance()->getRequest()->error(400, 'Invalid record ID!');
         }
         $breadcrumbs = [
-            ['Records', URLHelper::url('record'), true]
+            ['Records', URLHelper::url('record'), true],
+            ['Person name', null, false],
+            ['Record name (Record ID)', null, true]
         ];
         View::render('record.single', 'View Record', $breadcrumbs);
     }
