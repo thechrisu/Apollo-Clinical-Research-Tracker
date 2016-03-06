@@ -133,14 +133,19 @@ class GetController extends GenericController
                 "value" => "Aston Martin DB5"
             ],
             [
+                "name" => "Intentionally left blank",
+                "type" => 2,
+                "value" => null
+            ],
+            [
                 "name" => "Japanese names",
                 "type" => 2,
-                "value" => ['Ryuko', 'Satsuki', 'Misaka', 'Asuna', 'Minene', 'Kurisu']
+                "value" => ['Asuna', 'Kurisu']
             ],
             [
                 "name" => "References",
                 "type" => 4,
-                "value" => "Mister Bond is one of our nicest employees. In fact, he even developed new applications in conjunction with Q. He is always punctual."
+                "value" => "Mister Bond is one of our nicest employees. He even developed new applications in conjunction with Q."
             ],
             [
                 "name" => "Birthday",
