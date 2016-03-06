@@ -6,14 +6,22 @@
 @import "core/core"
 @import "partials/_loader"
 
-// For loader
+/* Extension to boostrap
+.undefined
+  font-style: italic
+  color: #aaa
+.panel-no-padding
+  padding-bottom: 0 !important
+  padding-top: 0 !important
+
+/* Loader-related CSS
 .loader-ready
   position: relative
 .panel-body
   .loader-container
     margin: -15px 0 0 -15px
 
-// Bootstrap fixes
+/* Bootstrap fixes
 
 // Do not display the top border on some tables
 .table.no-border-top
@@ -21,20 +29,17 @@
     td
       border-top: none !important
 
+// Add an extra margin for icons inside buttons
 .btn
   & > .glyphicon
     margin-right: 5px
 
-.panel-heading
-  .pull-left, .pull-right
-    vertical-align: middle
-  .btn
-    margin-left: 5px
-
+// Remove margin on breadcrumbs for better appearance
 .panel-heading
   .breadcrumb
     margin-bottom: 0
 
+// Removing the margin on the error page
 .jumbotron.error-page
   margin-bottom: 0
 

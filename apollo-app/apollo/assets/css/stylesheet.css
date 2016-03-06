@@ -47,22 +47,28 @@ body {
     transform: scaleY(1); }
   50% {
     transform: scaleY(2); } }
+/* Extension to boostrap */
+.undefined {
+  font-style: italic;
+  color: #aaa; }
+
+.panel-no-padding {
+  padding-bottom: 0 !important;
+  padding-top: 0 !important; }
+
+/* Loader-related CSS */
 .loader-ready {
   position: relative; }
 
 .panel-body .loader-container {
   margin: -15px 0 0 -15px; }
 
+/* Bootstrap fixes */
 .table.no-border-top tr:first-child td {
   border-top: none !important; }
 
 .btn > .glyphicon {
   margin-right: 5px; }
-
-.panel-heading .pull-left, .panel-heading .pull-right {
-  vertical-align: middle; }
-.panel-heading .btn {
-  margin-left: 5px; }
 
 .panel-heading .breadcrumb {
   margin-bottom: 0; }
