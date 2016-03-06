@@ -61,7 +61,7 @@ class Util {
  */
 class LoaderManager {
 
-    private static loaders:{[id: number] : JQuery};
+    private static loaders:{[id: number] : JQuery} = {};
     private static counter = 0;
 
     public static createLoader(target:JQuery):number {
@@ -72,7 +72,6 @@ class LoaderManager {
         var id = LoaderManager.newId();
         var container = $('<div class="loader-container loader-' + id + '" style="display: none">');
         container.append(loader);
-        this.loaders = {};
         this.loaders[id] = container;
         target.prepend(container);
         return id;
