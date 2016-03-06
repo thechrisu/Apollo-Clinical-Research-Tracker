@@ -63,6 +63,7 @@ var LoaderManager = (function () {
         var container = $('<div class="loader-container loader-' + id + '" style="display: none">');
         this.loaders[id] = container;
         target.prepend(container);
+        return id;
     };
     LoaderManager.showLoader = function (id) {
         this.loaders[id].fadeIn(200);

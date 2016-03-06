@@ -64,31 +64,32 @@ class LoaderManager {
     private static loaders:{[id: number] : JQuery};
     private static counter = 0;
 
-    public static createLoader(target:JQuery) {
+    public static createLoader(target:JQuery):number {
         var loader = $('<div class="loader"></div>');
-        for(var i = 0; i < 5; i++) {
-            loader.append($('<div class="line-' + (i + 1) +'"></div>'));
+        for (var i = 0; i < 5; i++) {
+            loader.append($('<div class="line-' + (i + 1) + '"></div>'));
         }
         var id = LoaderManager.newId();
         var container = $('<div class="loader-container loader-' + id + '" style="display: none">');
         this.loaders[id] = container;
         target.prepend(container);
+        return id;
     }
 
-    public static showLoader(id: number) {
+    public static showLoader(id:number) {
         this.loaders[id].fadeIn(200);
     }
 
-    public static hideLoader(id: number) {
+    public static hideLoader(id:number) {
         this.loaders[id].fadeOut(200);
     }
 
-    public static destroyLoader(id: number) {
+    public static destroyLoader(id:number) {
         this.loaders[id].remove();
         delete this.loaders[id];
     }
 
-    private static newId() : number {
+    private static newId():number {
         return ++this.counter;
     }
 
