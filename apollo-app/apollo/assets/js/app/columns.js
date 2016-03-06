@@ -3,11 +3,12 @@
  * Column manager typescript
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  */
 var ColumnManager = (function () {
-    function ColumnManager(target, columnCount) {
+    function ColumnManager(target, columnCount, totalRows) {
         if (columnCount === void 0) { columnCount = 3; }
+        if (totalRows === void 0) { totalRows = null; }
         this.targetSelector = target;
         this.target = $(target);
         this.container = $('<div class="row top-buffer"></div>');
@@ -16,7 +17,29 @@ var ColumnManager = (function () {
         for (var i = 0; i < columnCount; i++) {
             this.columns[i] = new Column(this.container);
         }
+        this.totalRows = totalRows;
     }
+    ColumnManager.prototype.add = function (row) {
+        if (this.totalRows == null) {
+            var bestColumn = this.columns[0];
+            for (var i = 0; i < this.columnCount; i++) {
+                var column = this.columns[i];
+                if (column.countRows() < bestColumn.countRows()) {
+                    bestColumn = column;
+                }
+            }
+            bestColumn.addToBack(row);
+        }
+        else {
+            for (var i = 0; i < this.columnCount; i++) {
+                var column = this.columns[i];
+                if (column.countRows() < this.totalRows / 3) {
+                    column.addToBack(row);
+                    break;
+                }
+            }
+        }
+    };
     ColumnManager.prototype.addToColumn = function (index, row) {
         this.columns[index].addToBack(row);
     };
@@ -53,6 +76,9 @@ var Column = (function () {
         var bootstrapColumn = $('<div class="col-md-4"></div>');
         bootstrapColumn.append(responsive);
         this.target.append(bootstrapColumn);
+    };
+    Column.prototype.countRows = function () {
+        return this.rows.length;
     };
     return Column;
 })();

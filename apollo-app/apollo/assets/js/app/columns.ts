@@ -3,7 +3,7 @@
  * Column manager typescript
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  */
 
 class ColumnManager {
@@ -13,8 +13,9 @@ class ColumnManager {
     private container:JQuery;
     private columnCount:number;
     private columns:Column[];
+    private totalRows:number;
 
-    constructor(target:string, columnCount:number = 3) {
+    constructor(target:string, columnCount:number = 3, totalRows:number = null) {
         this.targetSelector = target;
         this.target = $(target);
         this.container = $('<div class="row top-buffer"></div>');
@@ -22,6 +23,28 @@ class ColumnManager {
         this.columns = [];
         for (var i = 0; i < columnCount; i++) {
             this.columns[i] = new Column(this.container);
+        }
+        this.totalRows = totalRows;
+    }
+
+    public add(row:ColumnRow) {
+        if(this.totalRows == null) {
+            var bestColumn = this.columns[0];
+            for (var i = 0; i < this.columnCount; i++) {
+                var column = this.columns[i];
+                if(column.countRows() < bestColumn.countRows()) {
+                    bestColumn = column;
+                }
+            }
+            bestColumn.addToBack(row);
+        } else {
+            for (var i = 0; i < this.columnCount; i++) {
+                var column = this.columns[i];
+                if (column.countRows() < this.totalRows / 3) {
+                    column.addToBack(row);
+                    break;
+                }
+            }
         }
     }
 
@@ -71,6 +94,10 @@ class Column {
         this.target.append(bootstrapColumn);
     }
 
+    public countRows():number {
+        return this.rows.length;
+    }
+
 }
 
 class ColumnRow {
@@ -108,7 +135,7 @@ class ColumnRow {
     }
 
     public decorateValue(value:string):string {
-        if(value == null) {
+        if (value == null) {
             value = '<span class="undefined">None</span>"'
         } else {
             value = '<strong>' + value + '</strong>'
