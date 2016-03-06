@@ -5,8 +5,17 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.2
+ * @version 0.0.3
  */
+
+/**
+ * Default interfaces
+ * @since 0.0.3
+ */
+interface Error {
+    id: number,
+    description: string
+}
 
 /**
  * Sets the base url
@@ -22,11 +31,11 @@ if (!location.origin) {
  * @returns {string}
  * @since 0.0.2
  */
-function url(url: string, trailingSlash: boolean = true) {
-    if(url.substr(0, 1) != '/') {
+function url(url:string, trailingSlash:boolean = true) {
+    if (url.substr(0, 1) != '/') {
         url = '/' + url;
     }
-    if(trailingSlash && url.substr(url.length - 1) != '/') {
+    if (trailingSlash && url.substr(url.length - 1) != '/') {
         url += '/';
     }
     return url;
@@ -38,10 +47,10 @@ function url(url: string, trailingSlash: boolean = true) {
  * @param message
  * @since 0.0.2
  */
-function error(message: string = 'An error has occurred.') {
+function error(message:string = 'An error has occurred.') {
     var modal = $('#error-modal');
     var messageContainer = $('#error-message');
-    modal.on('show.bs.modal', function() {
+    modal.on('show.bs.modal', function () {
         messageContainer.html(message);
     });
     modal.modal('show');
