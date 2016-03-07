@@ -47,6 +47,9 @@ body {
     transform: scaleY(1); }
   50% {
     transform: scaleY(2); } }
+#essential-panel .panel-heading .btn {
+  margin-left: 10px; }
+
 #essential small {
   font-size: 0.9em; }
 #essential strong {
@@ -73,7 +76,7 @@ body {
   border-top: none !important; }
 
 .btn > .glyphicon {
-  margin-right: 5px; }
+  margin-right: 8px; }
 
 .panel-heading .breadcrumb {
   margin-bottom: 0; }

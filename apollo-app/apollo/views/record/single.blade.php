@@ -15,12 +15,9 @@ use Apollo\Helpers\URLHelper;
 
     <div class="panel panel-default loader-ready" id="essential-panel">
         <div class="panel-heading">
-            <p class="pull-right">Record actions:
-                <a href="#" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-pencil"
-                                                                 aria-hidden="true"></span> Edit</a>
-                <a href="#" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove"
-                                                                aria-hidden="true"></span>
-                    Delete</a>
+            <p class="pull-right">Record actions:<!--
+             --><a href="#" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>Edit</a><!--
+             --><a href="#" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Delete</a>
             </p>
             <p>Essential information</p>
         </div>
@@ -35,19 +32,19 @@ use Apollo\Helpers\URLHelper;
                                 <td>
                                     <small>Given Name</small>
                                 </td>
-                                <td><span class="undefined">None</span></td>
+                                <td><span class="undefined">Loading...</span></td>
                             </tr>
                             <tr>
                                 <td>
                                     <small>Middle Name</small>
                                 </td>
-                                <td><span class="undefined">None</span></td>
+                                <td><span class="undefined">Loading...</span></td>
                             </tr>
                             <tr>
                                 <td>
                                     <small>Last Name</small>
                                 </td>
-                                <td><span class="undefined">None</span></td>
+                                <td><span class="undefined">Loading...</span></td>
                             </tr>
                         </table>
                     </div>
@@ -60,13 +57,13 @@ use Apollo\Helpers\URLHelper;
                                 <td>
                                     <small>Email</small>
                                 </td>
-                                <td><span class="undefined">None</span></td>
+                                <td><span class="undefined">Loading...</span></td>
                             </tr>
                             <tr>
                                 <td>
                                     <small>Phone</small>
                                 </td>
-                                <td><span class="undefined">None</span></td>
+                                <td><span class="undefined">Loading...</span></td>
                             </tr>
                         </table>
                     </div>
@@ -79,7 +76,7 @@ use Apollo\Helpers\URLHelper;
                                 <td>
                                     <small>Address</small>
                                 </td>
-                                <td><span class="undefined">None</span></td>
+                                <td><span class="undefined">Loading...</span></td>
                             </tr>
                         </table>
                     </div>

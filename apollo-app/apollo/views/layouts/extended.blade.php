@@ -48,6 +48,13 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
         </div>
     </div>
 
+    <footer>
+        <div class="container">
+            <p class="pull-left text-muted">&copy; 2016 UCL School of Life and Medical Sciences</p>
+            <p class="pull-right text-mutedgit ">By Chris U, Desi K and Tim K</p>
+        </div>
+    </footer>
+
     <div class="modal fade" id="error-modal" tabindex="-1" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
