@@ -147,36 +147,3 @@ class LoaderManager {
 if (!location.origin) {
     location.origin = location.protocol + "//" + location.host;
 }
-
-/**
- * Returns the full URL to resource
- *
- * @returns {string}
- * @since 0.0.2
- * @deprecated
- */
-function url(url:string, trailingSlash:boolean = true):string {
-    if (url.substr(0, 1) != '/') {
-        url = '/' + url;
-    }
-    if (trailingSlash && url.substr(url.length - 1) != '/') {
-        url += '/';
-    }
-    return url;
-}
-
-/**
- * Displays the error modal window
- *
- * @param message
- * @since 0.0.2
- * @deprecated
- */
-function error(message:string = 'An error has occurred.') {
-    var modal = $('#error-modal');
-    var messageContainer = $('#error-message');
-    modal.on('show.bs.modal', function () {
-        messageContainer.html(message);
-    });
-    modal.modal('show');
-}
