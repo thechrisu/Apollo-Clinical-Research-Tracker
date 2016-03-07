@@ -8,7 +8,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.1
+ * @version 0.0.2
  */
 
 interface EssentialData {
@@ -21,7 +21,7 @@ interface EssentialData {
     record_id:number,
     record_name:string,
     record_ids:number[],
-    record_names:string[],
+    record_names:string[]
 
 }
 interface FieldData {
@@ -50,7 +50,7 @@ class SingleView {
         });
     }
 
-    public parseEssentials(data:EssentialData) {
+    private parseEssentials(data:EssentialData) {
         var loader = LoaderManager.createLoader($('#essential-panel'));
         LoaderManager.showLoader(loader, function () {
             var columnManager = new ColumnManager('#essential');
@@ -67,7 +67,7 @@ class SingleView {
         });
     }
 
-    public parseFields(data:FieldData[]) {
+    private parseFields(data:FieldData[]) {
         var loader = LoaderManager.createLoader($('#fields'));
         LoaderManager.showLoader(loader, function () {
             var count = data.length;

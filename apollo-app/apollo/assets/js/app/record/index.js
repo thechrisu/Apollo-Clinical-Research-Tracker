@@ -9,67 +9,85 @@
  * @license http://opensource.org/licenses/mit-license.php MIT License
  * @version 0.0.4
  */
-$(document).ready(function () {
-    var pagination = $('#pagination');
-    var loader = LoaderManager.createLoader($('.table-responsive.loader-ready'));
-    var search = '';
-    var page = 1;
-    var sort = 1;
-    pagination.pagination({
-        items: 0,
-        itemsOnPage: 10,
-        onPageClick: function (_page, event) {
-            event.preventDefault();
-            page = _page;
-            updateTable();
-        }
-    });
-    updateTable();
-    function updateTable() {
-        LoaderManager.showLoader(loader);
-        AJAX.get(Util.url('get/records/?page=' + page + '&sort=' + sort + '&search=' + encodeURIComponent(search), false), function (data) {
-            var table = $('#table-body');
-            table.html('');
-            pagination.pagination('updateItems', data.count);
-            if (data.count > 0) {
-                for (var i = 0; i < data.data.length; i++) {
-                    var record = data.data[i];
-                    var tr = $('<tr style="cursor: pointer" class="record-tr" data-id="' + record.id + '"></tr>');
-                    tr.append('<td>' + record.given_name + '</td>');
-                    tr.append('<td>' + record.last_name + '</td>');
-                    tr.append('<td>' + record.email + '</td>');
-                    tr.append('<td>' + record.phone + '</td>');
-                    table.append(tr);
-                }
-            }
-            else {
-                var tr = $('<tr></tr>');
-                tr.append('<td colspan="4" class="text-center"><b>Nothing to display...</b></td>');
-                table.append(tr);
-            }
-            LoaderManager.hideLoader(loader);
-        }, function (message) {
-            Util.error('An error has occurred during the loading of the list of records. Please reload the page or contact the administrator. Error message: ' + message);
-        });
+var RecordTable = (function () {
+    function RecordTable() {
     }
-    $('#sort-tabs').on('click', '.sort-tab', function () {
-        var that = $(this);
-        $('.sort-tab').removeClass('active');
-        that.addClass('active');
-        sort = that.data('sort');
-        updateTable();
-    });
-    $('#table-body').on('click', '.record-tr', function (e) {
-        e.preventDefault();
-        var that = $(this);
-        location.href = url('record/view/' + that.data('id'));
-    });
-    var timer = null;
-    $('#records-search').keyup(function () {
-        clearTimeout(timer);
-        search = $(this).val();
-        timer = setTimeout(function () {
-            updateTable();
-        }, 600);
-    });
+    RecordTable.prototype.load = function () {
+        this.table = $('#table-body');
+        this.pagination = $('#pagination');
+        this.loader = LoaderManager.createLoader($('.table-responsive.loader-ready'));
+        this.page = 1;
+        this.sort = 1;
+        this.search = '';
+        this.setup();
+        this.updateTable();
+    };
+    RecordTable.prototype.setup = function () {
+        var that = this;
+        this.pagination.pagination({
+            items: 0,
+            itemsOnPage: 10,
+            onPageClick: function (page, event) {
+                if (event != null) {
+                    event.preventDefault();
+                }
+                that.page = page;
+                that.updateTable();
+            }
+        });
+        $('#sort-tabs').on('click', '.sort-tab', function () {
+            $('.sort-tab').removeClass('active');
+            $(this).addClass('active');
+            that.sort = $(this).data('sort');
+            that.updateTable();
+        });
+        this.table.on('click', '.record-tr', function (e) {
+            e.preventDefault();
+            location.href = Util.url('record/view/' + $(this).data('id'));
+        });
+        var timer = null;
+        $('#records-search').keyup(function () {
+            clearTimeout(timer);
+            that.search = encodeURIComponent($(this).val());
+            timer = setTimeout(function () {
+                that.updateTable();
+            }, 600);
+        });
+    };
+    RecordTable.prototype.updateTable = function () {
+        var that = this;
+        LoaderManager.showLoader(that.loader, function () {
+            AJAX.get(Util.url('get/records/?page=' + that.page + '&sort=' + that.sort + '&search=' + that.search, false), function (data) {
+                if (data.count < (that.page - 1) * 10) {
+                    that.pagination.pagination('selectPage', data.count / 10 - data.count % 10);
+                    return;
+                }
+                that.pagination.pagination('updateItems', data.count);
+                that.table.html('');
+                if (data.count > 0) {
+                    for (var i = 0; i < data.data.length; i++) {
+                        that.renderTr(data.data[i]);
+                    }
+                }
+                else {
+                    that.table.append('<tr><td colspan="4" class="text-center"><b>Nothing to display . . .</b></td></tr>');
+                }
+                LoaderManager.hideLoader(that.loader);
+            }, function (message) {
+                Util.error('An error has occurred during the loading of the list of records. Please reload the page or contact the administrator. Error message: ' + message);
+            });
+        });
+    };
+    RecordTable.prototype.renderTr = function (data) {
+        var tr = $('<tr class="record-tr clickable" data-id="' + data.id + '"></tr>');
+        tr.append('<td>' + data.given_name + '</td>');
+        tr.append('<td>' + data.last_name + '</td>');
+        tr.append('<td>' + data.email + '</td>');
+        tr.append('<td>' + data.phone + '</td>');
+        this.table.append(tr);
+    };
+    return RecordTable;
+})();
+$(document).ready(function () {
+    new RecordTable().load();
 });

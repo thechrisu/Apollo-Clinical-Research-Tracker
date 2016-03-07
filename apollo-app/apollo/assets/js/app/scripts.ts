@@ -5,7 +5,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.7
+ * @version 0.0.8
  */
 
 /**
@@ -155,7 +155,7 @@ if (!location.origin) {
  * @since 0.0.2
  * @deprecated
  */
-function url(url:string, trailingSlash:boolean = true) {
+function url(url:string, trailingSlash:boolean = true):string {
     if (url.substr(0, 1) != '/') {
         url = '/' + url;
     }

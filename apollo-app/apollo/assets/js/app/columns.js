@@ -3,7 +3,7 @@
  * Column manager typescript
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  */
 var ColumnManager = (function () {
     function ColumnManager(target, columnCount, totalRows) {

@@ -3,7 +3,7 @@
  * Column manager typescript
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  */
 
 class ColumnManager {
@@ -129,12 +129,12 @@ class ColumnRow {
         }
     }
 
-    public decorateKey(key:string):string {
+    private decorateKey(key:string):string {
         key = '<small>' + key + '</small>'
         return key;
     }
 
-    public decorateValue(value:string):string {
+    private decorateValue(value:string):string {
         if (value == null) {
             value = '<span class="undefined">None</span>'
         } else {
