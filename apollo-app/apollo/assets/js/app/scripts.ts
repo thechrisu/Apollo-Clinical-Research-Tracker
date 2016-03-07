@@ -5,7 +5,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.8
+ * @version 0.0.9
  */
 
 /**
@@ -93,6 +93,7 @@ class Util {
 
 /**
  * Deals with loaders
+ * @since 0.0.9 Added documnetation
  * @since 0.0.5
  */
 class LoaderManager {
@@ -100,6 +101,14 @@ class LoaderManager {
     private static loaders:{[id: number] : JQuery} = {};
     private static counter = 0;
 
+    /**
+     * Returns the unique ID of the loader after placing it on the page as the first child of the target
+     * container. The loader is initially hidden.
+     *
+     * @param target
+     * @returns {number}
+     * @since 0.0.5
+     */
     public static createLoader(target:JQuery):number {
         var loader = $('<div class="loader"></div>');
         for (var i = 0; i < 5; i++) {
@@ -113,6 +122,13 @@ class LoaderManager {
         return id;
     }
 
+    /**
+     * Fades in the loader, callback is called after the animation is complete
+     *
+     * @param id
+     * @param callback
+     * @since 0.0.5
+     */
     public static showLoader(id:number, callback:Function = null) {
         if (callback == null) {
             this.loaders[id].fadeIn(200);
@@ -121,6 +137,13 @@ class LoaderManager {
         }
     }
 
+    /**
+     * Fades out the loader, callback is called after the animation is complete
+     *
+     * @param id
+     * @param callback
+     * @since 0.0.5
+     */
     public static hideLoader(id:number, callback:Function = null) {
         if (callback == null) {
             this.loaders[id].fadeOut(200);
@@ -129,6 +152,11 @@ class LoaderManager {
         }
     }
 
+    /**
+     * Removes the loader from the page based on its ID
+     *
+     * @param id
+     */
     public static destroyLoader(id:number) {
         this.loaders[id].remove();
         delete this.loaders[id];

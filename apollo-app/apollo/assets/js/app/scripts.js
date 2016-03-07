@@ -5,7 +5,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.8
+ * @version 0.0.9
  */
 /**
  * Util class
@@ -85,11 +85,20 @@ var Util = (function () {
 })();
 /**
  * Deals with loaders
+ * @since 0.0.9 Added documnetation
  * @since 0.0.5
  */
 var LoaderManager = (function () {
     function LoaderManager() {
     }
+    /**
+     * Returns the unique ID of the loader after placing it on the page as the first child of the target
+     * container. The loader is initially hidden.
+     *
+     * @param target
+     * @returns {number}
+     * @since 0.0.5
+     */
     LoaderManager.createLoader = function (target) {
         var loader = $('<div class="loader"></div>');
         for (var i = 0; i < 5; i++) {
@@ -102,6 +111,13 @@ var LoaderManager = (function () {
         target.prepend(container);
         return id;
     };
+    /**
+     * Fades in the loader, callback is called after the animation is complete
+     *
+     * @param id
+     * @param callback
+     * @since 0.0.5
+     */
     LoaderManager.showLoader = function (id, callback) {
         if (callback === void 0) { callback = null; }
         if (callback == null) {
@@ -111,6 +127,13 @@ var LoaderManager = (function () {
             this.loaders[id].fadeIn(200, callback);
         }
     };
+    /**
+     * Fades out the loader, callback is called after the animation is complete
+     *
+     * @param id
+     * @param callback
+     * @since 0.0.5
+     */
     LoaderManager.hideLoader = function (id, callback) {
         if (callback === void 0) { callback = null; }
         if (callback == null) {
@@ -120,6 +143,11 @@ var LoaderManager = (function () {
             this.loaders[id].fadeOut(200, callback);
         }
     };
+    /**
+     * Removes the loader from the page based on its ID
+     *
+     * @param id
+     */
     LoaderManager.destroyLoader = function (id) {
         this.loaders[id].remove();
         delete this.loaders[id];
