@@ -6,7 +6,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.3
+ * @version 0.0.4
  */
 
 use Apollo\Apollo;
@@ -51,7 +51,7 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
     <footer>
         <div class="container">
             <p class="pull-left text-muted">&copy; 2016 UCL School of Life and Medical Sciences</p>
-            <p class="pull-right text-mutedgit ">By Chris U, Desi K and Tim K</p>
+            <p class="pull-right text-muted">By Chris U, Desi K and Tim K</p>
         </div>
     </footer>
 
