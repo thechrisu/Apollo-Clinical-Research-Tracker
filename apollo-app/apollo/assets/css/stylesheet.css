@@ -1,4 +1,4 @@
-/* Apollo stylesheet v0.0.1
+/* Apollo stylesheet v0.0.2
  * Copyright 2016 Timur Kuzhagaliyev
  * https://opensource.org/licenses/mit-license.php MIT License */
 body {
@@ -47,10 +47,15 @@ body {
     transform: scaleY(1); }
   50% {
     transform: scaleY(2); } }
-/* Extension to boostrap */
+#essential small {
+  font-size: 0.9em; }
+#essential strong {
+  font-size: 1.05em; }
+
+/* Extension to bootstrap */
 .undefined {
-  font-style: italic;
-  color: #aaa; }
+  color: #aaa;
+  font-style: italic; }
 
 .panel-no-padding {
   padding-bottom: 0 !important;
