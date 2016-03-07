@@ -15,11 +15,31 @@ use Apollo\Helpers\URLHelper;
 
     <div class="panel panel-default loader-ready" id="essential-panel">
         <div class="panel-heading">
-            <p class="pull-right">Record actions:<!--
-             --><a href="#" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>Edit</a><!--
-             --><a href="#" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Delete</a>
-            </p>
-            <p>Essential information</p>
+            <span class="pull-right">
+                <span>Record actions:</span><!--
+             --><a href="#" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-pencil"
+                                                                 aria-hidden="true"></span>Edit</a><!--
+             --><a href="#" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove"
+                                                                aria-hidden="true"></span>Delete</a>
+            </span>
+            <span>
+                <span>Current record:</span><!--
+             --><div class="dropdown">
+                        <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="true">
+                            Dropdown
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+                            <li><a href="#">Something else here</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">Separated link</a></li>
+                        </ul>
+                </div>
+            </span>
+
         </div>
         <div class="panel-body panel-no-padding" id="essential">
 
