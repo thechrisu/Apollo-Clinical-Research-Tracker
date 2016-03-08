@@ -1,0 +1,26 @@
+{
+  "error": null,
+  "name": "Some programme",
+  "target_group": ["Young people", "Old people", "Twentysomething people"],
+  "target_group_comment": "This is an exceptional programme",
+  "programme_funding": "Through funds",
+  "start_date": 1457476303,
+  "end_date": 1857476303,
+  "participants": [
+    {
+      "given_name": "Peter",
+      "last_name": "Parker",
+      "id": "13"
+    },
+    {
+      "given_name": "Michael",
+      "last_name": "Jackdaughter",
+      "id": "12"
+    },
+    {
+      "given_name": "Rowan",
+      "last_name": "@kinson",
+      "id": "1"
+    }
+  ]
+}

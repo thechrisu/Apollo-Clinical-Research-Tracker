@@ -17,7 +17,7 @@ use Apollo\Helpers\URLHelper;
             <input type="text" class="form-control input-small" id="programmes-search"
                    placeholder="Search programmes...">
         </div>
-        <div class="col-sm-3 btn-group-sm">
+        <div class="col-sm-2 btn-group-sm">
             <a href="#" id="add-record" class="btn btn-default btn-block">Add a Programme</a>
         </div>
 
@@ -51,24 +51,21 @@ use Apollo\Helpers\URLHelper;
         </div>
 
         <div class="col-lg-8 content-loader-ready" id="programmeContent">
-            <div class="programme-title">
+            <div class="programme-title top-buffer">
                 Programme 1
             </div>
-            <div class="target-group">
+            <div class="target-group top-buffer">
                 Target group (dropdown list and comment field
             </div>
-            <div>
+            <div class="funding top-buffer">
                 Programme funding
             </div>
-            <div class="row">
-                <div class="col-lg-6">
+            <div class="row top-buffer">
+                <div class="col-lg-12">
                     <input type="text" class="form-control input-sm" id="person-input"/>
                 </div>
-                <div class="col-lg-6">
-                    Thing to go to people
-                </div>
             </div>
-            <div clsas="row">
+            <div class="row top-buffer">
                 <div class="col-lg-6">
                     Start date
                 </div>
@@ -92,5 +89,5 @@ use Apollo\Helpers\URLHelper;
 @stop
 @section('scripts')
     @parent
-    <script src="{{ AssetHelper::js('app/programme/menu') }}"></script>
+    <script src="{{ AssetHelper::js('app/programme/programme') }}"></script>
 @stop
