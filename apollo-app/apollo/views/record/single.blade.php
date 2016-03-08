@@ -16,8 +16,9 @@ use Apollo\Helpers\URLHelper;
     <div class="panel panel-default loader-ready" id="essential-panel">
         <div class="panel-heading">
             <p class="pull-right">Record actions:<!--
-             --><a href="#" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>Edit</a><!--
-             --><a href="#" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Delete</a>
+             --><a href="#" id="record-add" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add a record</a><!--
+             --><a href="#" id="record-edit" class="btn btn-sm btn-warning"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>Edit</a><!--
+             --><a href="#" id="record-hide" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Hide</a>
             </p>
             <p>Essential information</p>
         </div>

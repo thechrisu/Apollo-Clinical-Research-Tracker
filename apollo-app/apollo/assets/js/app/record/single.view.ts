@@ -2,13 +2,14 @@
 ///<reference path="../scripts.ts"/>
 ///<reference path="../jquery.d.ts"/>
 ///<reference path="../columns.ts"/>
+///<reference path="../bootbox.d.ts"/>
 /**
  * Single record view typescript
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.2
+ * @version 0.0.3
  */
 
 interface EssentialData {
@@ -45,6 +46,7 @@ class SingleView {
             breadcrumbs.find('li:nth-child(4)').text('Record #' + data.essential.record_id + ': ' + data.essential.record_name);
             that.parseEssentials(data.essential);
             that.parseFields(data.data);
+            that.setupButtons(data.essential);
         }, function (message:string) {
             Util.error('An error has occurred during the loading of single record data. Please reload the page or contact the administrator. Error message: ' + message);
         });
@@ -85,6 +87,27 @@ class SingleView {
                 LoaderManager.destroyLoader(loader);
             });
         });
+    }
+
+    private setupButtons(data:EssentialData) {
+        var editButton = $('#record-edit');
+        var hideButton = $('#record-hide');
+
+        editButton.attr('href', Util.url('record/edit/' + data.record_id));
+        hideButton.click(function(e) {
+            e.preventDefault();
+            bootbox.confirm('Are you sure you want to hide this record (belonging to ' + data.given_name + ' ' + data.last_name + ')? The data won\'t be deleted and can be restored later.', function(result) {
+                AJAX.post(Util.url('post/record?action=hide&id=' + data.record_id, false), {
+                    action: 'hide',
+                    id: data.record_id
+                }, function (data:RecordData) {
+                    Util.to('record');
+                }, function (message:string) {
+                    Util.error('An error has occurred during hiding of the record. Error message: ' + message);
+                });
+            });
+        });
+
     }
 
 }

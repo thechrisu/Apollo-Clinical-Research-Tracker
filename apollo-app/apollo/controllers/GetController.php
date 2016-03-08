@@ -21,7 +21,7 @@ use Apollo\Components\Person;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  */
 class GetController extends GenericController
 {
@@ -33,6 +33,17 @@ class GetController extends GenericController
     public function index()
     {
         Apollo::getInstance()->getRequest()->error(400, 'No action is specified.');
+    }
+
+
+    /**
+     * Return 400 error on invalid action
+     *
+     * @since 0.0.4
+     */
+    public function notFound()
+    {
+        Apollo::getInstance()->getRequest()->error(400, 'Invalid action.');
     }
 
     /**

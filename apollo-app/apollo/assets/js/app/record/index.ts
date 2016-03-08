@@ -65,7 +65,7 @@ class RecordTable {
         });
         this.table.on('click', '.record-tr', function (e) {
             e.preventDefault();
-            location.href = Util.url('record/view/' + $(this).data('id'));
+            Util.to('record/view/' + $(this).data('id'));
         });
         var timer = null;
         $('#records-search').keyup(function () {

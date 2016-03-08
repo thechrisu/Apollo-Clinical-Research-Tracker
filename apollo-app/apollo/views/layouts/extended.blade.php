@@ -6,7 +6,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.4
+ * @version 0.0.5
  */
 
 use Apollo\Apollo;
@@ -83,5 +83,6 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
     <script src="{{ AssetHelper::js('plugins/docs.min') }}"></script>
     <script src="{{ AssetHelper::js('plugins/scrollspy') }}"></script>
     <script src="{{ AssetHelper::js('plugins/typeahead.bundle.min') }}"></script>
+    <script src="{{ AssetHelper::js('plugins/bootbox.min') }}"></script>
     <script src="http://eternicode.github.io/bootstrap-datepicker/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
 @stop
