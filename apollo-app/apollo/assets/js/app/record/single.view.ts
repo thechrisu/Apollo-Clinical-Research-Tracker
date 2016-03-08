@@ -90,6 +90,18 @@ class SingleView {
     }
 
     private setupButtons(data:EssentialData) {
+        var dropdownCurrent = $('#current-record');
+        var dropdownOther = $('#other-records');
+        dropdownCurrent.html(data.record_name + ' <span class="caret"></span>');
+        if(data.record_ids.length > 0) {
+            for(var i = 0; i < data.record_ids.length; i++) {
+                dropdownOther.append('<li><a href="' + Util.url('record/view' + data.record_ids[i]) + '">' + data.record_names[i] + '</a></li>');
+            }
+        } else {
+            dropdownOther.append('<li class="dropdown-header">Nothing to display . . .</li>');
+        }
+
+        var addButton = $('#record-add');
         var editButton = $('#record-edit');
         var hideButton = $('#record-hide');
 
