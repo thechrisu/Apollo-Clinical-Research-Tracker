@@ -3,6 +3,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/gpl-license.php MIT License
+ * @version 0.0.2
  */
 
 use Apollo\Helpers\AssetHelper;
@@ -11,65 +12,70 @@ use Apollo\Helpers\URLHelper;
 ?>
 @extends('layouts.extended')
 @section('content')
-    <div id="programme-wrapper">
-        <div class="col-lg-4">
-            <div class="input-group-sm">
-                <input type="text" class="form-control input-small" id="programmes-search" placeholder="Search programmes...">
-            </div>
-
-        <div id="programmeTable" class="table-responsive">
-            <table class="table table-hover small-table">
-            <thead>
-            <tr>
-                <th>
-                    Programme name
-                </th>
-                <th>
-                    Start Date
-                </th>
-                <th>
-                    End date
-                </th>
-            </tr>
-            </thead>
-            <tbody id="table-body">
-            <div class="loader-container" id="menuLoader">
-                <div class="loader">
-                    <div class="line-1"></div>
-                    <div class="line-2"></div>
-                    <div class="line-3"></div>
-                    <div class="line-4"></div>
-                    <div class="line-5"></div>
-                </div>
-            </div>
-            <tr>
-                <td>Programme 1</td>
-            </tr>
-            <tr>
-                <td>Programme 2</td>
-            </tr>
-            </tbody>
-        </table>
+    <div class="row">
+        <div class="input-group-sm col-lg-4">
+            <input type="text" class="form-control input-small" id="programmes-search"
+                   placeholder="Search programmes...">
         </div>
-
-    </div>
-    <div class="col-lg-8">
-        <div class="col-sm-4 btn-group-sm">
+        <div class="col-sm-3 btn-group-sm">
             <a href="#" id="add-record" class="btn btn-default btn-block">Add a Programme</a>
         </div>
-        <div id="programmeContent" class="top-buffer">
-            <div class="loader-container" id="contentLoader">
-                <div class="loader">
-                    <div class="line-1"></div>
-                    <div class="line-2"></div>
-                    <div class="line-3"></div>
-                    <div class="line-4"></div>
-                    <div class="line-5"></div>
+
+    </div>
+
+    <div id="programme-wrapper" class="row">
+        <div class="col-lg-4 divider-vertical table-responsive menu-loader-ready" id="programmeTable">
+            <table class="table table-hover small-table">
+                <thead>
+                <tr>
+                    <th>
+                        Programme name
+                    </th>
+                    <th>
+                        Start Date
+                    </th>
+                    <th>
+                        End date
+                    </th>
+                </tr>
+                </thead>
+                <tbody id="table-body">
+                <tr>
+                    <td>Programme 1</td>
+                </tr>
+                <tr>
+                    <td>Programme 2</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-lg-8 content-loader-ready" id="programmeContent">
+            <div class="programme-title">
+                Programme 1
+            </div>
+            <div class="target-group">
+                Target group (dropdown list and comment field
+            </div>
+            <div>
+                Programme funding
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <input type="text" class="form-control input-sm" id="person-input"/>
+                </div>
+                <div class="col-lg-6">
+                    Thing to go to people
                 </div>
             </div>
-            Programme 1
+            <div clsas="row">
+                <div class="col-lg-6">
+                    Start date
+                </div>
+                <div class="col-lg-6">
+                    End date
+                </div>
         </div>
-    </div>
 
 
         <nav class="text-center">
@@ -80,8 +86,11 @@ use Apollo\Helpers\URLHelper;
 
     </div>
 
+
+    </div>
+
 @stop
 @section('scripts')
     @parent
-    <script src="{{ AssetHelper::js('app/programme/index') }}"></script>
+    <script src="{{ AssetHelper::js('app/programme/menu') }}"></script>
 @stop

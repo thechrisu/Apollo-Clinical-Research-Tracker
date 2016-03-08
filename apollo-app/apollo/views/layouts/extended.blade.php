@@ -19,6 +19,8 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
 
     <link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.min.css" />
     <link rel="stylesheet" href="{{ AssetHelper::css('stylesheet') }}" />
+    <link rel="stylesheet" href="{{ AssetHelper::css('bootstrap-tokenfield.min') }}" />
+    <link rel="stylesheet" href="{{ AssetHelper::css('tokenfield-typeahead.min') }}" />
     <link rel="icon" type="image/png" href="{{ AssetHelper::img('favicon.png') }}" />
     <title>{{ !empty($title) ? $title . ' | ' . APP_NAME : APP_NAME }}</title>
 @stop
@@ -76,5 +78,10 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
     <script src="{{ AssetHelper::js('app/scripts') }}"></script>
     <script src="{{ AssetHelper::js('app/ajax') }}"></script>
     <script src="{{ AssetHelper::js('plugins/jquery.simplePagination') }}"></script>
+    <script src="{{ AssetHelper::js('plugins/bootstrap-tokenfield.min') }}"></script>
+    <script src="{{ AssetHelper::js('plugins/affix') }}"></script>
+    <script src="{{ AssetHelper::js('plugins/docs.min') }}"></script>
+    <script src="{{ AssetHelper::js('plugins/scrollspy') }}"></script>
+    <script src="{{ AssetHelper::js('plugins/typeahead.bundle.min') }}"></script>
     <script src="http://eternicode.github.io/bootstrap-datepicker/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
 @stop

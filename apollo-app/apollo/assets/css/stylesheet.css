@@ -3,10 +3,12 @@
  * https://opensource.org/licenses/mit-license.php MIT License */
 body {
   background-color: #f2f2f2;
-  padding: 54px 0 0 0; }
+  padding: 54px 0 0 0;
+}
 
 .top-buffer {
-  margin-top: 20px; }
+  margin-top: 20px;
+}
 
 .loader-container {
   background-color: rgba(255, 255, 255, 0.6);
@@ -14,75 +16,103 @@ body {
   overflow: hidden;
   z-index: 100;
   height: 100%;
-  width: 100%; }
-  .loader-container .loader {
-    margin: -60px 0 0 -60px;
-    height: 120px;
-    width: 120px;
-    position: absolute;
-    left: 50%;
-    top: 50%; }
-    .loader-container .loader > div {
-      float: left;
-      margin: 40% 2% 0 0;
-      width: 4%;
-      height: 16%;
-      background-color: #2f2f2f;
-      animation: wave 0.8s cubic-bezier(0.2, 0.68, 0.18, 1.08) infinite; }
-    .loader-container .loader .line-1 {
-      margin-left: 30%; }
-    .loader-container .loader .line-1 {
-      animation-delay: 0.1s; }
-    .loader-container .loader .line-2 {
-      animation-delay: 0.2s; }
-    .loader-container .loader .line-3 {
-      animation-delay: 0.3s; }
-    .loader-container .loader .line-4 {
-      animation-delay: 0.4s; }
-    .loader-container .loader .line-5 {
-      animation-delay: 0.5s; }
+  width: 100%;
+}
+.loader-container .loader {
+  margin: -60px 0 0 -60px;
+  height: 120px;
+  width: 120px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+.loader-container .loader > div {
+  float: left;
+  margin: 40% 2% 0 0;
+  width: 4%;
+  height: 16%;
+  background-color: #2f2f2f;
+  animation: wave 0.8s cubic-bezier(0.2, 0.68, 0.18, 1.08) infinite;
+}
+.loader-container .loader .line-1 {
+  margin-left: 30%;
+}
+.loader-container .loader .line-1 {
+  animation-delay: 0.1s;
+}
+.loader-container .loader .line-2 {
+  animation-delay: 0.2s;
+}
+.loader-container .loader .line-3 {
+  animation-delay: 0.3s;
+}
+.loader-container .loader .line-4 {
+  animation-delay: 0.4s;
+}
+.loader-container .loader .line-5 {
+  animation-delay: 0.5s;
+}
 
 @keyframes wave {
   0%, 100% {
-    transform: scaleY(1); }
+    transform: scaleY(1);
+  }
   50% {
-    transform: scaleY(2); } }
+    transform: scaleY(2);
+  }
+}
 #essential-panel .panel-heading .btn {
-  margin-left: 10px; }
+  margin-left: 10px;
+}
 
 #essential small {
-  font-size: 0.9em; }
+  font-size: 0.9em;
+}
 #essential strong {
-  font-size: 1.05em; }
+  font-size: 1.05em;
+}
+
+.divider-vertical {
+  border-right: 1px solid #333333;
+}
 
 /* Extension to bootstrap */
 .undefined {
   color: #aaa;
-  font-style: italic; }
+  font-style: italic;
+}
 
 .panel-no-padding {
   padding-bottom: 0 !important;
-  padding-top: 0 !important; }
+  padding-top: 0 !important;
+}
 
 .clickable {
-  cursor: pointer; }
+  cursor: pointer;
+}
 
 /* Loader-related CSS */
 .loader-ready {
-  position: relative; }
+  position: relative;
+}
 
 /* Bootstrap fixes */
 .table.no-border-top tr:first-child td {
-  border-top: none !important; }
+  border-top: none !important;
+}
 
 .btn > .glyphicon {
-  margin-right: 8px; }
+  margin-right: 8px;
+}
 
 .panel-heading .breadcrumb {
-  margin-bottom: 0; }
+  margin-bottom: 0;
+}
 
 .jumbotron.error-page {
-  margin-bottom: 0; }
+  margin-bottom: 0;
+}
 
 #main-panel > .panel:last-child {
-  margin-bottom: 0; }
+  margin-bottom: 0;
+}
