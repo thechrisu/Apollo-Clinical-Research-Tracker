@@ -18,7 +18,7 @@ use Apollo\Helpers\URLHelper;
                    placeholder="Search programmes...">
         </div>
         <div class="col-sm-2 btn-group-sm">
-            <a href="#" id="add-record" class="btn btn-default btn-block">Add a Programme</a>
+            <a href="#" id="add-programme" class="btn btn-default btn-block">Add a Programme</a>
         </div>
 
     </div>
@@ -26,38 +26,21 @@ use Apollo\Helpers\URLHelper;
     <div id="programme-wrapper" class="row">
         <div class="col-lg-4 divider-vertical table-responsive menu-loader-ready" id="programmeTable">
             <table class="table table-hover small-table">
-                <thead>
-                <tr>
-                    <th>
-                        Programme name
-                    </th>
-                    <th>
-                        Start Date
-                    </th>
-                    <th>
-                        End date
-                    </th>
-                </tr>
-                </thead>
                 <tbody id="table-body">
-                <tr>
-                    <td>Programme 1</td>
-                </tr>
-                <tr>
-                    <td>Programme 2</td>
-                </tr>
                 </tbody>
             </table>
         </div>
 
         <div class="col-lg-8 content-loader-ready" id="programmeContent">
-            <div class="programme-title top-buffer">
+            <div class="top-buffer" id="programme-title">
                 Programme 1
             </div>
-            <div class="target-group top-buffer">
+            <div class="top-buffer">
+                <select id="target-dropdown" />
+                <input id="target-comment"/>
                 Target group (dropdown list and comment field
             </div>
-            <div class="funding top-buffer">
+            <div class="top-buffer" id="funding">
                 Programme funding
             </div>
             <div class="row top-buffer">
@@ -66,10 +49,10 @@ use Apollo\Helpers\URLHelper;
                 </div>
             </div>
             <div class="row top-buffer">
-                <div class="col-lg-6">
+                <div class="col-lg-6" id="start-date">
                     Start date
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-6" id="end-date">
                     End date
                 </div>
         </div>
