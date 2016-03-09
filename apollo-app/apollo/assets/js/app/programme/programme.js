@@ -6,17 +6,18 @@
  *
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.2
- * /
+ * @version 0.0.3
+ *
  */
 var fakeJSON_obj_oneProgramme = {
     "error": null,
     "name": "Some programme",
     "target_group": ["Young people", "Old people", "Twentysomething people"],
+    "current_target_group": 0,
     "target_group_comment": "This is an exceptional programme",
     "programme_funding": "Through funds",
-    "start_date": 1457476303,
-    "end_date": 1857476303,
+    "start_date": "1834-02-22 02:00:00",
+    "end_date": "1834-02-22 02:00:00",
     "participants": [
         {
             "given_name": "Peter",
@@ -81,7 +82,7 @@ var ValidatorTokenField = (function () {
     ValidatorTokenField.prototype.setSuggestionEngine = function () {
         //   docs for bloodhound suggestion engine https://github.com/twitter/typeahead.js/blob/master/doc/bloodhound.md
         this.engine = new Bloodhound({
-            local: [{ value: 'red' }, { value: 'blue' }, { value: 'green' }, { value: 'yellow' }, { value: 'violet' }, { value: 'brown' }, { value: 'purple' }, { value: 'black' }, { value: 'white' }],
+            local: [{ value: 'red' }, { value: 'Tim' }, { value: 'Peter' }, { value: 'Christoph' }],
             datumTokenizer: function (d) {
                 return Bloodhound.tokenizers.whitespace(d.value);
             },
@@ -106,7 +107,8 @@ var ValidatorTokenField = (function () {
  * TODO do quick search
  * TODO do the animation of displaying the programme on the right if the user clicks on it
  * TODO insert loader
- * @version 0.0.2
+ * TODO: Animation for when going to a programme
+ * @version 0.0.3
  */
 var ProgrammeTable = (function () {
     function ProgrammeTable() {
@@ -159,40 +161,74 @@ var ProgrammeTable = (function () {
         row = $('<tr></tr>');
         row.append('<td>' + data.name + '</td>');
         row.append('<td>' + startD + ' - ' + endD + '</td>');
-        row.click("test" + data.id);
+        row.click(this.displayProgramme);
         $('#table-body').append(row);
+    };
+    ProgrammeTable.prototype.displayProgramme = function (programmeId) {
+        window.location.href = window.location.origin + '/programme/' + programmeId;
     };
     return ProgrammeTable;
 })();
 /**
  * carries out all the tasks related to displaying the actual information of one programme on the right of the view
  * @since 0.0.2
- * TODO: Figure out how to use the ValidatorTokenField on top
+ * TODO: Make the add new person thing work
  * TODO: Display loader
  * TODO: autosave
  */
 var ProgrammeInformation = (function () {
     function ProgrammeInformation() {
     }
+    ProgrammeInformation.prototype.load = function () {
+        this.displayTitle("Second year placements");
+        this.displayPeople(fakeJSON_obj_oneProgramme.participants);
+        this.displayTargetGroup(fakeJSON_obj_oneProgramme.target_group, fakeJSON_obj_oneProgramme.current_target_group);
+        this.displayComment(fakeJSON_obj_oneProgramme.target_group_comment);
+        this.displayStartDate(fakeJSON_obj_oneProgramme.start_date);
+        this.displayEndDate(fakeJSON_obj_oneProgramme.end_date);
+    };
     ProgrammeInformation.prototype.displayTitle = function (title) {
-        $('#programme-title').html(title);
+        $('#programme-title').val(title);
     };
-    ProgrammeInformation.prototype.displayTargetGroup = function () {
-        //TODO
-        $('#funding').html("<select id='target-dropdown' />");
+    ProgrammeInformation.prototype.displayTargetGroup = function (options, active) {
+        var dropD = $('#target-dropdown');
+        dropD.append('<li class="dropdown-header">Choose a target group:</li>');
+        $('#target-button').append(options[active]);
+        for (var i = 0; i < options.length; i++) {
+            dropD.append('<li><a>' + options[i] + '</a></li>');
+        }
     };
-    ProgrammeInformation.prototype.displayComment = function () {
-        //TODO
+    ProgrammeInformation.prototype.displayComment = function (initialData) {
+        $('#target-comment').val(initialData);
     };
     ProgrammeInformation.prototype.displayFunding = function (text) {
         $('#funding').html(text);
     };
     ProgrammeInformation.prototype.displayPeople = function (people) {
-        //TODO
+        var table = $('#existingPeople');
+        for (var i = 0; i < people.length; i++) {
+            var row = $('<td></td>');
+            row.append(people[i].given_name + ' ' + people[i].last_name);
+            var fullRow = $('<tr href="#"></tr>');
+            fullRow.append(row);
+            fullRow.click(window.location.href = window.location.origin + '/record/view/' + people[i].id);
+            table.append(fullRow);
+        }
+    };
+    ProgrammeInformation.prototype.displayStartDate = function (sqlDate) {
+        //TODO insert datepicker item
+        var startD = Util.formatDate(Util.parseSQLDate(sqlDate));
+        $('#start-date').html("<span>Insert startdate  here</span>");
+    };
+    ProgrammeInformation.prototype.displayEndDate = function (sqldate) {
+        //TODO insert datepicker item
+        var endD = Util.formatDate(Util.parseSQLDate(sqldate));
+        $('#end-date').html("<span>Insert startdate here</span>");
     };
     return ProgrammeInformation;
 })();
 $(document).ready(function () {
-    new ValidatorTokenField().load();
+    //  new ValidatorTokenField().load();
+    new ProgrammeInformation().load();
     new ProgrammeTable().load();
 });
