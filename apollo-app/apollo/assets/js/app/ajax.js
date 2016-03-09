@@ -3,7 +3,7 @@
  * Class AJAX
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  */
 var AJAX = (function () {
     function AJAX() {
@@ -23,6 +23,36 @@ var AJAX = (function () {
             url: url,
             dataType: 'json',
             type: 'GET',
+            success: function (data) {
+                if (data.error != null) {
+                    errorCallback(data.error.description);
+                }
+                else {
+                    successCallback(data);
+                }
+            }.bind(this),
+            error: function (xhr, status, err) {
+                errorCallback(err.toString());
+            }.bind(this)
+        });
+    };
+    /**
+     * Makes a post AJAX request and returns the data received to the callback function.
+     *
+     * @param url
+     * @param data
+     * @param successCallback
+     * @param errorCallback
+     * @since 0.0.2
+     */
+    AJAX.post = function (url, data, successCallback, errorCallback) {
+        if (successCallback === void 0) { successCallback = null; }
+        if (errorCallback === void 0) { errorCallback = null; }
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'POST',
+            data: data,
             success: function (data) {
                 if (data.error != null) {
                     errorCallback(data.error.description);

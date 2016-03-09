@@ -5,7 +5,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.9
+ * @version 0.1.0
  */
 /**
  * Util class
@@ -29,6 +29,17 @@ var Util = (function () {
             url += '/';
         }
         return url;
+    };
+    /**
+     * Sends the user to specified URL
+     *
+     * @param url
+     * @param trailingSlash
+     * @since 0.1.0
+     */
+    Util.to = function (url, trailingSlash) {
+        if (trailingSlash === void 0) { trailingSlash = true; }
+        location.href = Util.url(url, trailingSlash);
     };
     /**
      * Displays the error modal window

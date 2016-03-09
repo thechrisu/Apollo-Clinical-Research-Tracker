@@ -58,12 +58,16 @@ body {
     transform: scaleY(1);
   }
   50% {
-    transform: scaleY(2);
-  }
-}
+    transform: scaleY(2); } }
+#essential-panel .panel-heading p {
+  margin: 0; }
+#essential-panel .panel-heading span > span {
+  vertical-align: middle; }
 #essential-panel .panel-heading .btn {
-  margin-left: 10px;
-}
+  margin-left: 10px; }
+#essential-panel .panel-heading .dropdown, #essential-panel .panel-heading .dropdown .btn {
+  display: inline-block;
+  margin: 0 0 0 5px; }w
 
 #essential small {
   font-size: 0.9em;
