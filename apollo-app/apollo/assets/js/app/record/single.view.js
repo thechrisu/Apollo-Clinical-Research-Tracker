@@ -9,7 +9,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.3
+ * @version 0.0.4
  */
 var SingleView = (function () {
     function SingleView() {
@@ -68,27 +68,94 @@ var SingleView = (function () {
         dropdownCurrent.html(data.record_name + ' <span class="caret"></span>');
         if (data.record_ids.length > 0) {
             for (var i = 0; i < data.record_ids.length; i++) {
-                dropdownOther.append('<li><a href="' + Util.url('record/view' + data.record_ids[i]) + '">' + data.record_names[i] + '</a></li>');
+                dropdownOther.append('<li><a href="' + Util.url('record/view/' + data.record_ids[i]) + '">' + data.record_names[i] + '</a></li>');
             }
         }
         else {
             dropdownOther.append('<li class="dropdown-header">Nothing to display . . .</li>');
         }
         var addButton = $('#record-add');
+        var duplicateButton = $('#record-duplicate');
         var editButton = $('#record-edit');
         var hideButton = $('#record-hide');
+        addButton.click(function (e) {
+            e.preventDefault();
+            bootbox.dialog({
+                title: 'Adding a new record for ' + data.given_name + ' ' + data.last_name,
+                message: $('#add-modal').html(),
+                buttons: {
+                    main: {
+                        label: "Cancel",
+                        className: "btn-primary",
+                        callback: function () {
+                        }
+                    },
+                    success: {
+                        label: "Add",
+                        className: "btn-success",
+                        callback: function () {
+                            var name = $('.modal').find('#add-name').val();
+                            var startDate = $('.modal').find('#add-start-date').val();
+                            var endDate = $('.modal').find('#add-end-date').val();
+                            newRecord(name, startDate, endDate);
+                        }
+                    }
+                }
+            });
+        });
+        duplicateButton.click(function (e) {
+            e.preventDefault();
+            bootbox.dialog({
+                title: 'Adding a new record for ' + data.given_name + ' ' + data.last_name,
+                message: $('#add-modal').html(),
+                buttons: {
+                    main: {
+                        label: "Cancel",
+                        className: "btn-primary",
+                        callback: function () {
+                        }
+                    },
+                    success: {
+                        label: "Add",
+                        className: "btn-success",
+                        callback: function () {
+                            var name = $('.modal').find('#add-name').val();
+                            var startDate = $('.modal').find('#add-start-date').val();
+                            var endDate = $('.modal').find('#add-end-date').val();
+                            newRecord(name, startDate, endDate, data.record_id);
+                        }
+                    }
+                }
+            });
+        });
+        function newRecord(name, startDate, endDate, id) {
+            if (id === void 0) { id = 0; }
+            AJAX.post(Util.url('post/record'), {
+                action: 'add',
+                name: name,
+                start_date: startDate,
+                end_date: endDate,
+                id: id
+            }, function (response) {
+                Util.to('record/edit/' + response.record_id);
+            }, function (message) {
+                Util.error('An error has occurred during the process of creation of the record. Error message: ' + message);
+            });
+        }
         editButton.attr('href', Util.url('record/edit/' + data.record_id));
         hideButton.click(function (e) {
             e.preventDefault();
             bootbox.confirm('Are you sure you want to hide this record (belonging to ' + data.given_name + ' ' + data.last_name + ')? The data won\'t be deleted and can be restored later.', function (result) {
-                AJAX.post(Util.url('post/record?action=hide&id=' + data.record_id, false), {
-                    action: 'hide',
-                    id: data.record_id
-                }, function (data) {
-                    Util.to('record');
-                }, function (message) {
-                    Util.error('An error has occurred during hiding of the record. Error message: ' + message);
-                });
+                if (result) {
+                    AJAX.post(Util.url('post/record'), {
+                        action: 'hide',
+                        id: data.record_id
+                    }, function (data) {
+                        Util.to('record');
+                    }, function (message) {
+                        Util.error('An error has occurred during hiding of the record. Error message: ' + message);
+                    });
+                }
             });
         });
     };

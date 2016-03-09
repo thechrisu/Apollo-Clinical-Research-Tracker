@@ -19,6 +19,7 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
 
     <link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.min.css" />
     <link rel="stylesheet" href="{{ AssetHelper::css('stylesheet') }}" />
+    <link rel="stylesheet" href="{{ AssetHelper::css('datepicker3.min') }}" />
     <link rel="stylesheet" href="{{ AssetHelper::css('bootstrap-tokenfield.min') }}" />
     <link rel="stylesheet" href="{{ AssetHelper::css('tokenfield-typeahead.min') }}" />
     <link rel="icon" type="image/png" href="{{ AssetHelper::img('favicon.png') }}" />

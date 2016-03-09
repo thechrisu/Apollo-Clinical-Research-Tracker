@@ -21,7 +21,7 @@ use Doctrine\ORM\EntityRepository;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  */
 class PostController extends GenericController
 {
@@ -48,21 +48,31 @@ class PostController extends GenericController
     /**
      *
      *
+     * @since 0.0.2 Parses
      * @since 0.0.1
      */
     public function actionRecord() {
         $em = DB::getEntityManager();
-        $data = $this->parseRequest(['action' => null, 'id' => 0]);
+        $data = $this->parseRequest(['action' => null, 'id' => 0, 'name' => null]);
         $action = strtolower($data['action']);
-        if(!in_array($action, ['hide', 'update'])) {
+        if(!in_array($action, ['add', 'hide', 'update'])) {
             Apollo::getInstance()->getRequest()->error(400, 'Invalid action.');
         };
-        if($data['id'] < 0) {
-            Apollo::getInstance()->getRequest()->error(400, 'Invalid ID specified.');
-        };
         $response['error'] = null;
-        $em = DB::getEntityManager();
+        if($action == 'add') {
+            if(!empty($data['name'])) {
+                $response['record_id'] = $data['id'];
+            } else {
+                $response['error'] = [
+                    'id' => 1,
+                    'description' => 'You must specify a name for the new record.'
+                ];
+            }
+        }
         if($action == 'hide') {
+            if($data['id'] < 0) {
+                Apollo::getInstance()->getRequest()->error(400, 'Invalid ID specified.');
+            };
             /**
              * @var EntityRepository $record_repository
              */
@@ -99,7 +109,7 @@ class PostController extends GenericController
             } else {
                 $response['error'] = [
                     'id' => 1,
-                    'description' => 'Selected record is either already hidden or does not exist'
+                    'description' => 'Selected record is either already hidden or does not exist.'
                 ];
             }
         }
@@ -118,8 +128,8 @@ class PostController extends GenericController
     {
         $parsedData = [];
         foreach ($data as $key => $default) {
-            if (isset($_GET[$key])) {
-                $parsedData[$key] = is_int($default) ? intval($_GET[$key]) : $_GET[$key];
+            if (isset($_POST[$key])) {
+                $parsedData[$key] = is_int($default) ? intval($_POST[$key]) : $_POST[$key];
             } else {
                 $parsedData[$key] = $default;
             }
