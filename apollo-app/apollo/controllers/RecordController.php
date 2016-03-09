@@ -84,8 +84,6 @@ class RecordController extends GenericController
 
     public function actionExample() {
         echo '<pre>';
-        echo Person::getEntityNamespace();
-        echo '<br>';
-        //Record::prepare(null);
+        Record::prepare(null);
     }
 }

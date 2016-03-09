@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping\OrderBy;
  *
  * @package Apollo\Entities
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  * @Entity @Table("records")
  */
 class RecordEntity
@@ -95,6 +95,15 @@ class RecordEntity
      */
     public function __construct()
     {
+    }
+
+    /**
+     * Returns essential fields
+     *
+     * @since 0.0.4
+     */
+    public function getRecordName() {
+
     }
 
     /**
