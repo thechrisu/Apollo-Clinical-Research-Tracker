@@ -31,7 +31,9 @@ class Record extends DBComponent
      * @param RecordEntity $record
      * @since 0.0.2
      */
-    private static function prepare($record) {
-
+    public static function prepare($record) {
+        $fieldRepo = Field::getRepository();
+        $fields = $fieldRepo->findBy(['is_hidden' => false]);
+        var_dump($fields);
     }
 }

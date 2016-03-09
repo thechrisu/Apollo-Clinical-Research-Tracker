@@ -10,6 +10,8 @@
 namespace Apollo\Controllers;
 
 use Apollo\Apollo;
+use Apollo\Components\Person;
+use Apollo\Components\Record;
 use Apollo\Components\View;
 use Apollo\Helpers\URLHelper;
 
@@ -81,11 +83,9 @@ class RecordController extends GenericController
     }
 
     public function actionExample() {
-        $breadcrumbs = [
-            ['Records', URLHelper::url('record'), true],
-            ['James Bond', null, false],
-            ['Record Name (#1337)', null, true]
-        ];
-        View::render('record.example', 'View Record', $breadcrumbs);
+        echo '<pre>';
+        echo Person::getEntityNamespace();
+        echo '<br>';
+        //Record::prepare(null);
     }
 }
