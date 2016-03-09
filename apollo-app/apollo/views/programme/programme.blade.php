@@ -17,8 +17,8 @@ use Apollo\Helpers\URLHelper;
             <input type="text" class="form-control input-small" id="programmes-search"
                    placeholder="Search programmes...">
         </div>
-        <div class="col-sm-3 btn-group-sm">
-            <a href="#" id="add-record" class="btn btn-default btn-block">Add a Programme</a>
+        <div class="col-sm-2 btn-group-sm">
+            <a href="#" id="add-programme" class="btn btn-default btn-block">Add a Programme</a>
         </div>
 
     </div>
@@ -26,53 +26,33 @@ use Apollo\Helpers\URLHelper;
     <div id="programme-wrapper" class="row">
         <div class="col-lg-4 divider-vertical table-responsive menu-loader-ready" id="programmeTable">
             <table class="table table-hover small-table">
-                <thead>
-                <tr>
-                    <th>
-                        Programme name
-                    </th>
-                    <th>
-                        Start Date
-                    </th>
-                    <th>
-                        End date
-                    </th>
-                </tr>
-                </thead>
                 <tbody id="table-body">
-                <tr>
-                    <td>Programme 1</td>
-                </tr>
-                <tr>
-                    <td>Programme 2</td>
-                </tr>
                 </tbody>
             </table>
         </div>
 
         <div class="col-lg-8 content-loader-ready" id="programmeContent">
-            <div class="programme-title">
+            <div class="top-buffer" id="programme-title">
                 Programme 1
             </div>
-            <div class="target-group">
+            <div class="top-buffer">
+                <select id="target-dropdown" />
+                <input id="target-comment"/>
                 Target group (dropdown list and comment field
             </div>
-            <div>
+            <div class="top-buffer" id="funding">
                 Programme funding
             </div>
-            <div class="row">
-                <div class="col-lg-6">
+            <div class="row top-buffer">
+                <div class="col-lg-12">
                     <input type="text" class="form-control input-sm" id="person-input"/>
                 </div>
-                <div class="col-lg-6">
-                    Thing to go to people
-                </div>
             </div>
-            <div clsas="row">
-                <div class="col-lg-6">
+            <div class="row top-buffer">
+                <div class="col-lg-6" id="start-date">
                     Start date
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-6" id="end-date">
                     End date
                 </div>
         </div>
@@ -92,5 +72,5 @@ use Apollo\Helpers\URLHelper;
 @stop
 @section('scripts')
     @parent
-    <script src="{{ AssetHelper::js('app/programme/menu') }}"></script>
+    <script src="{{ AssetHelper::js('app/programme/programme') }}"></script>
 @stop
