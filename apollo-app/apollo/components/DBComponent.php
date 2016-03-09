@@ -20,12 +20,6 @@ use Doctrine\ORM\EntityRepository;
 abstract class DBComponent
 {
     /**
-     * Namespace of entity class
-     * @var string
-     */
-    protected static $entityNamespace;
-
-    /**
      * @return EntityRepository
      */
     public static function getRepository() {
@@ -37,6 +31,6 @@ abstract class DBComponent
      */
     public static function getEntityNamespace()
     {
-        return self::$entityNamespace;
+        return static::$entityNamespace;
     }
 }
