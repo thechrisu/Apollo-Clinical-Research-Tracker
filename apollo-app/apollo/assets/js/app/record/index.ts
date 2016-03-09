@@ -1,6 +1,7 @@
 ///<reference path="../ajax.ts"/>
 ///<reference path="../scripts.ts"/>
 ///<reference path="../jquery.d.ts"/>
+///<reference path="../bootbox.d.ts"/>
 /**
  * Records index typescript
  *
@@ -114,4 +115,47 @@ class RecordTable {
 
 $(document).ready(function () {
     new RecordTable().load();
+    $('#add-record').click(function(e) {
+        e.preventDefault();
+        bootbox.dialog({
+                title: 'Creating a new person and a record',
+                message: $('#add-modal').html(),
+                buttons: {
+                    main: {
+                        label: "Cancel",
+                        className: "btn-primary",
+                        callback: function () {
+                        }
+                    },
+                    success: {
+                        label: "Add",
+                        className: "btn-success",
+                        callback: function () {
+                            var modal = $('.modal');
+                            var givenName = modal.find('#add-given-name').val();
+                            var middleName = modal.find('#add-middle-name').val();
+                            var lastName = modal.find('#add-last-name').val()
+                            var recordName = modal.find('#add-record-name').val();
+                            var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
+                            var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
+                            AJAX.post(Util.url('post/record'), {
+                                action: 'create',
+                                given_name: givenName,
+                                middle_name: middleName,
+                                last_name: lastName,
+                                record_name: recordName,
+                                start_date: startDate,
+                                end_date: endDate
+                            }, function (response:any) {
+                                alert(response.message);
+                                //Util.to('record/edit/' + response.record_id);
+                            }, function (message:string) {
+                                Util.error('An error has occurred during the process of creation of a new record for a person. Error message: ' + message);
+                            });
+                        }
+                    }
+                }
+            }
+        );
+    });
 });

@@ -40,6 +40,9 @@ class Record extends DBComponent
          */
         $fields = $fieldRepo->findBy(['is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
         $dataRepo = Data::getRepository();
+        /**
+         * @var FieldEntity $field
+         */
         foreach($fields as $field) {
             echo $field->getName() . PHP_EOL;
             $data = $dataRepo->findOneBy(['record_id' => $record->getId(), 'field_id' => $field->getId()]);
