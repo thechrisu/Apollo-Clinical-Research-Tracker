@@ -44,20 +44,20 @@ var fakeJSON_obj_programmeMenu: MenuData  = {
     "programmes": [
         {
             "name": "Programme 1",
-            "start_date": "2008-11-11",
-            "end_date": "2008-11-11",
+            "start_date": "1834-02-22 02:00:00",
+            "end_date": "1834-02-22 02:00:00",
             "id": "1"
         },
         {
             "name": "Programme 2",
-            "start_date": "2008-11-11",
-            "end_date": "2008-11-11",
+            "start_date": "1834-02-22 02:00:00",
+            "end_date": "1834-02-22 02:00:00",
             "id": "1"
         },
         {
             "name": "Programme 1",
-            "start_date": "2008-11-11",
-            "end_date": "2008-11-11",
+            "start_date": "1834-02-22 02:00:00",
+            "end_date": "1834-02-22 02:00:00",
             "id": "1"
         }
     ]
@@ -198,12 +198,11 @@ class ProgrammeTable {
         var row:JQuery;
         var startD;
         var endD;
-        startD = Util.formatDate(Util.parseSQLDate(<string> data.start_date));
-        endD = Util.formatDate(Util.parseSQLDate(<string> data.end_date));
+        startD = Util.formatShortDate(Util.parseSQLDate(<string> data.start_date));
+        endD = Util.formatShortDate(Util.parseSQLDate(<string> data.end_date));
         row = $('<tr></tr>');
         row.append('<td>' + data.name + '</td>');
-        row.append('<td>' + startD + '</td>');
-        row.append('<td>' + endD + '</td>');
+        row.append('<td>' + startD + ' - ' + endD + '</td>');
         row.click("test" + data.id);
         $('#table-body').append(row);
     }
@@ -226,7 +225,7 @@ class ProgrammeInformation {
         $('#funding').html("<select id='target-dropdown' />");
     }
 
-    private displayTargetComment(){
+    private displayComment(){
         //TODO
     }
 
@@ -238,9 +237,9 @@ class ProgrammeInformation {
         //TODO
     }
 
-    private displayStartDate(sqldate:string){
+    private displayDates(sqlDate:string{
         //TODO insert datepicker item, correctly parse date
-        var sDate:string = Util.formatDate(Util.parseSQLDate(<string> sqldate));
+        var sDate_f:string = Util.formatDate(Util.parseSQLDate(<string> sqlDate));
         $('#start-date').html("<span>Insert datepicker here</span>");
     }
 

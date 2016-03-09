@@ -41,20 +41,20 @@ var fakeJSON_obj_programmeMenu = {
     "programmes": [
         {
             "name": "Programme 1",
-            "start_date": "2008-11-11",
-            "end_date": "2008-11-11",
+            "start_date": "1834-02-22 02:00:00",
+            "end_date": "1834-02-22 02:00:00",
             "id": "1"
         },
         {
             "name": "Programme 2",
-            "start_date": "2008-11-11",
-            "end_date": "2008-11-11",
+            "start_date": "1834-02-22 02:00:00",
+            "end_date": "1834-02-22 02:00:00",
             "id": "1"
         },
         {
             "name": "Programme 1",
-            "start_date": "2008-11-11",
-            "end_date": "2008-11-11",
+            "start_date": "1834-02-22 02:00:00",
+            "end_date": "1834-02-22 02:00:00",
             "id": "1"
         }
     ]
@@ -154,12 +154,11 @@ var ProgrammeTable = (function () {
         var row;
         var startD;
         var endD;
-        startD = Util.formatDate(Util.parseSQLDate(data.start_date));
-        endD = Util.formatDate(Util.parseSQLDate(data.end_date));
+        startD = Util.formatShortDate(Util.parseSQLDate(data.start_date));
+        endD = Util.formatShortDate(Util.parseSQLDate(data.end_date));
         row = $('<tr></tr>');
         row.append('<td>' + data.name + '</td>');
-        row.append('<td>' + startD + '</td>');
-        row.append('<td>' + endD + '</td>');
+        row.append('<td>' + startD + ' - ' + endD + '</td>');
         row.click("test" + data.id);
         $('#table-body').append(row);
     };
@@ -182,7 +181,7 @@ var ProgrammeInformation = (function () {
         //TODO
         $('#funding').html("<select id='target-dropdown' />");
     };
-    ProgrammeInformation.prototype.displayTargetComment = function () {
+    ProgrammeInformation.prototype.displayComment = function () {
         //TODO
     };
     ProgrammeInformation.prototype.displayFunding = function (text) {
@@ -190,16 +189,6 @@ var ProgrammeInformation = (function () {
     };
     ProgrammeInformation.prototype.displayPeople = function (people) {
         //TODO
-    };
-    ProgrammeInformation.prototype.displayStartDate = function (sqldate) {
-        //TODO insert datepicker item, correctly parse date
-        var sDate = Util.formatDate(Util.parseSQLDate(sqldate));
-        $('#start-date').html("<span>Insert datepicker here</span>");
-    };
-    ProgrammeInformation.prototype.displayEndDate = function (sqldate) {
-        //TODO insert datepicker item, correctly parse date
-        var endD = Util.formatDate(Util.parseSQLDate(sqldate));
-        $('#end-date').html("<span>Insert datepicker here</span>");
     };
     return ProgrammeInformation;
 })();
