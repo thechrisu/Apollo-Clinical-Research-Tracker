@@ -7,6 +7,7 @@
 
 
 namespace Apollo\Components;
+use Apollo\Entities\RecordEntity;
 
 
 /**
@@ -14,21 +15,23 @@ namespace Apollo\Components;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  */
-class Record
+class Record extends DBComponent
 {
     /**
      * Namespace of entity class
      * @var string
      */
-    private static $entityNamespace = 'Apollo\\Entities\\RecordEntity';
+    protected static $entityNamespace = 'Apollo\\Entities\\RecordEntity';
 
     /**
-     * @return string
+     * Checks that default data exists for all fields, if not, adds the missing fields.
+     *
+     * @param RecordEntity $record
+     * @since 0.0.2
      */
-    public static function getEntityNamespace()
-    {
-        return self::$entityNamespace;
+    private static function prepare($record) {
+
     }
 }

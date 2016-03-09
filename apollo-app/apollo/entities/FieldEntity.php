@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping\OneToMany;
  *
  * @package Apollo\Entities
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  * @Entity @Table("fields")
  */
 class FieldEntity
@@ -77,11 +77,18 @@ class FieldEntity
     protected $is_multiple = false;
 
     /**
-     * Determines if record is shown or not
+     * Determines if the field is shown or not
      * @Column(type="boolean")
      * @var bool
      */
     protected $is_hidden = false;
+
+    /**
+     * Determines whether the field can be hidden or not
+     * @Column(type="boolean")
+     * @var bool
+     */
+    protected $is_essential = false;
 
     /**
      * FieldEntity constructor.
@@ -225,5 +232,21 @@ class FieldEntity
     public function setIsHidden($is_hidden)
     {
         $this->is_hidden = $is_hidden;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isEssential()
+    {
+        return $this->is_essential;
+    }
+
+    /**
+     * @param boolean $is_essential
+     */
+    public function setIsEssential($is_essential)
+    {
+        $this->is_essential = $is_essential;
     }
 }

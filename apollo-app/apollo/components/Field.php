@@ -10,17 +10,17 @@ namespace Apollo\Components;
 
 
 /**
- * Class Person
+ * Class Field
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @version 0.0.1
  */
-class Person extends DBComponent
+class Field extends DBComponent
 {
     /**
      * Namespace of entity class
      * @var string
      */
-    protected static $entityNamespace = 'Apollo\\Entities\\PersonEntity';
+    protected static $entityNamespace = 'Apollo\\Entities\\FieldEntity';
 }
