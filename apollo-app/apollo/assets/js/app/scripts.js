@@ -117,6 +117,23 @@ var Util = (function () {
             daySuffix = 'rd';
         return months[date.getMonth()] + ' ' + date.getDate() + daySuffix + ', ' + date.getFullYear();
     };
+    /**
+     * Formats JS Date to the following format:
+     * January 1st, 1970
+     *
+     * @param date
+     * @returns {string}
+     * @since 0.1.1
+     */
+    Util.formatShortDate = function (date) {
+        var months = [
+            "Jan", "Feb", "Mar",
+            "Apr", "May", "Jun", "Jul",
+            "Aug", "Sep", "Oct",
+            "Nov", "Dec"
+        ];
+        return months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+    };
     return Util;
 })();
 /**

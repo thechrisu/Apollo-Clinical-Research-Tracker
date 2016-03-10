@@ -6,18 +6,19 @@
  *
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.2
- * /
+ * @version 0.0.3
+ *
  */
 
 var fakeJSON_obj_oneProgramme = {
     "error": null,
     "name": "Some programme",
     "target_group": ["Young people", "Old people", "Twentysomething people"],
+    "current_target_group": 0,
     "target_group_comment": "This is an exceptional programme",
     "programme_funding": "Through funds",
-    "start_date": 1457476303,
-    "end_date": 1857476303,
+    "start_date": "1834-02-22 02:00:00",
+    "end_date": "1834-02-22 02:00:00",
     "participants": [
     {
         "given_name": "Peter",
@@ -44,20 +45,20 @@ var fakeJSON_obj_programmeMenu: MenuData  = {
     "programmes": [
         {
             "name": "Programme 1",
-            "start_date": "2008-11-11",
-            "end_date": "2008-11-11",
+            "start_date": "1834-02-22 02:00:00",
+            "end_date": "1834-02-22 02:00:00",
             "id": "1"
         },
         {
             "name": "Programme 2",
-            "start_date": "2008-11-11",
-            "end_date": "2008-11-11",
+            "start_date": "1834-02-22 02:00:00",
+            "end_date": "1834-02-22 02:00:00",
             "id": "1"
         },
         {
             "name": "Programme 1",
-            "start_date": "2008-11-11",
-            "end_date": "2008-11-11",
+            "start_date": "1834-02-22 02:00:00",
+            "end_date": "1834-02-22 02:00:00",
             "id": "1"
         }
     ]
@@ -118,7 +119,7 @@ class ValidatorTokenField {
     private setSuggestionEngine() {
         //   docs for bloodhound suggestion engine https://github.com/twitter/typeahead.js/blob/master/doc/bloodhound.md
         this.engine = new Bloodhound({
-            local: [{value: 'red'}, {value: 'blue'}, {value: 'green'}, {value: 'yellow'}, {value: 'violet'}, {value: 'brown'}, {value: 'purple'}, {value: 'black'}, {value: 'white'}],
+            local: [{value: 'red'}, {value: 'Tim'}, {value: 'Peter'}, {value: 'Christoph'}],
             datumTokenizer: function (d) {
                 return Bloodhound.tokenizers.whitespace(d.value);
             },
@@ -146,7 +147,8 @@ class ValidatorTokenField {
  * TODO do quick search
  * TODO do the animation of displaying the programme on the right if the user clicks on it
  * TODO insert loader
- * @version 0.0.2
+ * TODO: Animation for when going to a programme
+ * @version 0.0.3
  */
 class ProgrammeTable {
 
@@ -198,61 +200,89 @@ class ProgrammeTable {
         var row:JQuery;
         var startD;
         var endD;
-        startD = Util.formatDate(Util.parseSQLDate(<string> data.start_date));
-        endD = Util.formatDate(Util.parseSQLDate(<string> data.end_date));
+        startD = Util.formatShortDate(Util.parseSQLDate(<string> data.start_date));
+        endD = Util.formatShortDate(Util.parseSQLDate(<string> data.end_date));
         row = $('<tr></tr>');
         row.append('<td>' + data.name + '</td>');
-        row.append('<td>' + startD + '</td>');
-        row.append('<td>' + endD + '</td>');
-        row.click("test" + data.id);
+        row.append('<td>' + startD + ' - ' + endD + '</td>');
+        row.click(this.displayProgramme);
         $('#table-body').append(row);
+    }
+
+    private displayProgramme(programmeId:string) {
+        window.location.href = window.location.origin + '/programme/' + programmeId;
     }
 }
 
 /**
  * carries out all the tasks related to displaying the actual information of one programme on the right of the view
  * @since 0.0.2
- * TODO: Figure out how to use the ValidatorTokenField on top
+ * TODO: Make the add new person thing work
  * TODO: Display loader
  * TODO: autosave
  */
 class ProgrammeInformation {
+
+    public load(){
+        this.displayTitle("Second year placements");
+        this.displayPeople(fakeJSON_obj_oneProgramme.participants);
+        this.displayTargetGroup(fakeJSON_obj_oneProgramme.target_group, fakeJSON_obj_oneProgramme.current_target_group);
+        this.displayComment(fakeJSON_obj_oneProgramme.target_group_comment);
+        this.displayStartDate(fakeJSON_obj_oneProgramme.start_date);
+        this.displayEndDate(fakeJSON_obj_oneProgramme.end_date);
+    }
+
     private displayTitle(title:string){
-        $('#programme-title').html(title);
+        $('#programme-title').val(title);
+    }
+    private displayTargetGroup(options:string[], active:number){
+        var dropD = $('#target-dropdown');
+        dropD.append('<li class="dropdown-header">Choose a target group:</li>');
+        $('#target-button').append(options[active]);
+        for(var i = 0; i < options.length; i++) {
+                dropD.append('<li><a>' + options[i] + '</a></li>');
+        }
     }
 
-    private displayTargetGroup(){
-        //TODO
-        $('#funding').html("<select id='target-dropdown' />");
-    }
-
-    private displayTargetComment(){
-        //TODO
+    private displayComment(initialData:string){
+        $('#target-comment').val(initialData);
     }
 
     private displayFunding(text:string){
         $('#funding').html(text);
     }
 
-    private displayPeople(people:){
-        //TODO
+    private displayPeople(people:ParticipantData[]){
+        var table = $('#existingPeople');
+        for(var i = 0; i < people.length; i++) {
+            var row = $('<td></td>');
+            row.append(people[i].given_name + ' ' + people[i].last_name);
+            var fullRow = $('<tr href="#"></tr>');
+            fullRow.append(row);
+            fullRow.click(
+                window.location.href = window.location.origin + '/record/view/' + people[i].id
+            );
+
+            table.append(fullRow);
+        }
     }
 
-    private displayStartDate(sqldate:string){
-        //TODO insert datepicker item, correctly parse date
-        var sDate:string = Util.formatDate(Util.parseSQLDate(<string> sqldate));
-        $('#start-date').html("<span>Insert datepicker here</span>");
+    private displayStartDate(sqlDate:string){
+        //TODO insert datepicker item
+        var startD:string = Util.formatDate(Util.parseSQLDate(<string> sqlDate));
+        $('#start-date').html("<span>Insert startdate  here</span>");
     }
 
     private displayEndDate(sqldate:string){
-        //TODO insert datepicker item, correctly parse date
+        //TODO insert datepicker item
         var endD:string = Util.formatDate(Util.parseSQLDate(<string> sqldate));
-        $('#end-date').html("<span>Insert datepicker here</span>");
+        $('#end-date').html("<span>Insert startdate here</span>");
     }
 }
 
 $(document).ready(function () {
-    new ValidatorTokenField().load();
+  //  new ValidatorTokenField().load();
+    new ProgrammeInformation().load();
     new ProgrammeTable().load();
 });
 
