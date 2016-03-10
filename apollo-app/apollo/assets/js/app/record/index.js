@@ -123,8 +123,7 @@ $(document).ready(function () {
                             start_date: startDate,
                             end_date: endDate
                         }, function (response) {
-                            alert(response.message);
-                            //Util.to('record/edit/' + response.record_id);
+                            Util.to('record/edit/' + response.record_id);
                         }, function (message) {
                             Util.error('An error has occurred during the process of creation of a new record for a person. Error message: ' + message);
                         });

@@ -6,7 +6,7 @@
  *
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.3
+ * @version 0.0.4
  *
  */
 
@@ -53,13 +53,13 @@ var fakeJSON_obj_programmeMenu: MenuData  = {
             "name": "Programme 2",
             "start_date": "1834-02-22 02:00:00",
             "end_date": "1834-02-22 02:00:00",
-            "id": "1"
+            "id": "2"
         },
         {
             "name": "Programme 1",
             "start_date": "1834-02-22 02:00:00",
             "end_date": "1834-02-22 02:00:00",
-            "id": "1"
+            "id": "3"
         }
     ]
 };
@@ -205,12 +205,13 @@ class ProgrammeTable {
         row = $('<tr></tr>');
         row.append('<td>' + data.name + '</td>');
         row.append('<td>' + startD + ' - ' + endD + '</td>');
-        //row.click(this.displayProgramme);
+        var dispPFunc = Util.partial(this.displayProgramme, data.id);
+        row.click(dispPFunc);
         $('#table-body').append(row);
     }
 
     private displayProgramme(programmeId:string) {
-        window.location.href = window.location.origin + '/programme/' + programmeId;
+        window.location.href = window.location.origin + '/programme/view/' + programmeId;
     }
 }
 
@@ -257,12 +258,17 @@ class ProgrammeInformation {
         for(var i = 0; i < people.length; i++) {
             var row = $('<td></td>');
             row.append(people[i].given_name + ' ' + people[i].last_name);
-            var fullRow = $('<tr href="#"></tr>');
+            var fullRow = $('<tr></tr>');
             fullRow.append(row);
-            //fullRow.click(window.location.href = window.location.origin + '/record/view/' + people[i].id);
+            var viewID = Util.partial(this.goToView, (people[i].id));
+            fullRow.click(viewID);
 
             table.append(fullRow);
         }
+    }
+
+    private goToView(id:string){
+        window.location.href = window.location.origin + '/record/view/' + id;
     }
 
     private displayStartDate(sqlDate:string){
@@ -276,6 +282,8 @@ class ProgrammeInformation {
         var endD:string = Util.formatDate(Util.parseSQLDate(<string> sqldate));
         $('#end-date').html("<span>Insert startdate here</span>");
     }
+
+
 }
 
 $(document).ready(function () {

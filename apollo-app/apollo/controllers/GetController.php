@@ -102,11 +102,19 @@ class GetController extends GenericController
                 $response['error'] = ['id' => 1, 'description' => 'Person #' . $person->getId() . ' has 0 records!'];
             } else {
                 $recentRecord = $person->getRecords()[0];
+                $recentDate =  $recentRecord->findDateTime(FIELD_START_DATE);
+                foreach($person->getRecords() as $currentRecord) {
+                    $currentDate = $currentRecord->findDateTime(FIELD_START_DATE);
+                    if($recentDate < $currentDate) {
+                        $recentDate = $currentDate;
+                        $recentRecord = $currentRecord;
+                    }
+                }
                 $responsePerson['id'] = $recentRecord->getId();
                 $responsePerson['given_name'] = $person->getGivenName();
                 $responsePerson['last_name'] = $person->getLastName();
-                $responsePerson['phone'] = $recentRecord->getData()[0]->getVarchar();
-                $responsePerson['email'] = $recentRecord->getData()[1]->getVarchar();
+                $responsePerson['phone'] = $recentRecord->findVarchar(FIELD_PHONE);
+                $responsePerson['email'] = $recentRecord->findVarchar(FIELD_EMAIL);
                 $response['data'][] = $responsePerson;
             }
         }
@@ -119,6 +127,7 @@ class GetController extends GenericController
      * @since 0.0.3
      */
     public function actionRecord() {
+        //TODO: refactor this to use actual data
         $data['error'] = null;
         $data['essential'] = [
             "given_name" => "James",
@@ -127,6 +136,8 @@ class GetController extends GenericController
             "email" => "james.bond@mi6.gov.uk",
             "address" => ["85 Albert Embankment", "London, SE1 7TP"],
             "phone" => "+44 0000 007",
+            "start_date" => "1834-02-22 02:00:00",
+            "end_date" => "2015-02-22 02:00:00",
             "record_id" => 1,
             "record_name" => "Main",
             "record_ids" => [2, 3, 4, 5],

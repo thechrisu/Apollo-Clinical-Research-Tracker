@@ -30,8 +30,24 @@ class ProgrammeController extends GenericController
     public function index()
     {
         $breadcrumbs = [
-            ['Programmes', URLHelper::url('programme'), true]
+            ['Programmes', URLHelper::url('programme/view/'), true]
         ];
         View::render('programme.programme', 'Programmes', $breadcrumbs);
+    }
+
+    /**
+     * Shows one particular programme
+     * @param null $programme_id
+     */
+    public function actionView($programme_id = null)
+    {
+        $programme_id = intval($programme_id);
+        if($programme_id < 1) {
+            Apollo::getInstance()->getRequest()->error(400, 'Invalid programme ID!');
+        }
+        $breadcrumbs = [
+            ['Programmes', URLHelper::url('programme/view/' . $programme_id), true]
+        ];
+        View::render('programme.programme', 'View Programme', $breadcrumbs);
     }
 }

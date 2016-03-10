@@ -3,6 +3,7 @@
  * Scripts file containing functions related to modal windows
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
  * @version 0.1.3
@@ -123,13 +124,14 @@ class Util {
         if (day == '3') daySuffix = 'rd';
         return months[date.getMonth()] + ' ' + date.getDate() + daySuffix + ', ' + date.getFullYear();
     }
+
     /**
      * Formats JS Date to the following format:
      * January 1st, 1970
      *
      * @param date
      * @returns {string}
-     * @since 0.1.3
+     * @since 0.1.1
      */
     public static formatShortDate(date:Date):string {
         var months = [
@@ -139,6 +141,23 @@ class Util {
             "Nov", "Dec"
         ];
         return months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+    }
+
+
+
+    /**
+     * Partially applies a function: Used for setting "Default" parameters to functions in order to pass them to other objects
+     * http://stackoverflow.com/questions/321113/how-can-i-pre-set-arguments-in-javascript-function-call-partial-function-appli
+     * @param func
+     * @returns {function(): *}
+     * @since 0.1.3
+     */
+    public static partial(func, /*, 0..n args */) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        return function () {
+            var allArguments = args.concat(Array.prototype.slice.call(arguments));
+            return func.apply(this, allArguments);
+        };
     }
 }
 

@@ -63,7 +63,6 @@ class PersonEntity
     /**
      * Array with all of the records
      * @OneToMany(targetEntity="RecordEntity", mappedBy="person")
-     * @OrderBy({"start_date" = "DESC"})
      * @var RecordEntity[]
      */
     protected $records;

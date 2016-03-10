@@ -6,7 +6,7 @@
  *
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.3
+ * @version 0.0.4
  *
  */
 var fakeJSON_obj_oneProgramme = {
@@ -50,13 +50,13 @@ var fakeJSON_obj_programmeMenu = {
             "name": "Programme 2",
             "start_date": "1834-02-22 02:00:00",
             "end_date": "1834-02-22 02:00:00",
-            "id": "1"
+            "id": "2"
         },
         {
             "name": "Programme 1",
             "start_date": "1834-02-22 02:00:00",
             "end_date": "1834-02-22 02:00:00",
-            "id": "1"
+            "id": "3"
         }
     ]
 };
@@ -161,11 +161,12 @@ var ProgrammeTable = (function () {
         row = $('<tr></tr>');
         row.append('<td>' + data.name + '</td>');
         row.append('<td>' + startD + ' - ' + endD + '</td>');
-        //row.click(this.displayProgramme);
+        var dispPFunc = Util.partial(this.displayProgramme, data.id);
+        row.click(dispPFunc);
         $('#table-body').append(row);
     };
     ProgrammeTable.prototype.displayProgramme = function (programmeId) {
-        window.location.href = window.location.origin + '/programme/' + programmeId;
+        window.location.href = window.location.origin + '/programme/view/' + programmeId;
     };
     return ProgrammeTable;
 })();
@@ -209,11 +210,15 @@ var ProgrammeInformation = (function () {
         for (var i = 0; i < people.length; i++) {
             var row = $('<td></td>');
             row.append(people[i].given_name + ' ' + people[i].last_name);
-            var fullRow = $('<tr href="#"></tr>');
+            var fullRow = $('<tr></tr>');
             fullRow.append(row);
-            //fullRow.click(window.location.href = window.location.origin + '/record/view/' + people[i].id);
+            var viewID = Util.partial(this.goToView, (people[i].id));
+            fullRow.click(viewID);
             table.append(fullRow);
         }
+    };
+    ProgrammeInformation.prototype.goToView = function (id) {
+        window.location.href = window.location.origin + '/record/view/' + id;
     };
     ProgrammeInformation.prototype.displayStartDate = function (sqlDate) {
         //TODO insert datepicker item

@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping\ManyToOne;
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @Entity @Table("data")
- * @version 0.0.4
+ * @version 0.0.5
  */
 class DataEntity
 {
@@ -69,18 +69,6 @@ class DataEntity
      * @Column(type="datetime")
      * @var DateTime
      */
-    protected $start_date;
-
-    /**
-     * @Column(type="datetime")
-     * @var DateTime
-     */
-    protected $end_date;
-
-    /**
-     * @Column(type="datetime")
-     * @var DateTime
-     */
     protected $updated_on;
 
     /**
@@ -103,9 +91,8 @@ class DataEntity
         $date = new DateTime();
         $this->_int = 0;
         $this->_date_time = $date;
+        $this->_varchar = "";
         $this->_long_text = "";
-        $this->start_date = $date;
-        $this->end_date = $date;
         $this->updated_on = $date;
     }
 
@@ -211,38 +198,6 @@ class DataEntity
     public function setLongText($_long_text)
     {
         $this->_long_text = $_long_text;
-    }
-
-    /**
-     * @return DateTime
-     */
-    public function getStartDate()
-    {
-        return $this->start_date;
-    }
-
-    /**
-     * @param DateTime $start_date
-     */
-    public function setStartDate($start_date)
-    {
-        $this->start_date = $start_date;
-    }
-
-    /**
-     * @return DateTime
-     */
-    public function getEndDate()
-    {
-        return $this->end_date;
-    }
-
-    /**
-     * @param DateTime $end_date
-     */
-    public function setEndDate($end_date)
-    {
-        $this->end_date = $end_date;
     }
 
     /**
