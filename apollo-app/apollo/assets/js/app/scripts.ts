@@ -5,7 +5,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.1
+ * @version 0.1.3
  */
 
 /**
@@ -78,6 +78,30 @@ class Util {
     }
 
     /**
+     * Creates a MySQL date string based on JS Date object
+     *
+     * @param date
+     * @returns {string}
+     * @since 0.1.2
+     */
+    public static toMysqlFormat(date:Date):string {
+        return date.getUTCFullYear() + "-" + Util.twoDigits(1 + date.getUTCMonth()) + "-" + Util.twoDigits(date.getUTCDate()) + " " + Util.twoDigits(date.getUTCHours()) + ":" + Util.twoDigits(date.getUTCMinutes()) + ":" + Util.twoDigits(date.getUTCSeconds());
+    };
+
+    /**
+     * Required for the function above
+     *
+     * @param d
+     * @returns {string}
+     * @since 0.1.2
+     */
+    public static twoDigits(d:any):string {
+        if (0 <= d && d < 10) return "0" + d.toString();
+        if (-10 < d && d < 0) return "-0" + (-1 * d).toString();
+        return d.toString();
+    }
+
+    /**
      * Formats JS Date to the following format:
      * January 1st, 1970
      *
@@ -99,14 +123,13 @@ class Util {
         if (day == '3') daySuffix = 'rd';
         return months[date.getMonth()] + ' ' + date.getDate() + daySuffix + ', ' + date.getFullYear();
     }
-
     /**
      * Formats JS Date to the following format:
      * January 1st, 1970
      *
      * @param date
      * @returns {string}
-     * @since 0.1.1
+     * @since 0.1.3
      */
     public static formatShortDate(date:Date):string {
         var months = [

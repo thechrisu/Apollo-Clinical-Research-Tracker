@@ -7,7 +7,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.0
+ * @version 0.1.1
  */
 
 /**
@@ -72,3 +72,14 @@ defined('DB_HOST') OR define('DB_HOST', '127.0.0.1');
 defined('DB_NAME') OR define('DB_NAME', 'apollo');
 defined('DB_USER') OR define('DB_USER', 'root');
 defined('DB_PASS') OR define('DB_PASS', '');
+
+/**
+ * Constants for fields IDs
+ * @since 0.1.1
+ */
+define('FIELD_RECORD_NAME', 1);
+define('FIELD_START_DATE', 2);
+define('FIELD_END_DATE', 3);
+define('FIELD_EMAIL', 4);
+define('FIELD_PHONE', 5);
+define('FIELD_ADDRESS', 6);

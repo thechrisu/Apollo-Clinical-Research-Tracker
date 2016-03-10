@@ -10,6 +10,8 @@
 namespace Apollo\Controllers;
 
 use Apollo\Apollo;
+use Apollo\Components\Data;
+use Apollo\Components\Field;
 use Apollo\Components\Person;
 use Apollo\Components\Record;
 use Apollo\Components\View;
@@ -82,10 +84,9 @@ class RecordController extends GenericController
         View::render('record.edit', 'Edit Record', $breadcrumbs);
     }
 
+    // TODO: Remove this in production
     public function actionExample() {
         echo '<pre>';
-        echo Person::getEntityNamespace();
-        echo '<br>';
-        //Record::prepare(null);
+        var_dump(Data::getRepository()->findOneBy(['record' => 1, 'field' => FIELD_RECORD_NAME]));
     }
 }

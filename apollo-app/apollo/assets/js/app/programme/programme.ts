@@ -205,7 +205,7 @@ class ProgrammeTable {
         row = $('<tr></tr>');
         row.append('<td>' + data.name + '</td>');
         row.append('<td>' + startD + ' - ' + endD + '</td>');
-        row.click(this.displayProgramme);
+        //row.click(this.displayProgramme);
         $('#table-body').append(row);
     }
 
@@ -259,9 +259,7 @@ class ProgrammeInformation {
             row.append(people[i].given_name + ' ' + people[i].last_name);
             var fullRow = $('<tr href="#"></tr>');
             fullRow.append(row);
-            fullRow.click(
-                window.location.href = window.location.origin + '/record/view/' + people[i].id
-            );
+            //fullRow.click(window.location.href = window.location.origin + '/record/view/' + people[i].id);
 
             table.append(fullRow);
         }

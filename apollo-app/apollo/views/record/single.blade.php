@@ -14,40 +14,38 @@ use Apollo\Helpers\URLHelper;
 @section('content')
 
     <div id="add-modal" style="display: none;">
-        <div class="row">
-            <div class="col-md-12">
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <label class="col-md-3 control-label" for="name">Name</label>
-                        <div class="col-md-6">
-                            <input id="add-name" type="text"
-                                   class="form-control input-md">
-                            <span class="help-block">The name for the new record</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label" for="name">Start date:</label>
-                        <div class="col-md-6">
-                            <div class="input-group date" data-provide="datepicker">
-                                <input id="add-start-date" type="text" class="form-control"><span class="input-group-addon"><i
-                                            class="glyphicon glyphicon-th"></i></span>
-                            </div>
-                            <span class="help-block">The start of the the time interval covered by this record.</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-3 control-label" for="name">End date:</label>
-                        <div class="col-md-6">
-                            <div class="input-group date" data-provide="datepicker">
-                                <input id="add-end-date" type="text" class="form-control"><span class="input-group-addon"><i
-                                            class="glyphicon glyphicon-th"></i></span>
-                            </div>
-                            <span class="help-block">The start of the the time interval covered by this record.</span>
-                        </div>
-                    </div>
-                </form>
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label class="col-md-3 control-label" for="name">Name</label>
+                <div class="col-md-8">
+                    <input id="add-name" type="text"
+                           class="form-control input-md">
+                    <span class="help-block">The name for the new record</span>
+                </div>
             </div>
-        </div>
+            <div class="form-group">
+                <label class="col-md-3 control-label" for="name">Time period:</label>
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-group date" data-provide="datepicker">
+                                <input id="add-start-date" type="text" placeholder="Start date" class="form-control"><span
+                                        class="input-group-addon"><i
+                                            class="glyphicon glyphicon-th"></i></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group date" data-provide="datepicker">
+                                <input id="add-end-date" type="text" placeholder="End date" class="form-control"><span
+                                        class="input-group-addon"><i
+                                            class="glyphicon glyphicon-th"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="help-block">Time period covered by this record.</span>
+                </div>
+            </div>
+        </form>
     </div>
 
     <div class="panel panel-default loader-ready" id="essential-panel">

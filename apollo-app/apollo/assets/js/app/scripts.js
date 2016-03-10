@@ -5,7 +5,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.1
+ * @version 0.1.3
  */
 /**
  * Util class
@@ -68,6 +68,31 @@ var Util = (function () {
         return new Date(+parts[0], +parts[1] - 1, +parts[2], +parts[3], +parts[4], +parts[5]);
     };
     /**
+     * Creates a MySQL date string based on JS Date object
+     *
+     * @param date
+     * @returns {string}
+     * @since 0.1.2
+     */
+    Util.toMysqlFormat = function (date) {
+        return date.getUTCFullYear() + "-" + Util.twoDigits(1 + date.getUTCMonth()) + "-" + Util.twoDigits(date.getUTCDate()) + " " + Util.twoDigits(date.getUTCHours()) + ":" + Util.twoDigits(date.getUTCMinutes()) + ":" + Util.twoDigits(date.getUTCSeconds());
+    };
+    ;
+    /**
+     * Required for the function above
+     *
+     * @param d
+     * @returns {string}
+     * @since 0.1.2
+     */
+    Util.twoDigits = function (d) {
+        if (0 <= d && d < 10)
+            return "0" + d.toString();
+        if (-10 < d && d < 0)
+            return "-0" + (-1 * d).toString();
+        return d.toString();
+    };
+    /**
      * Formats JS Date to the following format:
      * January 1st, 1970
      *
@@ -98,7 +123,7 @@ var Util = (function () {
      *
      * @param date
      * @returns {string}
-     * @since 0.1.1
+     * @since 0.1.3
      */
     Util.formatShortDate = function (date) {
         var months = [

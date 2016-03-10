@@ -86,4 +86,7 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
     <script src="{{ AssetHelper::js('plugins/typeahead.bundle.min') }}"></script>
     <script src="{{ AssetHelper::js('plugins/bootbox.min') }}"></script>
     <script src="http://eternicode.github.io/bootstrap-datepicker/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+    <script>
+        $.fn.datepicker.defaults.format = "dd/mm/yyyy";
+    </script>
 @stop

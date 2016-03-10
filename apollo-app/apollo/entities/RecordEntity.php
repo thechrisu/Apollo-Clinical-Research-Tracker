@@ -7,6 +7,8 @@
 
 
 namespace Apollo\Entities;
+use Apollo\Components\Data;
+use Apollo\Components\Field;
 use DateTime;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -21,7 +23,7 @@ use Doctrine\ORM\Mapping\OrderBy;
  *
  * @package Apollo\Entities
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.5
  * @Entity @Table("records")
  */
 class RecordEntity
@@ -95,6 +97,31 @@ class RecordEntity
      */
     public function __construct()
     {
+    }
+
+    /**
+     * Returns essential fields
+     *
+     * @since 0.0.4
+     */
+    public function getRecordName() {
+
+    }
+
+    /**
+     * Sets essential fields
+     *
+     * @param string $name
+     * @since 0.0.5
+     */
+    public function setRecordName($name) {
+        $data = Data::getRepository()->findOneBy(['record' => $this->getId(), 'field' => FIELD_RECORD_NAME]);
+        //TODO: Update if exists, create if doesn't
+        if($data != null) {
+
+        } else {
+
+        }
     }
 
     /**
