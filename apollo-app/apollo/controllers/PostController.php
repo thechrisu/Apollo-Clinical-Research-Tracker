@@ -7,9 +7,11 @@
 
 
 namespace Apollo\Controllers;
+
 use Apollo\Apollo;
 use Apollo\Components\DB;
 use Apollo\Components\Record;
+use Apollo\Entities\PersonEntity;
 use Apollo\Entities\RecordEntity;
 use DateTime;
 use Doctrine\ORM\EntityRepository;
@@ -52,26 +54,42 @@ class PostController extends GenericController
      * @since 0.0.2 Parses
      * @since 0.0.1
      */
-    public function actionRecord() {
+    public function actionRecord()
+    {
         $em = DB::getEntityManager();
         $data = $this->parseRequest(['action' => null]);
         $action = strtolower($data['action']);
-        if(!in_array($action, ['create', 'add', 'hide', 'update'])) {
+        if (!in_array($action, ['create', 'add', 'hide', 'update'])) {
             Apollo::getInstance()->getRequest()->error(400, 'Invalid action.');
         };
         $response['error'] = null;
-        if($action == 'create') {
+        if ($action == 'create') {
             $data = $this->parseRequest(['given_name' => null, 'middle_name' => null, 'last_name' => null, 'record_name' => null, 'start_date' => null, 'end_date' => null]);
             $empty = false;
-            foreach($data as $value) {
-                if(empty($value)) $empty = true;
+            foreach ($data as $key => $value) {
+                if (empty($value) && $key != 'middle_name') $empty = true;
             }
-            if(!$empty) {
-                $start_date = DateTime::createFromFormat('m/d/Y H:i:s', $data['start_date']);
-                $end_date = DateTime::createFromFormat('m/d/Y H:i:s', $data['end_date']);
-                $record = new RecordEntity();
-                $record->setRecordName('test');
-                //TODO: Return errors or response IDs
+            if (!$empty) {
+                $user = Apollo::getInstance()->getUser();
+                $person = new PersonEntity();
+                $person->setOrganisation($user->getOrganisation());
+                $person->setGivenName($data['given_name']);
+                $person->setMiddleName($data['middle_name']);
+                $person->setLastName($data['last_name']);
+                $em->persist($person);
+
+                $start_date = new DateTime($data['start_date']);
+                $end_date = new DateTime($data['end_date']);
+                $record = new RecordEntity($user->getEntity());
+                $record->setPerson($person);
+                $em->persist($record);
+                $record->setVarchar(FIELD_RECORD_NAME, $data['record_name']);
+                $record->setDateTime(FIELD_START_DATE, $start_date);
+                $record->setDateTime(FIELD_END_DATE, $end_date);
+
+                $em->flush();
+
+                $response['record_id'] = $record->getId();
             } else {
                 $response['error'] = [
                     'id' => 1,
@@ -79,9 +97,9 @@ class PostController extends GenericController
                 ];
             }
         }
-        if($action == 'add') {
+        if ($action == 'add') {
             $data = $this->parseRequest(['id' => 0, 'name' => null]);
-            if(!empty($data['name'])) {
+            if (!empty($data['name'])) {
                 $response['record_id'] = $data['id'];
                 //TODO: Return errors or response IDs
             } else {
@@ -91,9 +109,9 @@ class PostController extends GenericController
                 ];
             }
         }
-        if($action == 'hide') {
+        if ($action == 'hide') {
             $data = $this->parseRequest(['id' => 0]);
-            if($data['id'] < 0) {
+            if ($data['id'] < 0) {
                 Apollo::getInstance()->getRequest()->error(400, 'Invalid ID specified.');
             };
             /**
@@ -104,17 +122,17 @@ class PostController extends GenericController
              * @var RecordEntity $record
              */
             $record = $record_repository->findOneBy(['id' => $data['id'], 'is_hidden' => 0]);
-            if($record != null) {
+            if ($record != null) {
                 $person = $record->getPerson();
-                if($person->getOrganisation()->getId() == Apollo::getInstance()->getUser()->getOrganisationId()) {
+                if ($person->getOrganisation()->getId() == Apollo::getInstance()->getUser()->getOrganisationId()) {
                     $records = $person->getRecords();
                     $count = 0;
-                    foreach($records as $current_record) {
-                        if(!$current_record->isHidden()) {
+                    foreach ($records as $current_record) {
+                        if (!$current_record->isHidden()) {
                             $count++;
                         }
                     }
-                    if($count > 1) {
+                    if ($count > 1) {
                         $record->setIsHidden(true);
                         $em->flush();
                     } else {

@@ -100,6 +100,12 @@ use Apollo\Helpers\URLHelper;
                                 </td>
                                 <td><span class="undefined">Loading...</span></td>
                             </tr>
+                            <tr>
+                                <td>
+                                    <small>Email</small>
+                                </td>
+                                <td><span class="undefined">Loading...</span></td>
+                            </tr>
                         </table>
                     </div>
                 </div>
@@ -109,13 +115,25 @@ use Apollo\Helpers\URLHelper;
                         <table class="table no-border-top">
                             <tr>
                                 <td>
-                                    <small>Email</small>
+                                    <small>Phone</small>
                                 </td>
                                 <td><span class="undefined">Loading...</span></td>
                             </tr>
                             <tr>
                                 <td>
-                                    <small>Phone</small>
+                                    <small>Record name</small>
+                                </td>
+                                <td><span class="undefined">Loading...</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <small>Record start date</small>
+                                </td>
+                                <td><span class="undefined">Loading...</span></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <small>Record end date</small>
                                 </td>
                                 <td><span class="undefined">Loading...</span></td>
                             </tr>

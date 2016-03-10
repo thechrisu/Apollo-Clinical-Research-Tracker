@@ -7,7 +7,10 @@
 
 
 namespace Apollo\Entities;
+
+use Apollo\Apollo;
 use Apollo\Components\Data;
+use Apollo\Components\DB;
 use Apollo\Components\Field;
 use DateTime;
 use Doctrine\ORM\Mapping\Column;
@@ -23,7 +26,7 @@ use Doctrine\ORM\Mapping\OrderBy;
  *
  * @package Apollo\Entities
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.5
+ * @version 0.0.6
  * @Entity @Table("records")
  */
 class RecordEntity
@@ -41,18 +44,6 @@ class RecordEntity
      * @var PersonEntity
      */
     protected $person;
-
-    /**
-     * @Column(type="datetime")
-     * @var DateTime
-     */
-    protected $start_date;
-
-    /**
-     * @Column(type="datetime")
-     * @var DateTime
-     */
-    protected $end_date;
 
     /**
      * @OneToMany(targetEntity="DataEntity", mappedBy="record")
@@ -94,34 +85,145 @@ class RecordEntity
 
     /**
      * RecordEntity constructor.
+     *
+     * @param UserEntity $user
+     * @since 0.0.6
      */
-    public function __construct()
+    public function __construct($user)
     {
+        $this->created_by = $user;
+        $this->created_on = new DateTime();
+        $this->updated_by = $user;
+        $this->updated_on = new DateTime();
     }
 
     /**
-     * Returns essential fields
+     * Finds int data
      *
-     * @since 0.0.4
+     * @param int $field_id
+     * @return int
+     * @since 0.0.6
      */
-    public function getRecordName() {
-
+    public function findInt($field_id)
+    {
+        $data = $this->findOrCreateData($field_id);
+        return $data->getInt();
     }
 
     /**
-     * Sets essential fields
+     * Finds varchar data
      *
+     * @param int $field_id
+     * @return string
+     * @since 0.0.6
+     */
+    public function findVarchar($field_id)
+    {
+        $data = $this->findOrCreateData($field_id);
+        return $data->getVarchar();
+    }
+
+    /**
+     * Finds DateTime data
+     *
+     * @param int $field_id
+     * @return DateTime
+     * @since 0.0.6
+     */
+    public function findDateTime($field_id)
+    {
+        $data = $this->findOrCreateData($field_id);
+        return $data->getDateTime();
+    }
+
+    /**
+     * Finds long text data
+     *
+     * @param int $field_id
+     * @return string
+     * @since 0.0.6
+     */
+    public function findLongText($field_id)
+    {
+        $data = $this->findOrCreateData($field_id);
+        return $data->getLongText();
+    }
+
+    /**
+     * Sets int value
+     *
+     * @param int $field_id
+     * @param int $int
+     * @since 0.0.6
+     */
+    public function setInt($field_id, $int)
+    {
+        $data = $this->findOrCreateData($field_id);
+        $data->setInt($int);
+    }
+
+    /**
+     * Sets varchar value
+     *
+     * @param int $field_id
      * @param string $name
-     * @since 0.0.5
+     * @since 0.0.6
      */
-    public function setRecordName($name) {
-        $data = Data::getRepository()->findOneBy(['record' => $this->getId(), 'field' => FIELD_RECORD_NAME]);
-        //TODO: Update if exists, create if doesn't
-        if($data != null) {
+    public function setVarchar($field_id, $name)
+    {
+        $data = $this->findOrCreateData($field_id);
+        $data->setVarchar($name);
+    }
 
-        } else {
+    /**
+     * Sets DateTime value
+     *
+     * @param int $field_id
+     * @param DateTime $date
+     * @since 0.0.6
+     */
+    public function setDateTime($field_id, $date)
+    {
+        $data = $this->findOrCreateData($field_id);
+        $data->setDateTime($date);
+    }
 
+    /**
+     * Sets long text value
+     *
+     * @param int $field_id
+     * @param string $text
+     * @since 0.0.6
+     */
+    public function setLongText($field_id, $text)
+    {
+        $data = $this->findOrCreateData($field_id);
+        $data->setLongText($text);
+    }
+
+    /**
+     * Returns the data field or creates it if it does not exist
+     *
+     * @param int $field_id
+     * @return DataEntity
+     * @since 0.0.6
+     */
+    public function findOrCreateData($field_id)
+    {
+        /**
+         * @var FieldEntity $field
+         */
+        $field = Field::getRepository()->find($field_id);
+        $data = Data::getRepository()->findOneBy(['record' => $this->getId(), 'field' => $field_id]);
+        if ($data == null) {
+            $data = new DataEntity();
+            $data->setRecord($this);
+            $data->setField($field);
+            $data->setUpdatedBy(Apollo::getInstance()->getUser()->getEntity());
+            DB::getEntityManager()->persist($data);
+            DB::getEntityManager()->flush();
         }
+        return $data;
     }
 
     /**
@@ -146,38 +248,6 @@ class RecordEntity
     public function setPerson($person)
     {
         $this->person = $person;
-    }
-
-    /**
-     * @return DateTime
-     */
-    public function getStartDate()
-    {
-        return $this->start_date;
-    }
-
-    /**
-     * @param DateTime $start_date
-     */
-    public function setStartDate($start_date)
-    {
-        $this->start_date = $start_date;
-    }
-
-    /**
-     * @return DateTime
-     */
-    public function getEndDate()
-    {
-        return $this->end_date;
-    }
-
-    /**
-     * @param DateTime $end_date
-     */
-    public function setEndDate($end_date)
-    {
-        $this->end_date = $end_date;
     }
 
     /**

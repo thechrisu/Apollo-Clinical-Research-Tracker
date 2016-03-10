@@ -8,6 +8,7 @@
 
 namespace Apollo\Components;
 
+use Apollo\Entities\OrganisationEntity;
 use Apollo\Entities\UserEntity;
 use Apollo\Helpers\StringHelper;
 
@@ -20,7 +21,7 @@ use Apollo\Helpers\StringHelper;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.7
+ * @version 0.0.9
  */
 class User
 {
@@ -79,10 +80,21 @@ class User
     }
 
     /**
+     * Returns the entity of the user
+     *
+     * @return UserEntity
+     * @since 0.0.8
+     */
+    public function getEntity()
+    {
+        return $this->entity;
+    }
+
+    /**
      * Returns the ID of the user
      *
      * @return int
-     * @since Now just returns the integer
+     * @since 0.0.6 Now just returns the integer
      * @since 0.0.5
      */
     public function getId()
@@ -121,6 +133,17 @@ class User
     public function getEmail()
     {
         return $this->entity->getEmail();
+    }
+
+    /**
+     * Returns organisation entity
+     *
+     * @return OrganisationEntity
+     * @since 0.0.9
+     */
+    public function getOrganisation()
+    {
+        return $this->entity->getOrganisation();
     }
 
     /**

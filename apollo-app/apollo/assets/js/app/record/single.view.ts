@@ -9,7 +9,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.4
+ * @version 0.0.5
  */
 
 interface EssentialData {
@@ -19,6 +19,8 @@ interface EssentialData {
     email:string,
     address:string[],
     phone:string,
+    start_date:string,
+    end_date:string,
     record_id:number,
     record_name:string,
     record_ids:number[],
@@ -59,8 +61,11 @@ class SingleView {
             columnManager.addToColumn(0, new ColumnRow('Given name', data.given_name));
             columnManager.addToColumn(0, new ColumnRow('Middle name', data.middle_name));
             columnManager.addToColumn(0, new ColumnRow('Last name', data.last_name));
-            columnManager.addToColumn(1, new ColumnRow('Email', data.email));
+            columnManager.addToColumn(0, new ColumnRow('Email', data.email));
             columnManager.addToColumn(1, new ColumnRow('Phone', data.phone));
+            columnManager.addToColumn(1, new ColumnRow('Record name', data.record_name));
+            columnManager.addToColumn(1, new ColumnRow('Record start date', Util.formatDate(Util.parseSQLDate(data.start_date))));
+            columnManager.addToColumn(1, new ColumnRow('Record end date', Util.formatDate(Util.parseSQLDate(data.end_date))));
             columnManager.addToColumn(2, new ColumnRow('Address', data.address));
             columnManager.render();
             LoaderManager.hideLoader(loader, function () {
