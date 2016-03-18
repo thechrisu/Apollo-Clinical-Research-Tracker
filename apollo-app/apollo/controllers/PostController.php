@@ -10,6 +10,7 @@ namespace Apollo\Controllers;
 
 use Apollo\Apollo;
 use Apollo\Components\DB;
+use Apollo\Components\Person;
 use Apollo\Components\Record;
 use Apollo\Entities\PersonEntity;
 use Apollo\Entities\RecordEntity;
@@ -98,10 +99,23 @@ class PostController extends GenericController
             }
         }
         if ($action == 'add') {
-            $data = $this->parseRequest(['id' => 0, 'name' => null]);
-            if (!empty($data['name'])) {
-                $response['record_id'] = $data['id'];
-                //TODO: Return errors or response IDs
+            $data = $this->parseRequest(['person_id' => 0, 'id' => 0, 'record_name' => null, 'start_date' => null, 'end_date' => null]);
+            if (!empty($data['record_name'])) {
+                $record = new RecordEntity(Apollo::getInstance()->getUser()->getEntity());
+                //TODO Tim: Check that person ID is legit
+                $record->setPerson(Person::getRepository()->find($data['person_id']));
+                DB::getEntityManager()->persist($record);
+                DB::getEntityManager()->flush();
+                $start_date = new DateTime($data['start_date']);
+                $end_date = new DateTime($data['end_date']);
+                $record->setVarchar(FIELD_RECORD_NAME, $data['record_name']);
+                $record->setDateTime(FIELD_START_DATE, $start_date);
+                $record->setDateTime(FIELD_END_DATE, $end_date);
+                if($data['id'] > 0) {
+                    //TODO Tim: Check that record with that ID exists, copy the data
+                }
+                DB::getEntityManager()->flush();
+                $response['record_id'] = $record->getId();
             } else {
                 $response['error'] = [
                     'id' => 1,

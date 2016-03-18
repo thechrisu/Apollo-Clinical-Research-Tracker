@@ -44,8 +44,7 @@ class Record extends DBComponent
          * @var FieldEntity $field
          */
         foreach($fields as $field) {
-            echo $field->getName() . PHP_EOL;
-            $data = $dataRepo->findOneBy(['record_id' => $record->getId(), 'field_id' => $field->getId()]);
+            $record->findOrCreateData($field->getId());
         }
     }
 }

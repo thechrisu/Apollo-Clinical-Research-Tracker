@@ -9,9 +9,11 @@
 namespace Apollo\Controllers;
 
 use Apollo\Apollo;
+use Apollo\Components\Record;
 use Apollo\Entities\PersonEntity;
 use Apollo\Components\DB;
 use Apollo\Components\Person;
+use Apollo\Entities\RecordEntity;
 
 
 /**
@@ -128,20 +130,43 @@ class GetController extends GenericController
      */
     public function actionRecord() {
         //TODO: refactor this to use actual data
+
+        /**
+         * @var RecordEntity $record
+         */
+        $record = Record::getRepository()->find(intval($_GET['id']));
+        Record::prepare($record);
+
         $data['error'] = null;
+
+        /**
+         * @var RecordEntity[] $other_records
+         */
+        $other_records = Record::getRepository()->findBy(['person' => $record->getPerson()->getId(), 'is_hidden' => 0]);
+        $id_array = [];
+        $name_array = [];
+        foreach($other_records as $other_record) {
+            if($other_record->getId() != intval($_GET['id'])) {
+                $id_array[] = $other_record->getId();
+                $name_array[] = $other_record->findVarchar(FIELD_RECORD_NAME);
+            }
+        }
+
         $data['essential'] = [
-            "given_name" => "James",
-            "middle_name" => "Houka",
-            "last_name" => "Bond",
-            "email" => "james.bond@mi6.gov.uk",
-            "address" => ["85 Albert Embankment", "London, SE1 7TP"],
-            "phone" => "+44 0000 007",
-            "start_date" => "1834-02-22 02:00:00",
-            "end_date" => "2015-02-22 02:00:00",
-            "record_id" => 1,
-            "record_name" => "Main",
-            "record_ids" => [2, 3, 4, 5],
-            "record_names" => ['Second', 'Third', 'Fourth', 'Fifth']
+            "given_name" => $record->getPerson()->getGivenName(),
+            "middle_name" => $record->getPerson()->getMiddleName(),
+            "last_name" => $record->getPerson()->getLastName(),
+            "email" => $record->findOrCreateData(FIELD_EMAIL)->getVarchar(),
+            //TODO Tim: make a proper arrayifying of the address
+            "address" => [$record->findOrCreateData(FIELD_ADDRESS)->getVarchar(), "London, SE1 7TP"],
+            "phone" => $record->findOrCreateData(FIELD_PHONE)->getVarchar(),
+            "start_date" => $record->findOrCreateData(FIELD_START_DATE)->getDateTime()->format('Y-m-d H:i:s'),
+            "end_date" => $record->findOrCreateData(FIELD_END_DATE)->getDateTime()->format('Y-m-d H:i:s'),
+            "person_id" => $record->getPerson()->getId(),
+            "record_id" => $record->getId(),
+            "record_name" => $record->findOrCreateData(FIELD_RECORD_NAME)->getVarchar(),
+            "record_ids" => $id_array,
+            "record_names" => $name_array
         ];
         $data['data'] = [
             [
@@ -155,14 +180,19 @@ class GetController extends GenericController
                 "value" => "Aston Martin DB5"
             ],
             [
+                "name" => "Work experience",
+                "type" => 2,
+                "value" => ['D-Wave Systems, Junior Research Scientist and Software Engineer', 'EXI Wireless, Bluetooth Group Software and Hardware Engineer', 'Nortel Networks, OPTera Solutions, Photonic Group']
+            ],
+            [
                 "name" => "Intentionally left blank",
                 "type" => 2,
                 "value" => null
             ],
             [
-                "name" => "Japanese names",
+                "name" => "Subjects",
                 "type" => 2,
-                "value" => ['Asuna', 'Kurisu']
+                "value" => ['Software Engineering', 'Compiling Techniques', 'Cryptography']
             ],
             [
                 "name" => "References",
@@ -172,8 +202,18 @@ class GetController extends GenericController
             [
                 "name" => "Birthday",
                 "type" => 3,
-                "value" => "1834-02-22 02:00:00"
-            ]
+                "value" => "1974-02-22 02:00:00"
+            ],
+            [
+                "name" => "Some other date",
+                "type" => 3,
+                "value" => "2067-11-12 02:00:00"
+            ],
+            [
+            "name" => "Lab skills",
+            "type" => 2,
+            "value" => ['Digital/Analog Scopes', 'Spectrum Analyzer', 'Function Generators']
+        ]
         ];
         echo json_encode($data);
     }

@@ -28,16 +28,10 @@ $userRepo = $entity_manager->getRepository('Apollo\\Entities\\UserEntity');
  * @var UserEntity $user
  */
 $user = $userRepo->find(1);
+date_default_timezone_set('Europe/London');
 $date = new DateTime();
-$fieldRepo = $entity_manager->getRepository('Apollo\\Entities\\FieldEntity');
-/**
- * @var FieldEntity $email
- * @var FieldEntity $phone
- */
-$phone = $fieldRepo->find(1);
-$email = $fieldRepo->find(2);
 
-for($i = 0; $i < 100; $i++) {
+for($i = 0; $i < 200; $i++) {
 
     $faker = Factory::create();
     $person = new PersonEntity();
@@ -50,35 +44,18 @@ for($i = 0; $i < 100; $i++) {
     $entity_manager->persist($person);
     $entity_manager->flush();
 
-    $record = new RecordEntity();
+    $record = new RecordEntity($user);
     $record->setPerson($person);
-    $record->setCreatedBy($user);
-    $record->setUpdatedBy($user);
-    $record->setStartDate($date);
-    $record->setEndDate($date);
-    $record->setCreatedOn($date);
-    $record->setUpdatedOn($date);
-    $record->setIsHidden(false);
-
     $entity_manager->persist($record);
     $entity_manager->flush();
 
-    $phoneData = new DataEntity();
-    $phoneData->setRecord($record);
-    $phoneData->setField($phone);
-    $phoneData->setUpdatedBy($user);
-    $phoneData->setUpdatedOn($date);
-    $phoneData->setVarchar($faker->phoneNumber);
+    $record->setVarchar(FIELD_RECORD_NAME, 'First Record');
+    $record->setVarchar(FIELD_EMAIL, $faker->email);
+    $record->setVarchar(FIELD_PHONE, $faker->phoneNumber);
+    $record->setVarchar(FIELD_ADDRESS, $faker->address);
+    $record->setDateTime(FIELD_START_DATE, new DateTime());
+    $record->setDateTime(FIELD_END_DATE, new DateTime());
 
-    $emailData = new DataEntity();
-    $emailData->setRecord($record);
-    $emailData->setField($email);
-    $emailData->setUpdatedBy($user);
-    $emailData->setUpdatedOn($date);
-    $emailData->setVarchar($faker->email);
-
-    $entity_manager->persist($phoneData);
-    $entity_manager->persist($emailData);
     $entity_manager->flush();
 
 

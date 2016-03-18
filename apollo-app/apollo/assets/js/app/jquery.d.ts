@@ -2334,6 +2334,7 @@ interface JQuery {
 
     pagination(param1: any, param2: any): JQuery;
     modal(param1: any): JQuery;
+    datepicker(param1: any): any;
 
     /**
 

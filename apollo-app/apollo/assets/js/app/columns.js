@@ -111,7 +111,7 @@ var ColumnRow = (function () {
         return key;
     };
     ColumnRow.prototype.decorateValue = function (value) {
-        if (value == null) {
+        if (value == null || value.length == 0) {
             value = '<span class="undefined">None</span>';
         }
         else {

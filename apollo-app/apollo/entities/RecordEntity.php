@@ -219,7 +219,7 @@ class RecordEntity
             $data = new DataEntity();
             $data->setRecord($this);
             $data->setField($field);
-            $data->setUpdatedBy(Apollo::getInstance()->getUser()->getEntity());
+            $data->setUpdatedBy(DB::getEntityManager()->getRepository('Apollo\\Entities\\UserEntity')->find(1));//Apollo::getInstance()->getUser()->getEntity());
             DB::getEntityManager()->persist($data);
             DB::getEntityManager()->flush();
         }

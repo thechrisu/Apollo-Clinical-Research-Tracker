@@ -135,7 +135,7 @@ class ColumnRow {
     }
 
     private decorateValue(value:string):string {
-        if (value == null) {
+        if (value == null || value.length == 0) {
             value = '<span class="undefined">None</span>'
         } else {
             value = '<strong>' + value + '</strong>'
