@@ -54,7 +54,7 @@ var ColumnManager = (function () {
         this.target.append(this.container);
     };
     return ColumnManager;
-})();
+}());
 var Column = (function () {
     function Column(target) {
         this.target = target;
@@ -81,7 +81,7 @@ var Column = (function () {
         return this.rows.length;
     };
     return Column;
-})();
+}());
 var ColumnRow = (function () {
     function ColumnRow(key, value) {
         this.key = key;
@@ -120,4 +120,4 @@ var ColumnRow = (function () {
         return value;
     };
     return ColumnRow;
-})();
+}());

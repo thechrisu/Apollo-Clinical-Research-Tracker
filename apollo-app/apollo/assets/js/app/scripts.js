@@ -135,7 +135,7 @@ var Util = (function () {
         return months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
     };
     return Util;
-})();
+}());
 /**
  * Deals with loaders
  * @since 0.0.9 Added documnetation
@@ -211,7 +211,7 @@ var LoaderManager = (function () {
     LoaderManager.loaders = {};
     LoaderManager.counter = 0;
     return LoaderManager;
-})();
+}());
 /**
  * Sets the base url
  * @since 0.0.1
