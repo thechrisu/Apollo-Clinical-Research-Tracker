@@ -50,16 +50,13 @@ use Apollo\Helpers\URLHelper;
                             </div>
                         </div>
                     </div>
-                    <div class="top-buffer" id="funding">
-                        Programme funding: Dropdown or text
-                    </div>
                     <div class="row top-buffer">
                         <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
                             <table class="table table-hover small-table no-border-top">
                                 <tbody id="existingPeople">
                                 </tbody>
                             </table>
-                            <form>
+                            <form  onSubmit="return false;">
                                 <fieldset class="form-group">
                                     <input type="text" class="form-control input-sm" id="person-input"
                                            placeholder="Add more people..." />
@@ -74,10 +71,12 @@ use Apollo\Helpers\URLHelper;
                     </div>
                     <div class="row top-buffer">
                         <div class="col-lg-6" id="start-date">
-                            Start date
+                            <small>Start date</small>
+                            <span class="undefined">Loading...</span>
                         </div>
                         <div class="col-lg-6" id="end-date">
-                            End date
+                            <small>End date</small>
+                            <span class="undefined">Loading...</span>
                         </div>
                     </div>
 

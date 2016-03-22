@@ -98,18 +98,20 @@ interface DetailProgrammeData {
 
 /**
  * Class to store the token field (the field to add/remove users from a program)
- * @version 0.0.1
+ * @version 0.0.2
+ * TODO get people's names (--> or display more information?) from the database who are not yet in the program
  */
 class ValidatorTokenField {
     private engine:BloodHound;
     private tf; //consider refactoring this
-    private elements:ParticipantData[]; //holds the data of the people
     public load(){
         this.setUp();
     }
+
     private setUp() {
         this.setSuggestionEngine();
         this.displayTokenField();
+        this.preventDuplicates();
     }
 
     /**
@@ -123,9 +125,24 @@ class ValidatorTokenField {
             datumTokenizer: function (d) {
                 return Bloodhound.tokenizers.whitespace(d.value);
             },
-            queryTokenizer: Bloodhound.tokenizers.whitespace
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
         });
         this.engine.initialize();
+    }
+
+    /**
+     * Checks if one of the tokens entered is a duplicate of an existing one.
+     * @since 0.0.4
+     */
+    private preventDuplicates(){
+        $('#person-input').on('tokenfield:createToken', function(e) {
+            console.log('...checking if too many tokens');
+            var existingTokens = this.tf('getTokens');
+            $.each(existingTokens, function(i, tok) {
+                if (tok.value === e.attrs.value){
+                    e.preventDefault();
+                }});
+        });
     }
 
     /**
@@ -137,7 +154,6 @@ class ValidatorTokenField {
             typeahead: [null, {source: this.engine.ttAdapter()}]
         });
     }
-    //TODO get people's names (--> or display more information?) from the database who are not yet in the program
 
 }
 
@@ -146,7 +162,6 @@ class ValidatorTokenField {
  * TODO hook up to API (display first programme)
  * TODO do quick search
  * TODO do the animation of displaying the programme on the right if the user clicks on it
- * TODO insert loader
  * TODO: Animation for when going to a programme
  * @version 0.0.3
  */
@@ -163,8 +178,15 @@ class ProgrammeTable {
      * Creates the basic structure of the table
      */
     private setUp() {
-        this.makeAddButton();
-        this.addDataToTable(fakeJSON_obj_programmeMenu);
+        var that = this;
+        var loader = LoaderManager.createLoader($('#table-body'));
+        LoaderManager.showLoader((loader), function() {
+            that.makeAddButton();
+            that.addDataToTable(fakeJSON_obj_programmeMenu);
+        });
+        LoaderManager.hideLoader(loader, function () {
+            LoaderManager.destroyLoader(loader);
+        });
     }
 
     /**
@@ -225,12 +247,23 @@ class ProgrammeTable {
 class ProgrammeInformation {
 
     public load(){
-        this.displayTitle("Second year placements");
-        this.displayPeople(fakeJSON_obj_oneProgramme.participants);
-        this.displayTargetGroup(fakeJSON_obj_oneProgramme.target_group, fakeJSON_obj_oneProgramme.current_target_group);
-        this.displayComment(fakeJSON_obj_oneProgramme.target_group_comment);
-        this.displayStartDate(fakeJSON_obj_oneProgramme.start_date);
-        this.displayEndDate(fakeJSON_obj_oneProgramme.end_date);
+        this.setUp();
+    }
+
+    private setUp(){
+        var that = this;
+        var loader = LoaderManager.createLoader($('#programmeContent'));
+        LoaderManager.showLoader((loader), function() {
+            that.displayTitle("Second year placements");
+            that.displayPeople(fakeJSON_obj_oneProgramme.participants);
+            that.displayTargetGroup(fakeJSON_obj_oneProgramme.target_group, fakeJSON_obj_oneProgramme.current_target_group);
+            that.displayComment(fakeJSON_obj_oneProgramme.target_group_comment);
+            that.displayStartDate(fakeJSON_obj_oneProgramme.start_date);
+            that.displayEndDate(fakeJSON_obj_oneProgramme.end_date);
+        });
+        LoaderManager.hideLoader(loader, function () {
+            LoaderManager.destroyLoader(loader);
+        });
     }
 
     private displayTitle(title:string){
@@ -249,9 +282,6 @@ class ProgrammeInformation {
         $('#target-comment').val(initialData);
     }
 
-    private displayFunding(text:string){
-        $('#funding').html(text);
-    }
 
     private displayPeople(people:ParticipantData[]){
         var table = $('#existingPeople');
@@ -274,6 +304,9 @@ class ProgrammeInformation {
     private displayStartDate(sqlDate:string){
         //TODO insert datepicker item
         var startD:string = Util.formatDate(Util.parseSQLDate(<string> sqlDate));
+        var startDate = startD.datepicker('getDate');
+        //var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
+
         $('#start-date').html("<span>Insert startdate  here</span>");
     }
 
@@ -283,11 +316,21 @@ class ProgrammeInformation {
         $('#end-date').html("<span>Insert startdate here</span>");
     }
 
-
+    private getCalendar(unixtime, fieldName) {
+    var realTime = getStringFromEpochTime(unixtime);
+    var container = $('<div class="input-group date" data-provide="datepicker" id=\"' + fieldName + 'Picker\">');
+    var input = $('<input class="form-control small-table" type="text" placeholder=\"' + fieldName + '\" value=\"' + realTime + '\">');
+    container.append(input);
+    var cal = $('<div class="input-group-addon small-table" style="height: 14px !important; line-height: 14px !important;">');
+    var openIcon = $('<span class="glyphicon glyphicon-th small-table" style="font-size: 12px !important; height: 14px !important; line-height: 14px !important;"></span>');
+    cal.append(openIcon);
+    container.append(container);
+    return container;
+}
 }
 
 $(document).ready(function () {
-  //  new ValidatorTokenField().load();
+    new ValidatorTokenField().load();
     new ProgrammeInformation().load();
     new ProgrammeTable().load();
 });
