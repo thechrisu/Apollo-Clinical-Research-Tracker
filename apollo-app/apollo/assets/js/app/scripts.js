@@ -5,8 +5,14 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.2
+ * @version 0.1.4
  */
+/**
+ * Constant specifying a delay before the AJAX request after the user
+ * has finished typing
+ * @since 0.1.4
+ */
+var AJAX_DELAY = 600;
 /**
  * Util class
  * @since 0.0.4
@@ -133,6 +139,65 @@ var Util = (function () {
             "Nov", "Dec"
         ];
         return months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+    };
+    /**
+     * Extracts the ID (of a record) from the URL, i.e.
+     * ../record/view/201/ -> 201
+     *
+     * @param url
+     * @returns {number}
+     * @since 0.1.3
+     */
+    Util.extractId = function (url) {
+        var re = new RegExp("[^\/]+(?=\/*$)|$");
+        var base = re.exec(url);
+        if (base == null)
+            return NaN;
+        return parseInt(base[0]);
+    };
+    /**
+     * Builds a JQuery node
+     *
+     * @param tag
+     * @param attributes
+     * @param content
+     * @param selfClosing
+     * @returns {JQuery}
+     * @since 0.1.4
+     */
+    Util.buildNode = function (tag, attributes, content, selfClosing) {
+        if (attributes === void 0) { attributes = {}; }
+        if (content === void 0) { content = ''; }
+        if (selfClosing === void 0) { selfClosing = false; }
+        var attributesString = '';
+        for (var key in attributes) {
+            if (attributes.hasOwnProperty(key)) {
+                attributesString += ' ' + key + '="' + attributes[key].replace('"', '\\"') + '"';
+            }
+        }
+        return $('<' + tag + attributesString + (selfClosing ? ' />' : '>' + content + '</' + tag + '>'));
+    };
+    /**
+     * Merges two objects into one
+     *
+     * @param object1
+     * @param object2
+     * @returns {{}}
+     * @since 0.1.4
+     */
+    Util.mergeObjects = function (object1, object2) {
+        var object = {};
+        for (var key in object1) {
+            if (object1.hasOwnProperty(key)) {
+                object[key] = object1[key];
+            }
+        }
+        for (var key in object2) {
+            if (object2.hasOwnProperty(key)) {
+                object[key] = object2[key];
+            }
+        }
+        return object;
     };
     return Util;
 }());

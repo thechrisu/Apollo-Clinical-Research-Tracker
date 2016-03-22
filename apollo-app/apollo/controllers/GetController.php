@@ -103,13 +103,15 @@ class GetController extends GenericController
             if(count($personRecords) < 1) {
                 $response['error'] = ['id' => 1, 'description' => 'Person #' . $person->getId() . ' has 0 records!'];
             } else {
-                $recentRecord = $person->getRecords()[0];
-                $recentDate =  $recentRecord->findDateTime(FIELD_START_DATE);
+                $recentRecord = null;
+                $recentDate =  null;
                 foreach($person->getRecords() as $currentRecord) {
-                    $currentDate = $currentRecord->findDateTime(FIELD_START_DATE);
-                    if($recentDate < $currentDate) {
-                        $recentDate = $currentDate;
-                        $recentRecord = $currentRecord;
+                    if(!$currentRecord->isHidden()) {
+                        $currentDate = $currentRecord->findDateTime(FIELD_START_DATE);
+                        if ($recentDate == null || $recentDate < $currentDate) {
+                            $recentDate = $currentDate;
+                            $recentRecord = $currentRecord;
+                        }
                     }
                 }
                 $responsePerson['id'] = $recentRecord->getId();

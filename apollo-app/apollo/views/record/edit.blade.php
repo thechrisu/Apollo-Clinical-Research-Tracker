@@ -13,6 +13,8 @@ use Apollo\Helpers\URLHelper;
 @extends('layouts.extended')
 @section('content')
 
+    <div id="test"></div>
+
     <div class="panel panel-default loader-ready" id="essential-panel">
         <div class="panel-heading">
             <span class="pull-right">Record actions:<!--
@@ -126,5 +128,6 @@ use Apollo\Helpers\URLHelper;
 @section('scripts')
     @parent
     <script src="{{ AssetHelper::js('app/columns') }}"></script>
+    <script src="{{ AssetHelper::js('app/inputs') }}"></script>
     <script src="{{ AssetHelper::js('app/record/single.edit') }}"></script>
 @stop

@@ -5,16 +5,38 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.2
+ * @version 0.1.4
  */
 
 /**
- * Default interfaces
+ * Constant specifying a delay before the AJAX request after the user
+ * has finished typing
+ * @since 0.1.4
+ */
+const AJAX_DELAY: number = 600;
+
+/**
+ * Default error interface
  * @since 0.0.3
  */
 interface Error {
-    id: number,
-    description: string
+    id:number,
+    description:string
+}
+/**
+ * Interface indicating that the object has a render() function,
+ * i.e. can be rendered on a page
+ * @since 0.1.4
+ */
+interface Renderable {
+    render(target:JQuery);
+}
+/**
+ * Interface specifying an object containing HTML attributes for a tag
+ * @since 0.1.4
+ */
+interface Attributes {
+    [key:string]:string;
 }
 
 /**
@@ -141,6 +163,64 @@ class Util {
         ];
         return months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
     }
+
+    /**
+     * Extracts the ID (of a record) from the URL, i.e.
+     * ../record/view/201/ -> 201
+     *
+     * @param url
+     * @returns {number}
+     * @since 0.1.3
+     */
+    public static extractId(url:string):number {
+        var re = new RegExp("[^\/]+(?=\/*$)|$");
+        var base = re.exec(url);
+        if (base == null) return NaN;
+        return parseInt(base[0]);
+    }
+
+    /**
+     * Builds a JQuery node
+     *
+     * @param tag
+     * @param attributes
+     * @param content
+     * @param selfClosing
+     * @returns {JQuery}
+     * @since 0.1.4
+     */
+    public static buildNode(tag:string, attributes:Attributes = {}, content:string = '', selfClosing:boolean = false):JQuery {
+        var attributesString = '';
+        for (var key in attributes) {
+            if (attributes.hasOwnProperty(key)) {
+                attributesString += ' ' + key + '="' + attributes[key].replace('"', '\\"') + '"';
+            }
+        }
+        return $('<' + tag + attributesString + (selfClosing ? ' />' : '>' + content + '</' + tag + '>'));
+    }
+
+    /**
+     * Merges two objects into one
+     *
+     * @param object1
+     * @param object2
+     * @returns {{}}
+     * @since 0.1.4
+     */
+    public static mergeObjects(object1:Object, object2:Object):Object {
+        var object = {};
+        for (var key in object1) {
+            if (object1.hasOwnProperty(key)) {
+                object[key] = object1[key];
+            }
+        }
+        for (var key in object2) {
+            if (object2.hasOwnProperty(key)) {
+                object[key] = object2[key];
+            }
+        }
+        return object;
+    }
 }
 
 /**
@@ -150,7 +230,7 @@ class Util {
  */
 class LoaderManager {
 
-    private static loaders:{[id: number] : JQuery} = {};
+    private static loaders:{[id:number]:JQuery} = {};
     private static counter = 0;
 
     /**

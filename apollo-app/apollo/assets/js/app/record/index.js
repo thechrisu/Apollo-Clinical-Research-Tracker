@@ -52,7 +52,7 @@ var RecordTable = (function () {
             that.search = encodeURIComponent($(this).val());
             timer = setTimeout(function () {
                 that.updateTable();
-            }, 600);
+            }, AJAX_DELAY);
         });
     };
     RecordTable.prototype.updateTable = function () {
@@ -88,7 +88,7 @@ var RecordTable = (function () {
         this.table.append(tr);
     };
     return RecordTable;
-})();
+}());
 $(document).ready(function () {
     new RecordTable().load();
     $('#add-record').click(function (e) {

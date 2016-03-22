@@ -100,7 +100,11 @@ class Column {
 
 }
 
-class ColumnRow {
+interface ColumnRow {
+    render(target:JQuery);
+}
+
+class ColumnRowStatic implements ColumnRow {
 
     private key:string;
     private value:string|string[];
@@ -112,13 +116,14 @@ class ColumnRow {
 
     public render(target:JQuery) {
         if (this.value instanceof Array) {
-            var length = this.value.length;
+            var array = <string[]> this.value;
+            var length = array.length;
             for (var k = 0; k < length; k++) {
                 var rowHTML = $('<tr></tr>');
                 if (k == 0) {
                     rowHTML.append($('<td rowspan="' + length + '">' + this.decorateKey(this.key) + '</td>'));
                 }
-                rowHTML.append($('<td>' + this.decorateValue(this.value[k]) + '</td>'));
+                rowHTML.append($('<td>' + this.decorateValue(array[k]) + '</td>'));
                 target.append(rowHTML);
             }
         } else {
@@ -142,5 +147,9 @@ class ColumnRow {
         }
         return value;
     }
+
+}
+
+class ColumnRowEditable {
 
 }

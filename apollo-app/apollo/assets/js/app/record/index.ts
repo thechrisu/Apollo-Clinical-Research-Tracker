@@ -74,7 +74,7 @@ class RecordTable {
             that.search = encodeURIComponent($(this).val());
             timer = setTimeout(function () {
                 that.updateTable();
-            }, 600);
+            }, AJAX_DELAY);
         });
     }
 

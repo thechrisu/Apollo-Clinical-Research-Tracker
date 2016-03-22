@@ -82,20 +82,21 @@ var Column = (function () {
     };
     return Column;
 }());
-var ColumnRow = (function () {
-    function ColumnRow(key, value) {
+var ColumnRowStatic = (function () {
+    function ColumnRowStatic(key, value) {
         this.key = key;
         this.value = value;
     }
-    ColumnRow.prototype.render = function (target) {
+    ColumnRowStatic.prototype.render = function (target) {
         if (this.value instanceof Array) {
-            var length = this.value.length;
+            var array = this.value;
+            var length = array.length;
             for (var k = 0; k < length; k++) {
                 var rowHTML = $('<tr></tr>');
                 if (k == 0) {
                     rowHTML.append($('<td rowspan="' + length + '">' + this.decorateKey(this.key) + '</td>'));
                 }
-                rowHTML.append($('<td>' + this.decorateValue(this.value[k]) + '</td>'));
+                rowHTML.append($('<td>' + this.decorateValue(array[k]) + '</td>'));
                 target.append(rowHTML);
             }
         }
@@ -106,11 +107,11 @@ var ColumnRow = (function () {
             target.append(rowHTML);
         }
     };
-    ColumnRow.prototype.decorateKey = function (key) {
+    ColumnRowStatic.prototype.decorateKey = function (key) {
         key = '<small>' + key + '</small>';
         return key;
     };
-    ColumnRow.prototype.decorateValue = function (value) {
+    ColumnRowStatic.prototype.decorateValue = function (value) {
         if (value == null || value.length == 0) {
             value = '<span class="undefined">None</span>';
         }
@@ -119,5 +120,10 @@ var ColumnRow = (function () {
         }
         return value;
     };
-    return ColumnRow;
+    return ColumnRowStatic;
+}());
+var ColumnRowEditable = (function () {
+    function ColumnRowEditable() {
+    }
+    return ColumnRowEditable;
 }());

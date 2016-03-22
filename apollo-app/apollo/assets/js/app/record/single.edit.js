@@ -3,6 +3,7 @@
 ///<reference path="../jquery.d.ts"/>
 ///<reference path="../columns.ts"/>
 ///<reference path="../bootbox.d.ts"/>
+///<reference path="../inputs.ts"/>
 /**
  * Single record view typescript
  *
@@ -14,16 +15,16 @@
 var SingleView = (function () {
     function SingleView() {
     }
-    SingleView.prototype.load = function () {
+    SingleView.prototype.load = function (id) {
+        var test = $('#test');
+        var input = new InputText(1, function (id, value) {
+            alert('Value is: ' + value);
+        }, {});
+        input.render(test);
+        return;
+        this.id = id;
         var that = this;
-        //TODO Tim:
-        var url = window.location.toString();
-        var re = new RegExp("[^\/]+(?=\/*$)|$"); //Matches anything that comes after the last slash (and anything before final slashes)
-        var base = re.exec(url);
-        if (base == null) {
-            console.error("URL ending could not be found out correctly, URL: " + url);
-        }
-        AJAX.get(Util.url('get/record?id=' + base[0], false), function (data) {
+        AJAX.get(Util.url('get/record?id=' + this.id, false), function (data) {
             var breadcrumbs = $('#nav-breadcrumbs');
             breadcrumbs.find('li:nth-child(3)').text(data.essential.given_name + ' ' + data.essential.last_name);
             breadcrumbs.find('li:nth-child(4)').text('Record #' + data.essential.record_id + ': ' + data.essential.record_name);
@@ -51,15 +52,15 @@ var SingleView = (function () {
                     return '<input type="text" class="form-control input-sm input-block-level" value="' + value + '">';
                 }
             }
-            columnManager.addToColumn(0, new ColumnRow('Given name', wrap(data.given_name)));
-            columnManager.addToColumn(0, new ColumnRow('Middle name', wrap(data.middle_name)));
-            columnManager.addToColumn(0, new ColumnRow('Last name', wrap(data.last_name)));
-            columnManager.addToColumn(0, new ColumnRow('Email', wrap(data.email)));
-            columnManager.addToColumn(1, new ColumnRow('Phone', wrap(data.phone)));
-            columnManager.addToColumn(1, new ColumnRow('Record name', wrap(data.record_name)));
-            columnManager.addToColumn(1, new ColumnRow('Record start date', wrap(data.start_date, 3)));
-            columnManager.addToColumn(1, new ColumnRow('Record end date', wrap(data.end_date, 3)));
-            columnManager.addToColumn(2, new ColumnRow('Address', wrap(data.address)));
+            columnManager.addToColumn(0, new ColumnRowStatic('Given name', wrap(data.given_name)));
+            columnManager.addToColumn(0, new ColumnRowStatic('Middle name', wrap(data.middle_name)));
+            columnManager.addToColumn(0, new ColumnRowStatic('Last name', wrap(data.last_name)));
+            columnManager.addToColumn(0, new ColumnRowStatic('Email', wrap(data.email)));
+            columnManager.addToColumn(1, new ColumnRowStatic('Phone', wrap(data.phone)));
+            columnManager.addToColumn(1, new ColumnRowStatic('Record name', wrap(data.record_name)));
+            columnManager.addToColumn(1, new ColumnRowStatic('Record start date', wrap(data.start_date, 3)));
+            columnManager.addToColumn(1, new ColumnRowStatic('Record end date', wrap(data.end_date, 3)));
+            columnManager.addToColumn(2, new ColumnRowStatic('Address', wrap(data.address)));
             columnManager.render();
             LoaderManager.hideLoader(loader, function () {
                 LoaderManager.destroyLoader(loader);
@@ -77,7 +78,7 @@ var SingleView = (function () {
                 if (field.type == 3) {
                     value = Util.formatDate(Util.parseSQLDate(value));
                 }
-                columnManager.add(new ColumnRow(field.name, value));
+                columnManager.add(new ColumnRowStatic(field.name, value));
             }
             columnManager.render(false);
             LoaderManager.hideLoader(loader, function () {
@@ -188,5 +189,7 @@ var SingleView = (function () {
     return SingleView;
 }());
 $(document).ready(function () {
-    new SingleView().load();
+    var single = new SingleView();
+    var id = Util.extractId(window.location.toString());
+    single.load(id);
 });
