@@ -72,11 +72,9 @@ use Apollo\Helpers\URLHelper;
                     <div class="row top-buffer">
                         <div class="col-lg-6" id="start-date">
                             <small>Start date</small>
-                            <span class="undefined">Loading...</span>
                         </div>
                         <div class="col-lg-6" id="end-date">
                             <small>End date</small>
-                            <span class="undefined">Loading...</span>
                         </div>
                     </div>
 

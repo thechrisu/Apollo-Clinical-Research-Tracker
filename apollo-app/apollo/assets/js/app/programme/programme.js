@@ -6,7 +6,7 @@
  *
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.4
+ * @version 0.0.5
  *
  */
 var fakeJSON_obj_oneProgramme = {
@@ -16,7 +16,7 @@ var fakeJSON_obj_oneProgramme = {
     "current_target_group": 0,
     "target_group_comment": "This is an exceptional programme",
     "programme_funding": "Through funds",
-    "start_date": "1834-02-22 02:00:00",
+    "start_date": "1834-01-22 02:00:00",
     "end_date": "1834-02-22 02:00:00",
     "participants": [
         {
@@ -216,6 +216,7 @@ var ProgrammeInformation = (function () {
             that.displayComment(fakeJSON_obj_oneProgramme.target_group_comment);
             that.displayStartDate(fakeJSON_obj_oneProgramme.start_date);
             that.displayEndDate(fakeJSON_obj_oneProgramme.end_date);
+            $('.undefined').html = "";
         });
         LoaderManager.hideLoader(loader, function () {
             LoaderManager.destroyLoader(loader);
@@ -255,18 +256,14 @@ var ProgrammeInformation = (function () {
     ProgrammeInformation.prototype.displayStartDate = function (sqlDate) {
         //TODO insert datepicker item
         var startD = Util.formatDate(Util.parseSQLDate(sqlDate));
-        var startDate = '<div class="input-group date" data-provide="datepicker">' +
-            '<input id="add-start-date" type="text" value="' + startD + '" class="form-control input-sm input-block-level"' +
-            '><span class="input-group-addon" style="padding: 0 18px !important; font-size: 0.8em !important;"><i class="glyphicon glyphicon-th"></i></span>' +
-            '</div>';
-        //var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
-        $('#start-date').html("<span>Insert startdate  here</span>");
+        var startDate = Util.getDatePicker(startD, "add-start-date");
         $('#start-date').append(startDate);
     };
     ProgrammeInformation.prototype.displayEndDate = function (sqldate) {
         //TODO insert datepicker item
         var endD = Util.formatDate(Util.parseSQLDate(sqldate));
-        $('#end-date').html("<span>Insert startdate here</span>");
+        var endDate = Util.getDatePicker(endD, "add-start-date");
+        $('#end-date').append(endDate);
     };
     return ProgrammeInformation;
 })();

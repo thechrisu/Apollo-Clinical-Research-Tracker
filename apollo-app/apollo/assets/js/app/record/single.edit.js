@@ -187,7 +187,7 @@ var SingleView = (function () {
         });
     };
     return SingleView;
-}());
+})();
 $(document).ready(function () {
     var single = new SingleView();
     var id = Util.extractId(window.location.toString());
