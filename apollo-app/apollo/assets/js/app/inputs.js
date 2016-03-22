@@ -6,7 +6,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.1
+ * @version 0.0.2
  */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -22,9 +22,16 @@ var InputField = (function () {
     function InputField(id, callback) {
         this.id = id;
         this.callback = callback;
+        this.parentNode = $('<div class="apollo-input-container"></div>');
     }
     InputField.prototype.render = function (target) {
         target.append(this.parentNode);
+    };
+    InputField.prototype.callbackWrapper = function (callback) {
+        clearTimeout(this.timeout);
+        this.timeout = setTimeout(function () {
+            callback();
+        }, AJAX_DELAY);
     };
     return InputField;
 }());
@@ -35,42 +42,121 @@ var InputField = (function () {
  */
 var InputText = (function (_super) {
     __extends(InputText, _super);
-    function InputText(id, callback, attributes) {
+    function InputText(id, callback, attributes, value) {
+        if (value === void 0) { value = null; }
         _super.call(this, id, callback);
         this.attributes = Util.mergeObjects(attributes, {
             'data-id': this.id.toString(),
             'id': 'input-text-' + this.id,
-            'class': 'form-control',
-            'type': 'text'
+            'class': 'form-control input-sm',
+            'type': 'text',
+            'value': (value == null ? '' : value)
         });
         this.prepareNode();
         this.setupCallback();
     }
     InputText.prototype.prepareNode = function () {
-        this.parentNode = $('<div class="apollo-input-container"></div>');
         this.input = Util.buildNode('input', this.attributes, null, true);
         this.parentNode.append(this.input);
     };
     InputText.prototype.setupCallback = function () {
         var that = this;
-        console.log('Setting up callback!');
         this.input.on({
-            keyup: function () { that.callbackWrapper(); }
+            keyup: function () {
+                that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
+            }
         });
-    };
-    InputText.prototype.callbackWrapper = function () {
-        clearTimeout(this.timeout);
-        var that = this;
-        this.timeout = setTimeout(function () {
-            that.callback.call(that.input, that.id, that.input.val());
-        }, AJAX_DELAY);
     };
     return InputText;
 }(InputField));
+/**
+ * Bootstrap dropdown
+ *
+ * @since 0.0.2
+ */
 var InputDropdown = (function (_super) {
     __extends(InputDropdown, _super);
-    function InputDropdown() {
-        _super.apply(this, arguments);
+    function InputDropdown(id, callback, options, selected, allowOther, value, multiple) {
+        if (selected === void 0) { selected = 0; }
+        if (allowOther === void 0) { allowOther = false; }
+        if (value === void 0) { value = null; }
+        if (multiple === void 0) { multiple = false; }
+        _super.call(this, id, callback);
+        this.options = options;
+        this.selected = selected;
+        this.allowOther = allowOther;
+        this.value = value;
+        this.multiple = multiple && !allowOther;
+        this.prepareNode();
+        this.setupCallback();
     }
+    InputDropdown.prototype.prepareNode = function () {
+        var attributes = {
+            'data-id': this.id.toString(),
+            'id': 'input-dropdown-' + this.id,
+            'class': 'form-control input-sm'
+        };
+        if (this.multiple) {
+            attributes = Util.mergeObjects(attributes, {
+                multiple: 'multiple'
+            });
+        }
+        this.select = Util.buildNode('select', attributes);
+        for (var i = 0; i < this.options.length + (this.allowOther ? 1 : 0); i++) {
+            var label = this.options[i];
+            if (i == this.options.length)
+                label = 'Other';
+            this.select.append($('<option' + (i == this.selected ? ' selected' : '') + ' value="' + i + '">' + label + '</option>'));
+        }
+        this.parentNode.append(this.select);
+        if (this.allowOther) {
+            this.input = Util.buildNode('input', {
+                'style': 'display:none;',
+                'data-id': this.id.toString(),
+                'id': 'input-dropdown-other-' + this.id,
+                'class': 'form-control input-sm',
+                'placeholder': 'Type here . . .',
+                'type': 'text',
+                'value': (this.value == null ? '' : this.value)
+            }, null, true);
+            this.parentNode.append(this.input);
+            if (this.selected == this.options.length)
+                this.input.show();
+        }
+    };
+    InputDropdown.prototype.setupCallback = function () {
+        var that = this;
+        this.select.on({
+            change: function () {
+                var value = that.select.val();
+                if (value == that.options.length) {
+                    that.input.show();
+                    that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
+                }
+                else {
+                    if (that.allowOther)
+                        that.input.hide();
+                    if (that.multiple) {
+                        if (value == null)
+                            value = [];
+                        for (var i = 0; i < value.length; i++) {
+                            value[i] = parseInt(value[i]);
+                        }
+                    }
+                    else {
+                        value = parseInt(value);
+                    }
+                    that.callbackWrapper(that.callback.bind(null, that.id, value));
+                }
+            }
+        });
+        if (this.allowOther) {
+            this.input.on({
+                keyup: function () {
+                    that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
+                }
+            });
+        }
+    };
     return InputDropdown;
 }(InputField));

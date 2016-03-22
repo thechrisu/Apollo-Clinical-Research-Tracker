@@ -47,9 +47,25 @@ class SingleView {
     public load(id:number) {
 
         var test = $('#test');
-        var input = new InputText(1, function(id:number, value:string) {
-            alert('Value is: ' + value);
-        }, {});
+        var type = 2;
+        var input;
+        switch (type) {
+            case 1:
+                input = new InputText(1, function(id:number, value:string) {
+                    alert('Value is: ' + value);
+                }, { placeholder: 'Test' }, 'Some Value');
+                break;
+            case 2:
+                input = new InputDropdown(2, function(id:number, value:string|number|number[]) {
+                    console.log(value);
+                }, ['First option', 'Second option'], 1, true, 'test');
+                break;
+            case 3:
+                input = new InputDropdown(2, function(id:number, value:string|number|number[]) {
+                    console.log(value);
+                }, ['First option', 'Second option'], 1, false, null, true);
+                break;
+        }
         input.render(test);
 
         return;
