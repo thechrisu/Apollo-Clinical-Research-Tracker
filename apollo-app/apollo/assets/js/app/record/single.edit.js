@@ -11,39 +11,11 @@
  * @license http://opensource.org/licenses/mit-license.php MIT License
  * @version 0.0.5
  */
-
-interface EssentialData {
-    given_name:string,
-    middle_name:string,
-    last_name:string,
-    email:string,
-    address:string[],
-    phone:string,
-    start_date:string,
-    end_date:string,
-    person_id:number,
-    record_id:number,
-    record_name:string,
-    record_ids:number[],
-    record_names:string[]
-
-}
-interface FieldData {
-    name:string,
-    type:number,
-    value:string|string[]
-}
-interface RecordData {
-    error:Error,
-    essential:EssentialData,
-    data:FieldData[]
-}
-
-class SingleView {
-
-    public load() {
+var SingleView = (function () {
+    function SingleView() {
+    }
+    SingleView.prototype.load = function () {
         var that = this;
-
         //TODO Tim:
         var url = window.location.toString();
         var re = new RegExp("[^\/]+(?=\/*$)|$"); //Matches anything that comes after the last slash (and anything before final slashes)
@@ -51,40 +23,50 @@ class SingleView {
         if (base == null) {
             console.error("URL ending could not be found out correctly, URL: " + url);
         }
-
-        AJAX.get(Util.url('get/record?id=' + base[0], false), function (data:RecordData) {
+        AJAX.get(Util.url('get/record?id=' + base[0], false), function (data) {
             var breadcrumbs = $('#nav-breadcrumbs');
             breadcrumbs.find('li:nth-child(3)').text(data.essential.given_name + ' ' + data.essential.last_name);
             breadcrumbs.find('li:nth-child(4)').text('Record #' + data.essential.record_id + ': ' + data.essential.record_name);
             that.parseEssentials(data.essential);
             that.parseFields(data.data);
             that.setupButtons(data.essential);
-        }, function (message:string) {
+        }, function (message) {
             Util.error('An error has occurred during the loading of single record data. Please reload the page or contact the administrator. Error message: ' + message);
         });
-    }
-
-    private parseEssentials(data:EssentialData) {
+    };
+    SingleView.prototype.parseEssentials = function (data) {
         var loader = LoaderManager.createLoader($('#essential-panel'));
         LoaderManager.showLoader(loader, function () {
             var columnManager = new ColumnManager('#essential');
-            columnManager.addToColumn(0, new ColumnRow('Given name', data.given_name));
-            columnManager.addToColumn(0, new ColumnRow('Middle name', data.middle_name));
-            columnManager.addToColumn(0, new ColumnRow('Last name', data.last_name));
-            columnManager.addToColumn(0, new ColumnRow('Email', data.email));
-            columnManager.addToColumn(1, new ColumnRow('Phone', data.phone));
-            columnManager.addToColumn(1, new ColumnRow('Record name', data.record_name));
-            columnManager.addToColumn(1, new ColumnRow('Record start date', Util.formatDate(Util.parseSQLDate(data.start_date))));
-            columnManager.addToColumn(1, new ColumnRow('Record end date', Util.formatDate(Util.parseSQLDate(data.end_date))));
-            columnManager.addToColumn(2, new ColumnRow('Address', data.address));
+            //TODO Tim: Refactor this
+            function wrap(value, type) {
+                if (type === void 0) { type = 2; }
+                if (type == 3) {
+                    return '<div class="input-group date" data-provide="datepicker">' +
+                        '<input id="add-end-date" type="text" value="' + value + '" class="form-control input-sm input-block-level"' +
+                        '><span class="input-group-addon" style="padding: 0 18px !important; font-size: 0.8em !important;"><i class="glyphicon glyphicon-th"></i></span>' +
+                        '</div>';
+                }
+                else {
+                    return '<input type="text" class="form-control input-sm input-block-level" value="' + value + '">';
+                }
+            }
+            columnManager.addToColumn(0, new ColumnRow('Given name', wrap(data.given_name)));
+            columnManager.addToColumn(0, new ColumnRow('Middle name', wrap(data.middle_name)));
+            columnManager.addToColumn(0, new ColumnRow('Last name', wrap(data.last_name)));
+            columnManager.addToColumn(0, new ColumnRow('Email', wrap(data.email)));
+            columnManager.addToColumn(1, new ColumnRow('Phone', wrap(data.phone)));
+            columnManager.addToColumn(1, new ColumnRow('Record name', wrap(data.record_name)));
+            columnManager.addToColumn(1, new ColumnRow('Record start date', wrap(data.start_date, 3)));
+            columnManager.addToColumn(1, new ColumnRow('Record end date', wrap(data.end_date, 3)));
+            columnManager.addToColumn(2, new ColumnRow('Address', wrap(data.address)));
             columnManager.render();
             LoaderManager.hideLoader(loader, function () {
                 LoaderManager.destroyLoader(loader);
             });
         });
-    }
-
-    private parseFields(data:FieldData[]) {
+    };
+    SingleView.prototype.parseFields = function (data) {
         var loader = LoaderManager.createLoader($('#fields'));
         LoaderManager.showLoader(loader, function () {
             var count = data.length;
@@ -93,7 +75,7 @@ class SingleView {
                 var field = data[i];
                 var value = field.value;
                 if (field.type == 3) {
-                    value = Util.formatDate(Util.parseSQLDate(<string> value));
+                    value = Util.formatDate(Util.parseSQLDate(value));
                 }
                 columnManager.add(new ColumnRow(field.name, value));
             }
@@ -102,9 +84,8 @@ class SingleView {
                 LoaderManager.destroyLoader(loader);
             });
         });
-    }
-
-    private setupButtons(data:EssentialData) {
+    };
+    SingleView.prototype.setupButtons = function (data) {
         var dropdownCurrent = $('#current-record');
         var dropdownOther = $('#other-records');
         dropdownCurrent.html(data.record_name + ' <span class="caret"></span>');
@@ -112,72 +93,68 @@ class SingleView {
             for (var i = 0; i < data.record_ids.length; i++) {
                 dropdownOther.append('<li><a href="' + Util.url('record/view/' + data.record_ids[i]) + '">' + data.record_names[i] + '</a></li>');
             }
-        } else {
+        }
+        else {
             dropdownOther.append('<li class="dropdown-header">Nothing to display . . .</li>');
         }
-
         var addButton = $('#record-add');
         var duplicateButton = $('#record-duplicate');
         var editButton = $('#record-edit');
         var hideButton = $('#record-hide');
-
         addButton.click(function (e) {
             e.preventDefault();
             bootbox.dialog({
-                    title: 'Adding a new record for ' + data.given_name + ' ' + data.last_name,
-                    message: $('#add-modal').html(),
-                    buttons: {
-                        main: {
-                            label: "Cancel",
-                            className: "btn-primary",
-                            callback: function () {
-                            }
-                        },
-                        success: {
-                            label: "Add",
-                            className: "btn-success",
-                            callback: function () {
-                                var modal = $('.modal');
-                                var name = modal.find('#add-name').val();
-                                var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
-                                var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
-                                newRecord(name, startDate, endDate);
-                            }
+                title: 'Adding a new record for ' + data.given_name + ' ' + data.last_name,
+                message: $('#add-modal').html(),
+                buttons: {
+                    main: {
+                        label: "Cancel",
+                        className: "btn-primary",
+                        callback: function () {
+                        }
+                    },
+                    success: {
+                        label: "Add",
+                        className: "btn-success",
+                        callback: function () {
+                            var modal = $('.modal');
+                            var name = modal.find('#add-name').val();
+                            var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
+                            var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
+                            newRecord(name, startDate, endDate);
                         }
                     }
                 }
-            );
+            });
         });
-
         duplicateButton.click(function (e) {
             e.preventDefault();
             bootbox.dialog({
-                    title: 'Adding a new record for ' + data.given_name + ' ' + data.last_name,
-                    message: $('#add-modal').html(),
-                    buttons: {
-                        main: {
-                            label: "Cancel",
-                            className: "btn-primary",
-                            callback: function () {
-                            }
-                        },
-                        success: {
-                            label: "Add",
-                            className: "btn-success",
-                            callback: function () {
-                                var modal = $('.modal');
-                                var name = modal.find('#add-name').val();
-                                var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
-                                var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
-                                newRecord(name, startDate, endDate, data.record_id);
-                            }
+                title: 'Adding a new record for ' + data.given_name + ' ' + data.last_name,
+                message: $('#add-modal').html(),
+                buttons: {
+                    main: {
+                        label: "Cancel",
+                        className: "btn-primary",
+                        callback: function () {
+                        }
+                    },
+                    success: {
+                        label: "Add",
+                        className: "btn-success",
+                        callback: function () {
+                            var modal = $('.modal');
+                            var name = modal.find('#add-name').val();
+                            var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
+                            var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
+                            newRecord(name, startDate, endDate, data.record_id);
                         }
                     }
                 }
-            );
+            });
         });
-
-        function newRecord(name:string, startDate:string, endDate:string, id:number = 0) {
+        function newRecord(name, startDate, endDate, id) {
+            if (id === void 0) { id = 0; }
             AJAX.post(Util.url('post/record'), {
                 action: 'add',
                 person_id: data.person_id,
@@ -185,13 +162,12 @@ class SingleView {
                 start_date: startDate,
                 end_date: endDate,
                 id: id
-            }, function (response:any) {
+            }, function (response) {
                 Util.to('record/edit/' + response.record_id);
-            }, function (message:string) {
+            }, function (message) {
                 Util.error('An error has occurred during the process of creation of the record. Error message: ' + message);
             });
         }
-
         editButton.attr('href', Util.url('record/edit/' + data.record_id));
         hideButton.click(function (e) {
             e.preventDefault();
@@ -200,18 +176,17 @@ class SingleView {
                     AJAX.post(Util.url('post/record'), {
                         action: 'hide',
                         id: data.record_id
-                    }, function (data:any) {
+                    }, function (data) {
                         Util.to('record');
-                    }, function (message:string) {
+                    }, function (message) {
                         Util.error('An error has occurred during hiding of the record. Error message: ' + message);
                     });
                 }
             });
         });
-    }
-
-}
-
+    };
+    return SingleView;
+}());
 $(document).ready(function () {
     new SingleView().load();
 });

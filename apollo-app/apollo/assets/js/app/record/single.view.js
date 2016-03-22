@@ -16,7 +16,14 @@ var SingleView = (function () {
     }
     SingleView.prototype.load = function () {
         var that = this;
-        AJAX.get(Util.url('get/record'), function (data) {
+        //TODO Tim:
+        var url = window.location.toString();
+        var re = new RegExp("[^\/]+(?=\/*$)|$"); //Matches anything that comes after the last slash (and anything before final slashes)
+        var base = re.exec(url);
+        if (base == null) {
+            console.error("URL ending could not be found out correctly, URL: " + url);
+        }
+        AJAX.get(Util.url('get/record?id=' + base[0], false), function (data) {
             var breadcrumbs = $('#nav-breadcrumbs');
             breadcrumbs.find('li:nth-child(3)').text(data.essential.given_name + ' ' + data.essential.last_name);
             breadcrumbs.find('li:nth-child(4)').text('Record #' + data.essential.record_id + ': ' + data.essential.record_name);
@@ -97,9 +104,10 @@ var SingleView = (function () {
                         label: "Add",
                         className: "btn-success",
                         callback: function () {
-                            var name = $('.modal').find('#add-name').val();
-                            var startDate = $('.modal').find('#add-start-date').val();
-                            var endDate = $('.modal').find('#add-end-date').val();
+                            var modal = $('.modal');
+                            var name = modal.find('#add-name').val();
+                            var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
+                            var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
                             newRecord(name, startDate, endDate);
                         }
                     }
@@ -122,9 +130,10 @@ var SingleView = (function () {
                         label: "Add",
                         className: "btn-success",
                         callback: function () {
-                            var name = $('.modal').find('#add-name').val();
-                            var startDate = $('.modal').find('#add-start-date').val();
-                            var endDate = $('.modal').find('#add-end-date').val();
+                            var modal = $('.modal');
+                            var name = modal.find('#add-name').val();
+                            var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
+                            var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
                             newRecord(name, startDate, endDate, data.record_id);
                         }
                     }
@@ -135,7 +144,8 @@ var SingleView = (function () {
             if (id === void 0) { id = 0; }
             AJAX.post(Util.url('post/record'), {
                 action: 'add',
-                name: name,
+                person_id: data.person_id,
+                record_name: name,
                 start_date: startDate,
                 end_date: endDate,
                 id: id

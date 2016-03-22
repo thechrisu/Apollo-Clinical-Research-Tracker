@@ -68,15 +68,27 @@ class SingleView {
         var loader = LoaderManager.createLoader($('#essential-panel'));
         LoaderManager.showLoader(loader, function () {
             var columnManager = new ColumnManager('#essential');
-            columnManager.addToColumn(0, new ColumnRow('Given name', data.given_name));
-            columnManager.addToColumn(0, new ColumnRow('Middle name', data.middle_name));
-            columnManager.addToColumn(0, new ColumnRow('Last name', data.last_name));
-            columnManager.addToColumn(0, new ColumnRow('Email', data.email));
-            columnManager.addToColumn(1, new ColumnRow('Phone', data.phone));
-            columnManager.addToColumn(1, new ColumnRow('Record name', data.record_name));
-            columnManager.addToColumn(1, new ColumnRow('Record start date', Util.formatDate(Util.parseSQLDate(data.start_date))));
-            columnManager.addToColumn(1, new ColumnRow('Record end date', Util.formatDate(Util.parseSQLDate(data.end_date))));
-            columnManager.addToColumn(2, new ColumnRow('Address', data.address));
+            //TODO Tim: Refactor this
+            function wrap(value:string|string[], type:number = 2) {
+                if(type == 3) {
+                    return '<div class="input-group date" data-provide="datepicker">' +
+                        '<input id="add-end-date" type="text" value="' + value + '" class="form-control input-sm input-block-level"' +
+                        '><span class="input-group-addon" style="padding: 0 18px !important; font-size: 0.8em !important;"><i class="glyphicon glyphicon-th"></i></span>' +
+                        '</div>';
+                } else {
+                    return '<input type="text" class="form-control input-sm input-block-level" value="' + value + '">';
+                }
+            }
+
+            columnManager.addToColumn(0, new ColumnRow('Given name', wrap(data.given_name)));
+            columnManager.addToColumn(0, new ColumnRow('Middle name', wrap(data.middle_name)));
+            columnManager.addToColumn(0, new ColumnRow('Last name', wrap(data.last_name)));
+            columnManager.addToColumn(0, new ColumnRow('Email', wrap(data.email)));
+            columnManager.addToColumn(1, new ColumnRow('Phone', wrap(data.phone)));
+            columnManager.addToColumn(1, new ColumnRow('Record name', wrap(data.record_name)));
+            columnManager.addToColumn(1, new ColumnRow('Record start date', wrap(data.start_date, 3)));
+            columnManager.addToColumn(1, new ColumnRow('Record end date', wrap(data.end_date, 3)));
+            columnManager.addToColumn(2, new ColumnRow('Address', wrap(data.address)));
             columnManager.render();
             LoaderManager.hideLoader(loader, function () {
                 LoaderManager.destroyLoader(loader);

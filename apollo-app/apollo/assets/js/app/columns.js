@@ -54,7 +54,7 @@ var ColumnManager = (function () {
         this.target.append(this.container);
     };
     return ColumnManager;
-})();
+}());
 var Column = (function () {
     function Column(target) {
         this.target = target;
@@ -81,7 +81,7 @@ var Column = (function () {
         return this.rows.length;
     };
     return Column;
-})();
+}());
 var ColumnRow = (function () {
     function ColumnRow(key, value) {
         this.key = key;
@@ -111,7 +111,7 @@ var ColumnRow = (function () {
         return key;
     };
     ColumnRow.prototype.decorateValue = function (value) {
-        if (value == null) {
+        if (value == null || value.length == 0) {
             value = '<span class="undefined">None</span>';
         }
         else {
@@ -120,4 +120,4 @@ var ColumnRow = (function () {
         return value;
     };
     return ColumnRow;
-})();
+}());
