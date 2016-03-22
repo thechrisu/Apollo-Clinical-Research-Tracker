@@ -227,8 +227,8 @@ class ProgrammeTable {
         row = $('<tr></tr>');
         row.append('<td>' + data.name + '</td>');
         row.append('<td>' + startD + ' - ' + endD + '</td>');
-        var dispPFunc = Util.partial(this.displayProgramme, data.id);
-        row.click(dispPFunc);
+        /*var dispPFunc = this.displayProgramme.call(null, data.id);
+        row.click(dispPFunc);*/
         $('#table-body').append(row);
     }
 
@@ -290,9 +290,10 @@ class ProgrammeInformation {
             row.append(people[i].given_name + ' ' + people[i].last_name);
             var fullRow = $('<tr></tr>');
             fullRow.append(row);
-            var viewID = Util.partial(this.goToView, (people[i].id));
-            fullRow.click(viewID);
-
+            var that = this;
+            fullRow.click(function() {
+                that.goToView.call(null, people[i].id);
+            });
             table.append(fullRow);
         }
     }
@@ -304,10 +305,14 @@ class ProgrammeInformation {
     private displayStartDate(sqlDate:string){
         //TODO insert datepicker item
         var startD:string = Util.formatDate(Util.parseSQLDate(<string> sqlDate));
-        var startDate = startD.datepicker('getDate');
+        var startDate = '<div class="input-group date" data-provide="datepicker">' +
+            '<input id="add-start-date" type="text" value="' + startD + '" class="form-control input-sm input-block-level"' +
+            '><span class="input-group-addon" style="padding: 0 18px !important; font-size: 0.8em !important;"><i class="glyphicon glyphicon-th"></i></span>' +
+            '</div>';
         //var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
 
         $('#start-date').html("<span>Insert startdate  here</span>");
+        $('#start-date').append(startDate);
     }
 
     private displayEndDate(sqldate:string){
@@ -316,17 +321,6 @@ class ProgrammeInformation {
         $('#end-date').html("<span>Insert startdate here</span>");
     }
 
-    private getCalendar(unixtime, fieldName) {
-    var realTime = getStringFromEpochTime(unixtime);
-    var container = $('<div class="input-group date" data-provide="datepicker" id=\"' + fieldName + 'Picker\">');
-    var input = $('<input class="form-control small-table" type="text" placeholder=\"' + fieldName + '\" value=\"' + realTime + '\">');
-    container.append(input);
-    var cal = $('<div class="input-group-addon small-table" style="height: 14px !important; line-height: 14px !important;">');
-    var openIcon = $('<span class="glyphicon glyphicon-th small-table" style="font-size: 12px !important; height: 14px !important; line-height: 14px !important;"></span>');
-    cal.append(openIcon);
-    container.append(container);
-    return container;
-}
 }
 
 $(document).ready(function () {
