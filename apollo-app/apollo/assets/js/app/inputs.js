@@ -6,7 +6,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.2
+ * @version 0.0.3
  */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -70,6 +70,27 @@ var InputText = (function (_super) {
     return InputText;
 }(InputField));
 /**
+ * Text with an option to add new fields
+ *
+ * @since 0.0.3
+ */
+var InputTextMultiple = (function (_super) {
+    __extends(InputTextMultiple, _super);
+    function InputTextMultiple(id, callback, attributes, values) {
+        if (values === void 0) { values = []; }
+        _super.call(this, id, callback);
+        this.prepareNode();
+    }
+    InputTextMultiple.prototype.prepareNode = function () {
+        //TODO Tim: complete this code
+        for (;;) {
+        }
+    };
+    InputTextMultiple.prototype.createInputNode = function () {
+    };
+    return InputTextMultiple;
+}(InputField));
+/**
  * Bootstrap dropdown
  *
  * @since 0.0.2
@@ -115,7 +136,7 @@ var InputDropdown = (function (_super) {
                 'data-id': this.id.toString(),
                 'id': 'input-dropdown-other-' + this.id,
                 'class': 'form-control input-sm',
-                'placeholder': 'Type here . . .',
+                'placeholder': 'Type here...',
                 'type': 'text',
                 'value': (this.value == null ? '' : this.value)
             }, null, true);

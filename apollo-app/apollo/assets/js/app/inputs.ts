@@ -6,7 +6,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.2
+ * @version 0.0.3
  */
 
 /**
@@ -79,6 +79,34 @@ class InputText extends InputField {
 }
 
 /**
+ * Text with an option to add new fields
+ *
+ * @since 0.0.3
+ */
+class InputTextMultiple extends InputField {
+
+    private inputNodes: JQuery[];
+
+    public constructor(id:number, callback:Function, attributes:Attributes, values:string[] = []) {
+        super(id, callback);
+        this.prepareNode();
+    }
+
+    private prepareNode() {
+
+        //TODO Tim: complete this code
+        for(;;) {
+
+        }
+    }
+
+    private createInputNode() {
+
+    }
+
+}
+
+/**
  * Bootstrap dropdown
  *
  * @since 0.0.2
@@ -128,7 +156,7 @@ class InputDropdown extends InputField {
                 'data-id': this.id.toString(),
                 'id': 'input-dropdown-other-' + this.id,
                 'class': 'form-control input-sm',
-                'placeholder': 'Type here . . .',
+                'placeholder': 'Type here...',
                 'type': 'text',
                 'value': (this.value == null ? '' : this.value)
             }, null, true);
