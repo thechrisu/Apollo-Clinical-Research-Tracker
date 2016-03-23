@@ -1,6 +1,7 @@
 <?php
 /**
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
  */
@@ -23,7 +24,8 @@ use Apollo\Entities\RecordEntity;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.4
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @version 0.0.5
  */
 class GetController extends GenericController
 {
@@ -51,8 +53,10 @@ class GetController extends GenericController
     /**
      * Returns the records
      *
+     * @since 0.0.5 Extracted sorting
      * @since 0.0.2 Implemented quick search
      * @since 0.0.1
+     * TODO: Refactor this (extract!)
      */
     public function actionRecords()
     {
@@ -65,21 +69,7 @@ class GetController extends GenericController
         $peopleQB->innerJoin('person.records', 'record');
         $peopleQB->where('person.organisation = ' . Apollo::getInstance()->getUser()->getOrganisationId());
         $peopleQB->andWhere('person.is_hidden = 0');
-        switch ($data['sort']) {
-            // Recently added
-            case 2:
-                $peopleQB->orderBy('record.created_on', 'DESC');
-                break;
-            // Recently updated
-            case 3:
-                $peopleQB->orderBy('record.updated_on', 'DESC');
-                break;
-            // All records
-            default:
-                $peopleQB->orderBy('person.given_name', 'ASC');
-                $peopleQB->addOrderBy('person.middle_name', 'ASC');
-                $peopleQB->addOrderBy('person.last_name', 'ASC');
-        }
+        $peopleQB = $this->orderRecords($peopleQB, $data['sort']);
         if(!empty($data['search'])) {
             $peopleQB->andWhere($peopleQB->expr()->orX(
                 $peopleQB->expr()->like('person.given_name', ':search'),
@@ -123,6 +113,26 @@ class GetController extends GenericController
             }
         }
         echo json_encode($response);
+    }
+
+    private function orderRecords($queryBuilder, $ordering)
+    {
+        switch ($ordering) {
+            // Recently added
+            case 2:
+                $queryBuilder->orderBy('record.created_on', 'DESC');
+                break;
+            // Recently updated
+            case 3:
+                $queryBuilder->orderBy('record.updated_on', 'DESC');
+                break;
+            // All records
+            default:
+                $queryBuilder->orderBy('person.given_name', 'ASC');
+                $queryBuilder->addOrderBy('person.middle_name', 'ASC');
+                $queryBuilder->addOrderBy('person.last_name', 'ASC');
+        }
+        return $queryBuilder;
     }
 
     /**
@@ -219,6 +229,39 @@ class GetController extends GenericController
         ];
         echo json_encode($data);
     }
+
+    /**
+     * Returns the short overview of programmes (shown on the left of the programme page)
+     * Currently serves dummy data
+     * @since 0.0.5
+     * TODO: Serve real data
+     */
+    public function actionShortprogramme()
+    {
+        $data['error'] = null;
+        $data['programmes'] = [
+            [
+            "name" => "Programme 1",
+            "start_date" => "1834-02-22 02:00:00",
+            "end_date" => "1834-02-22 02:00:00",
+            "id" => "1"
+        ],
+        [
+            "name" => "Programme 2",
+            "start_date" => "1834-02-22 02:00:00",
+            "end_date" => "1834-02-22 02:00:00",
+            "id" => "2"
+        ],
+        [
+            "name" => "Programme 1",
+            "start_date" => "1834-02-22 02:00:00",
+            "end_date" => "1834-02-22 02:00:00",
+            "id" => "3"
+        ]
+        ];
+        return $data;
+    }
+
 
     /**
      * Parses the request searching for specified keys. If a key is not defined in the GET request,
