@@ -9,18 +9,18 @@ namespace Apollo\Components;
 
 
 /**
- * Class Person
+ * Class Activity
  *
  * @package Apollo\Components
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @version 0.0.1
  */
-class Programme extends DBComponent
+class Activity extends DBComponent
 {
     /**
      * Namespace of entity class
      * @var string
      */
-    protected static $entityNamespace = 'Apollo\\Entities\\ProgrammeEntity';
+    protected static $entityNamespace = 'Apollo\\Entities\\ActivityEntity';
 
 }

@@ -32,6 +32,12 @@ use Apollo\Helpers\URLHelper;
                         <tbody id="table-body">
                         </tbody>
                     </table>
+
+                    <nav class="text-center">
+                        <ul class="pagination" id="pagination">
+                        </ul>
+                    </nav>
+
                 </div>
 
                 <div class="col-lg-8 content-loader-ready" id="programmeContent">
@@ -77,13 +83,6 @@ use Apollo\Helpers\URLHelper;
                             <small>End date</small>
                         </div>
                     </div>
-
-
-                    <nav class="text-center">
-                        <ul class="pagination" id="pagination">
-                        </ul>
-                    </nav>
-
 
                 </div>
 
