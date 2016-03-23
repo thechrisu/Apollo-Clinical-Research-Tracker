@@ -6,7 +6,7 @@
  *
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.5
+ * @version 0.0.6
  *
  */
 var fakeJSON_obj_oneProgramme = {
@@ -130,7 +130,7 @@ var ProgrammeTable = (function () {
     function ProgrammeTable() {
     }
     /**
-     * Loads up all of the information, makes AJAX request for getting the menu
+     * Loads up all of the information and sets up the instance variables
      */
     ProgrammeTable.prototype.load = function () {
         this.pagination = $('#pagination');
@@ -176,7 +176,6 @@ var ProgrammeTable = (function () {
                     event.preventDefault();
                 }
                 that.page = page;
-                that.updateTable();
             }
         });
     };
@@ -204,13 +203,15 @@ var ProgrammeTable = (function () {
         var row;
         var startD;
         var endD;
+        var that = this;
         startD = Util.formatShortDate(Util.parseSQLDate(data.start_date));
         endD = Util.formatShortDate(Util.parseSQLDate(data.end_date));
         row = $('<tr></tr>');
         row.append('<td>' + data.name + '</td>');
         row.append('<td>' + startD + ' - ' + endD + '</td>');
-        /*var dispPFunc = this.displayProgramme.call(null, data.id);
-        row.click(dispPFunc);*/
+        row.click(function () {
+            that.displayProgramme.call(null, data.id);
+        });
         $('#table-body').append(row);
     };
     ProgrammeTable.prototype.displayProgramme = function (programmeId) {
@@ -220,17 +221,22 @@ var ProgrammeTable = (function () {
 })();
 /**
  * carries out all the tasks related to displaying the actual information of one programme on the right of the view
- * @since 0.0.2
+ * @since 0.0.3
  * TODO: Make the add new person thing work
- * TODO: Display loader
  * TODO: autosave
  */
 var ProgrammeInformation = (function () {
     function ProgrammeInformation() {
     }
+    /**
+     * Loads up all of the information and sets up the instance variables
+     */
     ProgrammeInformation.prototype.load = function () {
         this.setUp();
     };
+    /**
+     * Creates the basic structure of the table
+     */
     ProgrammeInformation.prototype.setUp = function () {
         var that = this;
         var loader = LoaderManager.createLoader($('#programmeContent'));
@@ -247,9 +253,18 @@ var ProgrammeInformation = (function () {
             LoaderManager.destroyLoader(loader);
         });
     };
+    /**
+     * Displays the title of the programme in the dedicated textfield
+     * @param title
+     */
     ProgrammeInformation.prototype.displayTitle = function (title) {
         $('#programme-title').val(title);
     };
+    /**
+     * Shows the target group as dropdown
+     * @param options
+     * @param active
+     */
     ProgrammeInformation.prototype.displayTargetGroup = function (options, active) {
         var dropD = $('#target-dropdown');
         dropD.append('<li class="dropdown-header">Choose a target group:</li>');
@@ -258,9 +273,35 @@ var ProgrammeInformation = (function () {
             dropD.append('<li><a>' + options[i] + '</a></li>');
         }
     };
+    /**
+     * Displays the comment for the target group
+     * @param initialData
+     */
     ProgrammeInformation.prototype.displayComment = function (initialData) {
         $('#target-comment').val(initialData);
     };
+    /**
+     * Displays the start date of the programme
+     * @param sqlDate
+     */
+    ProgrammeInformation.prototype.displayStartDate = function (sqlDate) {
+        var startD = Util.formatNumberDate(Util.parseSQLDate(sqlDate));
+        var startDate = Util.getDatePicker(startD, "add-start-date");
+        $('#start-date').append(startDate);
+    };
+    /**
+     * Displays the end date of the programme
+     * @param sqldate
+     */
+    ProgrammeInformation.prototype.displayEndDate = function (sqldate) {
+        var endD = Util.formatNumberDate(Util.parseSQLDate(sqldate));
+        var endDate = Util.getDatePicker(endD, "add-start-date");
+        $('#end-date').append(endDate);
+    };
+    /**
+     * Creates the table with all the people in a programme
+     * @param people
+     */
     ProgrammeInformation.prototype.displayPeople = function (people) {
         var table = $('#existingPeople');
         for (var i = 0; i < people.length; i++) {
@@ -269,26 +310,20 @@ var ProgrammeInformation = (function () {
             var fullRow = $('<tr></tr>');
             fullRow.append(row);
             var that = this;
+            var personId = people[i].id;
             fullRow.click(function () {
-                that.goToView.call(null, people[i].id);
+                that.goToView.call(null, personId);
             });
             table.append(fullRow);
         }
     };
+    /**
+     * Changes to the specified record
+     * @param id
+     */
     ProgrammeInformation.prototype.goToView = function (id) {
+        console.log('going to view...');
         window.location.href = window.location.origin + '/record/view/' + id;
-    };
-    ProgrammeInformation.prototype.displayStartDate = function (sqlDate) {
-        //TODO insert datepicker item
-        var startD = Util.formatNumberDate(Util.parseSQLDate(sqlDate));
-        var startDate = Util.getDatePicker(startD, "add-start-date");
-        $('#start-date').append(startDate);
-    };
-    ProgrammeInformation.prototype.displayEndDate = function (sqldate) {
-        //TODO insert datepicker item
-        var endD = Util.formatNumberDate(Util.parseSQLDate(sqldate));
-        var endDate = Util.getDatePicker(endD, "add-start-date");
-        $('#end-date').append(endDate);
     };
     return ProgrammeInformation;
 })();

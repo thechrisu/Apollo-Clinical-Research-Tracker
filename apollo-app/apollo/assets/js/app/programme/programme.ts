@@ -6,7 +6,7 @@
  *
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.5
+ * @version 0.0.6
  *
  */
 
@@ -170,7 +170,7 @@ class ProgrammeTable {
     private page:number;
 
     /**
-     * Loads up all of the information, makes AJAX request for getting the menu
+     * Loads up all of the information and sets up the instance variables
      */
     public load() {
         this.pagination = $('#pagination');
@@ -219,7 +219,6 @@ class ProgrammeTable {
                     event.preventDefault();
                 }
                 that.page = page;
-                that.updateTable();
             }
         });
     }
@@ -250,13 +249,15 @@ class ProgrammeTable {
         var row:JQuery;
         var startD;
         var endD;
+        var that = this;
         startD = Util.formatShortDate(Util.parseSQLDate(<string> data.start_date));
         endD = Util.formatShortDate(Util.parseSQLDate(<string> data.end_date));
         row = $('<tr></tr>');
         row.append('<td>' + data.name + '</td>');
         row.append('<td>' + startD + ' - ' + endD + '</td>');
-        /*var dispPFunc = this.displayProgramme.call(null, data.id);
-        row.click(dispPFunc);*/
+        row.click(function() {
+            that.displayProgramme.call(null, data.id);
+        });
         $('#table-body').append(row);
     }
 
@@ -267,17 +268,22 @@ class ProgrammeTable {
 
 /**
  * carries out all the tasks related to displaying the actual information of one programme on the right of the view
- * @since 0.0.2
+ * @since 0.0.3
  * TODO: Make the add new person thing work
- * TODO: Display loader
  * TODO: autosave
  */
 class ProgrammeInformation {
 
+    /**
+     * Loads up all of the information and sets up the instance variables
+     */
     public load(){
         this.setUp();
     }
 
+    /**
+     * Creates the basic structure of the table
+     */
     private setUp(){
         var that = this;
         var loader = LoaderManager.createLoader($('#programmeContent'));
@@ -295,9 +301,19 @@ class ProgrammeInformation {
         });
     }
 
+    /**
+     * Displays the title of the programme in the dedicated textfield
+     * @param title
+     */
     private displayTitle(title:string){
         $('#programme-title').val(title);
     }
+
+    /**
+     * Shows the target group as dropdown
+     * @param options
+     * @param active
+     */
     private displayTargetGroup(options:string[], active:number){
         var dropD = $('#target-dropdown');
         dropD.append('<li class="dropdown-header">Choose a target group:</li>');
@@ -307,11 +323,39 @@ class ProgrammeInformation {
         }
     }
 
+    /**
+     * Displays the comment for the target group
+     * @param initialData
+     */
     private displayComment(initialData:string){
         $('#target-comment').val(initialData);
     }
 
 
+    /**
+     * Displays the start date of the programme
+     * @param sqlDate
+     */
+    private displayStartDate(sqlDate:string){
+        var startD:string = Util.formatNumberDate(Util.parseSQLDate(<string> sqlDate));
+        var startDate = Util.getDatePicker(startD, "add-start-date");
+        $('#start-date').append(startDate);
+    }
+
+    /**
+     * Displays the end date of the programme
+     * @param sqldate
+     */
+    private displayEndDate(sqldate:string){
+        var endD:string = Util.formatNumberDate(Util.parseSQLDate(<string> sqldate));
+        var endDate = Util.getDatePicker(endD, "add-start-date");
+        $('#end-date').append(endDate);
+    }
+
+    /**
+     * Creates the table with all the people in a programme
+     * @param people
+     */
     private displayPeople(people:ParticipantData[]){
         var table = $('#existingPeople');
         for(var i = 0; i < people.length; i++) {
@@ -320,32 +364,22 @@ class ProgrammeInformation {
             var fullRow = $('<tr></tr>');
             fullRow.append(row);
             var that = this;
+            var personId = people[i].id;
             fullRow.click(function() {
-                that.goToView.call(null, people[i].id);
+                that.goToView.call(null, personId);
             });
             table.append(fullRow);
         }
     }
 
+    /**
+     * Changes to the specified record
+     * @param id
+     */
     private goToView(id:string){
+        console.log('going to view...');
         window.location.href = window.location.origin + '/record/view/' + id;
     }
-
-    private displayStartDate(sqlDate:string){
-        //TODO insert datepicker item
-        var startD:string = Util.formatNumberDate(Util.parseSQLDate(<string> sqlDate));
-        var startDate = Util.getDatePicker(startD, "add-start-date");
-        $('#start-date').append(startDate);
-    }
-
-    private displayEndDate(sqldate:string){
-        //TODO insert datepicker item
-        var endD:string = Util.formatNumberDate(Util.parseSQLDate(<string> sqldate));
-        var endDate = Util.getDatePicker(endD, "add-start-date");
-        $('#end-date').append(endDate);
-
-    }
-
 }
 
 $(document).ready(function () {
