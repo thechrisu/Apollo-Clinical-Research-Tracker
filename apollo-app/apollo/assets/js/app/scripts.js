@@ -6,7 +6,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.5
+ * @version 0.1.6
  */
 /**
  * Constant specifying a delay before the AJAX request after the user
@@ -140,6 +140,15 @@ var Util = (function () {
             "Nov", "Dec"
         ];
         return months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+    };
+    /**
+     *
+     * @param date
+     * @return {string}
+     * @since 0.1.6
+     */
+    Util.formatNumberDate = function (date) {
+        return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
     };
     /**
      * Gets a date picker with specified value and div id

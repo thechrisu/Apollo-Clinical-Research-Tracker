@@ -6,7 +6,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.5
+ * @version 0.1.6
  */
 
 /**
@@ -163,6 +163,16 @@ class Util {
             "Nov", "Dec"
         ];
         return months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+    }
+
+    /**
+     *
+     * @param date
+     * @return {string}
+     * @since 0.1.6
+     */
+    public static formatNumberDate(date:Date):string {
+        return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
     }
 
     /**

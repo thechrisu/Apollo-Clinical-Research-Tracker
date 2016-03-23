@@ -16,7 +16,6 @@ var fakeJSON_obj_oneProgramme = {
     "target_group": ["Young people", "Old people", "Twentysomething people"],
     "current_target_group": 0,
     "target_group_comment": "This is an exceptional programme",
-    "programme_funding": "Through funds",
     "start_date": "1834-01-22 02:00:00",
     "end_date": "1834-02-22 02:00:00",
     "participants": [
@@ -40,7 +39,7 @@ var fakeJSON_obj_oneProgramme = {
 
 //var fakeJSON_oneProgramme = <JSON> fakeJSON_obj_oneProgramme;
 
-var fakeJSON_obj_programmeMenu: MenuData  = {
+var fakeJSON_obj_programmeMenu: MenuData = {
     "error": null,
     "programmes": [
         {
@@ -64,6 +63,7 @@ var fakeJSON_obj_programmeMenu: MenuData  = {
     ]
 };
 
+var fakeJSON_menu = <JSON> fakeJSON_obj_programmeMenu;
 
 interface ParticipantData {
     given_name:string,
@@ -87,7 +87,6 @@ interface DetailProgrammeData {
     name:string,
     target_group:string[],
     target_group_comment:string,
-    programme_funding:string,
     start_date:string,
     end_date:string,
     participants:ParticipantData[]
@@ -163,14 +162,19 @@ class ValidatorTokenField {
  * TODO do quick search
  * TODO do the animation of displaying the programme on the right if the user clicks on it
  * TODO: Animation for when going to a programme
- * @version 0.0.3
+ * @version 0.0.4
  */
 class ProgrammeTable {
+
+    private pagination:JQuery;
+    private page:number;
 
     /**
      * Loads up all of the information, makes AJAX request for getting the menu
      */
     public load() {
+        this.pagination = $('#pagination');
+        this.page = 1;
         this.setUp();
     }
 
@@ -182,7 +186,12 @@ class ProgrammeTable {
         var loader = LoaderManager.createLoader($('#table-body'));
         LoaderManager.showLoader((loader), function() {
             that.makeAddButton();
-            that.addDataToTable(fakeJSON_obj_programmeMenu);
+            that.setUpPagination();
+            AJAX.fakeGet(fakeJSON_menu, function(data:MenuData) {
+                that.addDataToTable(data);
+            }, function (message:string) {
+                Util.error('An error has occurred during the loading of the list of programmes. Please reload the page or contact the administrator. Error message: ' + message);
+            });
         });
         LoaderManager.hideLoader(loader, function () {
             LoaderManager.destroyLoader(loader);
@@ -194,6 +203,25 @@ class ProgrammeTable {
      */
     private addProgramme() {
         //console.log("adding programme...");
+    }
+
+    /**
+     * Sets up the pagination
+     * @since 0.0.4
+     */
+    private setUpPagination() {
+        var that = this;
+        this.pagination.pagination({
+            items: 0,
+            itemsOnPage: 10,
+            onPageClick: function (page, event) {
+                if(event != null) {
+                    event.preventDefault();
+                }
+                that.page = page;
+                that.updateTable();
+            }
+        });
     }
 
     /**
@@ -305,14 +333,14 @@ class ProgrammeInformation {
 
     private displayStartDate(sqlDate:string){
         //TODO insert datepicker item
-        var startD:string = Util.formatDate(Util.parseSQLDate(<string> sqlDate));
+        var startD:string = Util.formatNumberDate(Util.parseSQLDate(<string> sqlDate));
         var startDate = Util.getDatePicker(startD, "add-start-date");
         $('#start-date').append(startDate);
     }
 
     private displayEndDate(sqldate:string){
         //TODO insert datepicker item
-        var endD:string = Util.formatDate(Util.parseSQLDate(<string> sqldate));
+        var endD:string = Util.formatNumberDate(Util.parseSQLDate(<string> sqldate));
         var endDate = Util.getDatePicker(endD, "add-start-date");
         $('#end-date').append(endDate);
 

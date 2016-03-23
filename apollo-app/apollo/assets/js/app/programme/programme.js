@@ -15,7 +15,6 @@ var fakeJSON_obj_oneProgramme = {
     "target_group": ["Young people", "Old people", "Twentysomething people"],
     "current_target_group": 0,
     "target_group_comment": "This is an exceptional programme",
-    "programme_funding": "Through funds",
     "start_date": "1834-01-22 02:00:00",
     "end_date": "1834-02-22 02:00:00",
     "participants": [
@@ -60,6 +59,7 @@ var fakeJSON_obj_programmeMenu = {
         }
     ]
 };
+var fakeJSON_menu = fakeJSON_obj_programmeMenu;
 //var fakeJSON_programmeMenu = <JSON> fakeJSON_obj_programmeMenu;
 /**
  * Class to store the token field (the field to add/remove users from a program)
@@ -124,7 +124,7 @@ var ValidatorTokenField = (function () {
  * TODO do quick search
  * TODO do the animation of displaying the programme on the right if the user clicks on it
  * TODO: Animation for when going to a programme
- * @version 0.0.3
+ * @version 0.0.4
  */
 var ProgrammeTable = (function () {
     function ProgrammeTable() {
@@ -133,6 +133,8 @@ var ProgrammeTable = (function () {
      * Loads up all of the information, makes AJAX request for getting the menu
      */
     ProgrammeTable.prototype.load = function () {
+        this.pagination = $('#pagination');
+        this.page = 1;
         this.setUp();
     };
     /**
@@ -143,7 +145,12 @@ var ProgrammeTable = (function () {
         var loader = LoaderManager.createLoader($('#table-body'));
         LoaderManager.showLoader((loader), function () {
             that.makeAddButton();
-            that.addDataToTable(fakeJSON_obj_programmeMenu);
+            that.setUpPagination();
+            AJAX.fakeGet(fakeJSON_menu, function (data) {
+                that.addDataToTable(data);
+            }, function (message) {
+                Util.error('An error has occurred during the loading of the list of programmes. Please reload the page or contact the administrator. Error message: ' + message);
+            });
         });
         LoaderManager.hideLoader(loader, function () {
             LoaderManager.destroyLoader(loader);
@@ -154,6 +161,24 @@ var ProgrammeTable = (function () {
      */
     ProgrammeTable.prototype.addProgramme = function () {
         //console.log("adding programme...");
+    };
+    /**
+     * Sets up the pagination
+     * @since 0.0.4
+     */
+    ProgrammeTable.prototype.setUpPagination = function () {
+        var that = this;
+        this.pagination.pagination({
+            items: 0,
+            itemsOnPage: 10,
+            onPageClick: function (page, event) {
+                if (event != null) {
+                    event.preventDefault();
+                }
+                that.page = page;
+                that.updateTable();
+            }
+        });
     };
     /**
      * Links up the button for adding programmes with the JS
@@ -255,13 +280,13 @@ var ProgrammeInformation = (function () {
     };
     ProgrammeInformation.prototype.displayStartDate = function (sqlDate) {
         //TODO insert datepicker item
-        var startD = Util.formatDate(Util.parseSQLDate(sqlDate));
+        var startD = Util.formatNumberDate(Util.parseSQLDate(sqlDate));
         var startDate = Util.getDatePicker(startD, "add-start-date");
         $('#start-date').append(startDate);
     };
     ProgrammeInformation.prototype.displayEndDate = function (sqldate) {
         //TODO insert datepicker item
-        var endD = Util.formatDate(Util.parseSQLDate(sqldate));
+        var endD = Util.formatNumberDate(Util.parseSQLDate(sqldate));
         var endDate = Util.getDatePicker(endD, "add-start-date");
         $('#end-date').append(endDate);
     };
