@@ -6,9 +6,10 @@
  * Records index typescript
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.4
+ * @version 0.0.5
  */
 var RecordTable = (function () {
     function RecordTable() {
@@ -36,16 +37,27 @@ var RecordTable = (function () {
                 that.updateTable();
             }
         });
+        this.addTabFunctions();
+        this.addRecordClick();
+        this.addAutoSearch();
+    };
+    RecordTable.prototype.addTabFunctions = function () {
+        var that = this;
         $('#sort-tabs').on('click', '.sort-tab', function () {
             $('.sort-tab').removeClass('active');
             $(this).addClass('active');
             that.sort = $(this).data('sort');
             that.updateTable();
         });
+    };
+    RecordTable.prototype.addRecordClick = function () {
         this.table.on('click', '.record-tr', function (e) {
             e.preventDefault();
             Util.to('record/view/' + $(this).data('id'));
         });
+    };
+    RecordTable.prototype.addAutoSearch = function () {
+        var that = this;
         var timer = null;
         $('#records-search').keyup(function () {
             clearTimeout(timer);

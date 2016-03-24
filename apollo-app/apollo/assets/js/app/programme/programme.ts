@@ -6,70 +6,9 @@
  *
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.6
+ * @version 0.0.7
  *
  */
-
-var fakeJSON_obj_oneProgramme = {
-    "error": null,
-    "name": "Some programme",
-    "target_group": ["Young people", "Old people", "Twentysomething people"],
-    "current_target_group": 0,
-    "target_group_comment": "This is an exceptional programme",
-    "start_date": "1834-01-22 02:00:00",
-    "end_date": "1834-02-22 02:00:00",
-    "participants": [
-    {
-        "given_name": "Peter",
-        "last_name": "Parker",
-        "id": "13"
-    },
-    {
-        "given_name": "Michael",
-        "last_name": "Jackdaughter",
-        "id": "12"
-    },
-    {
-        "given_name": "Rowan",
-        "last_name": "@kinson",
-        "id": "1"
-    }
-]
-};
-
-//var fakeJSON_oneProgramme = <JSON> fakeJSON_obj_oneProgramme;
-
-var fakeJSON_obj_programmeMenu: MenuData = {
-    "error": null,
-    "programmes": [
-        {
-            "name": "Programme 1",
-            "start_date": "1834-02-22 02:00:00",
-            "end_date": "1834-02-22 02:00:00",
-            "id": "1"
-        },
-        {
-            "name": "Programme 2",
-            "start_date": "1834-02-22 02:00:00",
-            "end_date": "1834-02-22 02:00:00",
-            "id": "2"
-        },
-        {
-            "name": "Programme 1",
-            "start_date": "1834-02-22 02:00:00",
-            "end_date": "1834-02-22 02:00:00",
-            "id": "3"
-        }
-    ]
-};
-
-var fakeJSON_menu = <JSON> fakeJSON_obj_programmeMenu;
-
-interface ParticipantData {
-    given_name:string,
-    last_name:string,
-    id:string
-}
 
 interface ShortProgrammeData {
     name:string,
@@ -83,6 +22,13 @@ interface MenuData {
     count:number,
     programmes:ShortProgrammeData[]
 }
+
+interface ParticipantData {
+    given_name:string,
+    last_name:string,
+    id:string
+}
+
 interface DetailProgrammeData {
     error:Error,
     name:string,
@@ -93,9 +39,6 @@ interface DetailProgrammeData {
     end_date:string,
     participants:ParticipantData[]
 }
-
-//var fakeJSON_programmeMenu = <JSON> fakeJSON_obj_programmeMenu;
-
 
 /**
  * Class to store the token field (the field to add/remove users from a program)
@@ -300,17 +243,20 @@ class ProgrammeTable {
 
 /**
  * carries out all the tasks related to displaying the actual information of one programme on the right of the view
- * @since 0.0.3
+ * @since 0.0.4
  * TODO: Make the add new person thing work
  * TODO: autosave
  */
 class ProgrammeInformation {
 
+    private peopleTable:JQuery;
     private id:number;
+
     /**
      * Loads up all of the information and sets up the instance variables
      */
     public load(){
+        this.peopleTable = $('#existingPeople');
         this.id = 1;
         this.setUp();
     }
@@ -394,28 +340,25 @@ class ProgrammeInformation {
      * @param people
      */
     private displayPeople(people:ParticipantData[]){
-        var table = $('#existingPeople');
         for(var i = 0; i < people.length; i++) {
             var row = $('<td></td>');
             row.append(people[i].given_name + ' ' + people[i].last_name);
             var fullRow = $('<tr></tr>');
             fullRow.append(row);
-            var that = this;
-            var personId = people[i].id;
-            fullRow.click(function() {
-                that.goToView.call(null, personId);
-            });
-            table.append(fullRow);
+            this.addOnClickToRow(fullRow, people[i].id);
+            this.peopleTable.append(fullRow);
         }
     }
 
     /**
-     * Changes to the specified record
+     * Adds an on-click event to a row in the table in which all the people going to an activity are displayed
+     * @param row
      * @param id
      */
-    private goToView(id:string){
-        console.log('going to view...');
-        window.location.href = window.location.origin + '/record/view/' + id;
+    private addOnClickToRow(row:JQuery, id:string) {
+        row.click(function() {
+            Util.to('record/view/' + id);
+        });
     }
 }
 

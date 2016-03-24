@@ -3,21 +3,21 @@
   "programmes": [
     {
       "name": "Programme 1",
-      "start_date": 1457476081,
-      "end_date": 1457473081,
-      "id": 1
+      "start_date": "1834-02-22 02:00:00",
+      "end_date": "1834-02-22 02:00:00",
+      "id": "1"
     },
     {
       "name": "Programme 2",
-      "start_date": 1457476081,
-      "end_date": 1457473081,
-      "id": 2
+      "start_date": "1834-02-22 02:00:00",
+      "end_date": "1834-02-22 02:00:00",
+      "id": "2"
     },
     {
-      "name": "Programme 3",
-      "start_date": 1457476081,
-      "end_date": 1457473081,
-      "id": 1321212
+      "name": "Programme 1",
+      "start_date": "1834-02-22 02:00:00",
+      "end_date": "1834-02-22 02:00:00",
+      "id": "3"
     }
   ]
 }

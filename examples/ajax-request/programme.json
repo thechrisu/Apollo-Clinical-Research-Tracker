@@ -2,10 +2,10 @@
   "error": null,
   "name": "Some programme",
   "target_group": ["Young people", "Old people", "Twentysomething people"],
+  "current_target_group": 0,
   "target_group_comment": "This is an exceptional programme",
-  "programme_funding": "Through funds",
-  "start_date": 1457476303,
-  "end_date": 1857476303,
+  "start_date": "1834-01-22 02:00:00",
+  "end_date": "1834-02-22 02:00:00",
   "participants": [
     {
       "given_name": "Peter",
