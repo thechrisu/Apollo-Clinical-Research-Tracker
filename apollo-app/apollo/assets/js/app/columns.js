@@ -54,7 +54,7 @@ var ColumnManager = (function () {
         this.target.append(this.container);
     };
     return ColumnManager;
-}());
+})();
 var Column = (function () {
     function Column(target) {
         this.target = target;
@@ -81,7 +81,7 @@ var Column = (function () {
         return this.rows.length;
     };
     return Column;
-}());
+})();
 var ColumnRowStatic = (function () {
     function ColumnRowStatic(key, value) {
         this.key = key;
@@ -121,9 +121,9 @@ var ColumnRowStatic = (function () {
         return value;
     };
     return ColumnRowStatic;
-}());
+})();
 var ColumnRowEditable = (function () {
     function ColumnRowEditable() {
     }
     return ColumnRowEditable;
-}());
+})();

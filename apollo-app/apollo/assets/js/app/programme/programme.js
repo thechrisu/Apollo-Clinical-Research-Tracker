@@ -123,8 +123,7 @@ var ValidatorTokenField = (function () {
  * TODO hook up to API (display first programme)
  * TODO do quick search
  * TODO do the animation of displaying the programme on the right if the user clicks on it
- * TODO: Animation for when going to a programme
- * @version 0.0.4
+ * @version 0.0.6
  */
 var ProgrammeTable = (function () {
     function ProgrammeTable() {
@@ -134,7 +133,10 @@ var ProgrammeTable = (function () {
      */
     ProgrammeTable.prototype.load = function () {
         this.pagination = $('#pagination');
+        this.table = $('#table-body');
+        this.search = '';
         this.page = 1;
+        this.loader = LoaderManager.createLoader(this.table);
         this.setUp();
     };
     /**
@@ -142,18 +144,43 @@ var ProgrammeTable = (function () {
      */
     ProgrammeTable.prototype.setUp = function () {
         var that = this;
-        var loader = LoaderManager.createLoader($('#table-body'));
-        LoaderManager.showLoader((loader), function () {
+        LoaderManager.showLoader((that.loader), function () {
             that.makeAddButton();
             that.setUpPagination();
-            AJAX.fakeGet(fakeJSON_menu, function (data) {
-                that.addDataToTable(data);
-            }, function (message) {
-                Util.error('An error has occurred during the loading of the list of programmes. Please reload the page or contact the administrator. Error message: ' + message);
+            var timer = null;
+            $('#programmes-search').keyup(function () {
+                clearTimeout(timer);
+                that.search = encodeURIComponent($(this).val());
+                timer = setTimeout(function () {
+                    that.updateTable();
+                }, AJAX_DELAY);
             });
         });
-        LoaderManager.hideLoader(loader, function () {
-            LoaderManager.destroyLoader(loader);
+        LoaderManager.hideLoader(that.loader, function () {
+            LoaderManager.destroyLoader(that.loader);
+        });
+    };
+    /**
+     * Adding the content to the table.
+     * @since 0.0.6
+     */
+    ProgrammeTable.prototype.updateTable = function () {
+        var that = this;
+        AJAX.get(Util.url('get/programmes/?page=' + that.page + '&search=' + that.search, false), function (data) {
+            if (data.count < (that.page - 1) * 10) {
+                that.pagination.pagination('selectPage', data.count / 10 - data.count % 10);
+                return;
+            }
+            that.pagination.pagination('updateItems', data.count);
+            that.table.html('');
+            if (data.count > 0) {
+                that.addDataToTable(data);
+            }
+            else {
+                that.table.append('<tr><td colspan="4" class="text-center"><b>Nothing to display . . .</b></td></tr>');
+            }
+        }, function (message) {
+            Util.error('An error has occurred during the loading of the list of programmes. Please reload the page or contact the administrator. Error message: ' + message);
         });
     };
     /**
@@ -212,7 +239,7 @@ var ProgrammeTable = (function () {
         row.click(function () {
             that.displayProgramme.call(null, data.id);
         });
-        $('#table-body').append(row);
+        this.table.append(row);
     };
     ProgrammeTable.prototype.displayProgramme = function (programmeId) {
         window.location.href = window.location.origin + '/programme/view/' + programmeId;
@@ -232,6 +259,7 @@ var ProgrammeInformation = (function () {
      * Loads up all of the information and sets up the instance variables
      */
     ProgrammeInformation.prototype.load = function () {
+        this.id = 1;
         this.setUp();
     };
     /**
@@ -241,13 +269,16 @@ var ProgrammeInformation = (function () {
         var that = this;
         var loader = LoaderManager.createLoader($('#programmeContent'));
         LoaderManager.showLoader((loader), function () {
-            that.displayTitle("Second year placements");
-            that.displayPeople(fakeJSON_obj_oneProgramme.participants);
-            that.displayTargetGroup(fakeJSON_obj_oneProgramme.target_group, fakeJSON_obj_oneProgramme.current_target_group);
-            that.displayComment(fakeJSON_obj_oneProgramme.target_group_comment);
-            that.displayStartDate(fakeJSON_obj_oneProgramme.start_date);
-            that.displayEndDate(fakeJSON_obj_oneProgramme.end_date);
-            $('.undefined').html = "";
+            AJAX.get(Util.url('get/programme/' + that.id, false), function (data) {
+                that.displayTitle("Second year placements");
+                that.displayPeople(data.participants);
+                that.displayTargetGroup(data.target_group, data.current_target_group);
+                that.displayComment(data.target_group_comment);
+                that.displayStartDate(data.start_date);
+                that.displayEndDate(data.end_date);
+            }, function (message) {
+                Util.error('An error has occurred during the loading of the list of programmes. Please reload the page or contact the administrator. Error message: ' + message);
+            });
         });
         LoaderManager.hideLoader(loader, function () {
             LoaderManager.destroyLoader(loader);

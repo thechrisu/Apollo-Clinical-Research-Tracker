@@ -25,7 +25,7 @@ use Apollo\Entities\RecordEntity;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.5
+ * @version 0.0.6
  */
 class GetController extends GenericController
 {
@@ -231,14 +231,15 @@ class GetController extends GenericController
     }
 
     /**
-     * Returns the short overview of programmes (shown on the left of the programme page)
+     * It returns short information about several programmes
      * Currently serves dummy data
      * @since 0.0.5
      * TODO: Serve real data
      */
-    public function actionShortprogramme()
+    public function actionProgrammes()
     {
         $data['error'] = null;
+        $data['count'] = 3;
         $data['programmes'] = [
             [
             "name" => "Programme 1",
@@ -253,15 +254,49 @@ class GetController extends GenericController
             "id" => "2"
         ],
         [
-            "name" => "Programme 1",
+            "name" => "Programme 3",
             "start_date" => "1834-02-22 02:00:00",
             "end_date" => "1834-02-22 02:00:00",
             "id" => "3"
         ]
         ];
-        return $data;
+        echo json_encode($data);
     }
 
+    /**
+     * Returns detailed information on one programme
+     * @since 0.0.6
+     */
+    public function actionProgramme()
+    {
+        $data['error'] = null;
+        $data['name'] = "Some programme";
+        $data['target_group'] = ["Young people", "Old people", "Twentysomething people"];
+        $data['current_target_group'] = 0;
+        $data['target_group_comment'] = "This is an exceptional programme";
+        $data['start_date'] = "1834-01-22 02:00:00";
+        $data['end_date'] = "1834-02-22 02:00:00";
+        $data['participants'] = [
+
+            [
+                "given_name" => "Peter",
+                "last_name" => "Parker",
+                "id" => "13"
+            ],
+            [
+                "given_name" => "Michael",
+                "last_name" => "Jackdaughter",
+                "id" => "12"
+            ],
+            [
+                "given_name" => "Rowan",
+                "last_name" => "@kinson",
+                "id" => "1"
+            ]
+        ];
+
+        echo json_encode($data);
+    }
 
     /**
      * Parses the request searching for specified keys. If a key is not defined in the GET request,

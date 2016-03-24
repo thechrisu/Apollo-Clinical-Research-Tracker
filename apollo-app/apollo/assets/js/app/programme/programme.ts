@@ -80,12 +80,14 @@ interface ShortProgrammeData {
 
 interface MenuData {
     error:Error,
+    count:number,
     programmes:ShortProgrammeData[]
 }
 interface DetailProgrammeData {
     error:Error,
     name:string,
     target_group:string[],
+    current_target_group:number,
     target_group_comment:string,
     start_date:string,
     end_date:string,
@@ -161,20 +163,25 @@ class ValidatorTokenField {
  * TODO hook up to API (display first programme)
  * TODO do quick search
  * TODO do the animation of displaying the programme on the right if the user clicks on it
- * TODO: Animation for when going to a programme
- * @version 0.0.4
+ * @version 0.0.6
  */
 class ProgrammeTable {
 
     private pagination:JQuery;
+    private table:JQuery;
+    private search:string;
     private page:number;
+    private loader:number;
 
     /**
      * Loads up all of the information and sets up the instance variables
      */
     public load() {
         this.pagination = $('#pagination');
+        this.table = $('#table-body');
+        this.search = '';
         this.page = 1;
+        this.loader = LoaderManager.createLoader(this.table);
         this.setUp();
     }
 
@@ -183,18 +190,43 @@ class ProgrammeTable {
      */
     private setUp() {
         var that = this;
-        var loader = LoaderManager.createLoader($('#table-body'));
-        LoaderManager.showLoader((loader), function() {
+        LoaderManager.showLoader((that.loader), function() {
             that.makeAddButton();
             that.setUpPagination();
-            AJAX.fakeGet(fakeJSON_menu, function(data:MenuData) {
-                that.addDataToTable(data);
-            }, function (message:string) {
-                Util.error('An error has occurred during the loading of the list of programmes. Please reload the page or contact the administrator. Error message: ' + message);
+        var timer = null;
+            $('#programmes-search').keyup(function () {
+                clearTimeout(timer);
+                that.search = encodeURIComponent($(this).val());
+                timer = setTimeout(function () {
+                    that.updateTable();
+                }, AJAX_DELAY);
             });
         });
-        LoaderManager.hideLoader(loader, function () {
-            LoaderManager.destroyLoader(loader);
+        LoaderManager.hideLoader(that.loader, function () {
+            LoaderManager.destroyLoader(that.loader);
+        });
+    }
+
+    /**
+     * Adding the content to the table.
+     * @since 0.0.6
+     */
+    private updateTable(){
+        var that = this;
+        AJAX.get(Util.url('get/programmes/?page=' + that.page + '&search=' + that.search, false), function(data:MenuData) {
+                if(data.count < (that.page - 1) * 10) {
+                    that.pagination.pagination('selectPage', data.count / 10 - data.count % 10);
+                    return;
+                }
+                that.pagination.pagination('updateItems', data.count);
+                that.table.html('');
+                if (data.count > 0) {
+                    that.addDataToTable(data);
+                } else {
+                    that.table.append('<tr><td colspan="4" class="text-center"><b>Nothing to display . . .</b></td></tr>');
+                }
+        }, function (message:string) {
+            Util.error('An error has occurred during the loading of the list of programmes. Please reload the page or contact the administrator. Error message: ' + message);
         });
     }
 
@@ -258,7 +290,7 @@ class ProgrammeTable {
         row.click(function() {
             that.displayProgramme.call(null, data.id);
         });
-        $('#table-body').append(row);
+        this.table.append(row);
     }
 
     private displayProgramme(programmeId:string) {
@@ -274,10 +306,12 @@ class ProgrammeTable {
  */
 class ProgrammeInformation {
 
+    private id:number;
     /**
      * Loads up all of the information and sets up the instance variables
      */
     public load(){
+        this.id = 1;
         this.setUp();
     }
 
@@ -288,13 +322,16 @@ class ProgrammeInformation {
         var that = this;
         var loader = LoaderManager.createLoader($('#programmeContent'));
         LoaderManager.showLoader((loader), function() {
-            that.displayTitle("Second year placements");
-            that.displayPeople(fakeJSON_obj_oneProgramme.participants);
-            that.displayTargetGroup(fakeJSON_obj_oneProgramme.target_group, fakeJSON_obj_oneProgramme.current_target_group);
-            that.displayComment(fakeJSON_obj_oneProgramme.target_group_comment);
-            that.displayStartDate(fakeJSON_obj_oneProgramme.start_date);
-            that.displayEndDate(fakeJSON_obj_oneProgramme.end_date);
-            $('.undefined').html = "";
+            AJAX.get(Util.url('get/programme/' + that.id, false), function(data:DetailProgrammeData) {
+                that.displayTitle("Second year placements");
+                that.displayPeople(data.participants);
+                that.displayTargetGroup(data.target_group, data.current_target_group);
+                that.displayComment(data.target_group_comment);
+                that.displayStartDate(data.start_date);
+                that.displayEndDate(data.end_date);
+            }, function (message:string) {
+                Util.error('An error has occurred during the loading of the list of programmes. Please reload the page or contact the administrator. Error message: ' + message);
+            });
         });
         LoaderManager.hideLoader(loader, function () {
             LoaderManager.destroyLoader(loader);
