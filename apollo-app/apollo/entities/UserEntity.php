@@ -20,7 +20,7 @@ use Doctrine\ORM\Mapping\ManyToOne;
  *
  * @package Apollo\Entities
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.2
  * @Entity @Table(name="users")
  */
 class UserEntity

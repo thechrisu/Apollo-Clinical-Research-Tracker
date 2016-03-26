@@ -1,0 +1,252 @@
+<?php
+/**
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @copyright 2016
+ * @license http://opensource.org/licenses/mit-license.php MIT License
+ */
+
+namespace Apollo\Entities;
+use DateTime;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\ManyToOne;
+
+/**
+ * Class DataEntity
+ * @package Apollo\Entities
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @Entity @Table("data")
+ * @version 0.0.5
+ */
+class DataEntity
+{
+    /**
+     * @Id @Column(type="integer") @GeneratedValue
+     * @var int
+     */
+    protected $id;
+
+    /**
+     * @ManyToOne(targetEntity="RecordEntity", inversedBy="data")
+     * @var RecordEntity
+     */
+    protected $record;
+
+    /**
+     * @ManyToOne(targetEntity="FieldEntity")
+     * @var FieldEntity
+     */
+    protected $field;
+
+    /**
+     * @Column(type="integer")
+     * @var int
+     */
+    protected $_int;
+
+    /**
+     * @Column(type="string")
+     * @var string
+     */
+    protected $_varchar;
+
+    /**
+     * @Column(type="datetime")
+     * @var DateTime
+     */
+    protected $_date_time;
+
+    /**
+     * @Column(type="text")
+     * @var string
+     */
+    protected $_long_text;
+
+    /**
+     * @Column(type="datetime")
+     * @var DateTime
+     */
+    protected $updated_on;
+
+    /**
+     * @ManyToOne(targetEntity="UserEntity")
+     * @var UserEntity
+     */
+    protected $updated_by;
+
+    /**
+     * @Column(type="boolean")
+     * @var bool
+     */
+    protected $is_default = false;
+
+    /**
+     * DataEntity constructor.
+     */
+    public function __construct()
+    {
+        $date = new DateTime();
+        $this->_int = 0;
+        $this->_date_time = $date;
+        $this->_varchar = "";
+        $this->_long_text = "";
+        $this->updated_on = $date;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return RecordEntity
+     */
+    public function getRecord()
+    {
+        return $this->record;
+    }
+
+    /**
+     * @param RecordEntity $record
+     */
+    public function setRecord($record)
+    {
+        $this->record = $record;
+    }
+
+    /**
+     * @return FieldEntity
+     */
+    public function getField()
+    {
+        return $this->field;
+    }
+
+    /**
+     * @param FieldEntity $field
+     */
+    public function setField($field)
+    {
+        $this->field = $field;
+    }
+
+    /**
+     * @return int
+     */
+    public function getInt()
+    {
+        return $this->_int;
+    }
+
+    /**
+     * @param int $_int
+     */
+    public function setInt($_int)
+    {
+        $this->_int = $_int;
+    }
+
+    /**
+     * @return string
+     */
+    public function getVarchar()
+    {
+        return $this->_varchar;
+    }
+
+    /**
+     * @param string $_varchar
+     */
+    public function setVarchar($_varchar)
+    {
+        $this->_varchar = $_varchar;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getDateTime()
+    {
+        return $this->_date_time;
+    }
+
+    /**
+     * @param DateTime $_date_time
+     */
+    public function setDateTime($_date_time)
+    {
+        $this->_date_time = $_date_time;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLongText()
+    {
+        return $this->_long_text;
+    }
+
+    /**
+     * @param string $_long_text
+     */
+    public function setLongText($_long_text)
+    {
+        $this->_long_text = $_long_text;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getUpdatedOn()
+    {
+        return $this->updated_on;
+    }
+
+    /**
+     * @param DateTime $updated_on
+     */
+    public function setUpdatedOn($updated_on)
+    {
+        $this->updated_on = $updated_on;
+    }
+
+    /**
+     * @return UserEntity
+     */
+    public function getUpdatedBy()
+    {
+        return $this->updated_by;
+    }
+
+    /**
+     * @param UserEntity $updated_by
+     */
+    public function setUpdatedBy($updated_by)
+    {
+        $this->updated_by = $updated_by;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDefault()
+    {
+        return $this->is_default;
+    }
+
+    /**
+     * @param boolean $is_default
+     */
+    public function setIsDefault($is_default)
+    {
+        $this->is_default = $is_default;
+    }
+
+
+}

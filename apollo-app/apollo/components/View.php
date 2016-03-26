@@ -1,6 +1,7 @@
 <?php
 /**
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
  */
@@ -13,11 +14,11 @@ use Philo\Blade\Blade;
 
 /**
  * Class View
- *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @see https://github.com/PhiloNL/Laravel-Blade
- * @version 0.0.2
+ * @version 0.0.3
  */
 class View
 {
@@ -64,12 +65,13 @@ class View
      * @param string $title
      * @param array $breadcrumbs
      * @param array $parameters
+     * @since 0.0.3 Finally made use of the getView() method
      * @since 0.0.2
      */
     public static function render($page, $title = null, $breadcrumbs = null, $parameters = [])
     {
         $parameters['title'] = $title;
         $parameters['breadcrumbs'] = $breadcrumbs;
-        echo self::getBlade()->view()->make($page, $parameters)->render();
+        echo self::getView()->make($page, $parameters)->render();
     }
 }

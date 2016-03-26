@@ -9,8 +9,7 @@
 namespace Apollo\Controllers;
 
 use Apollo\Apollo;
-use Apollo\Helpers\FileHelper;
-use Apollo\Helpers\StringHelper;
+use finfo;
 
 
 /**
@@ -21,7 +20,7 @@ use Apollo\Helpers\StringHelper;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.2
  */
 class AssetController extends GenericController
 {
@@ -79,21 +78,32 @@ class AssetController extends GenericController
      *
      * @param string $dir
      * @param array $allowed_extensions
-     * @since 0.0.3 Removed dependency on fileinfo module
      * @since 0.0.1
      */
     private function serveFrom($dir, $allowed_extensions = []) {
         $params = Apollo::getInstance()->getRequest()->getParameters();
         $params_dir = implode('/', $params);
-        $extension = FileHelper::extension($params[count($params) - 1]);
-        $mime_type = FileHelper::mimeType($extension);
+        $file_name = $params[count($params) - 1];
+        $file_name_parts = explode('.', $file_name);
+        $extension = count($file_name_parts) > 1 ? strtolower($file_name_parts[count($file_name_parts) - 1]) : '';
         if(!empty($dir)) {
-            $dir = StringHelper::stripEnd($dir, '/');
             $dir .= '/';
         }
-        if((count($allowed_extensions) == 0 || in_array($extension, $allowed_extensions)) && $mime_type != null) {
+        if(count($allowed_extensions) == 0 || in_array($extension, $allowed_extensions)) {
             $path = ASSET_DIR . $dir . $params_dir;
             if(file_exists($path)) {
+                switch($extension){
+                    case 'css':
+                        $mime_type = 'text/css';
+                        break;
+                    case 'js':
+                        $mime_type = 'application/javascript';
+                        break;
+                    default:
+                        $file_info = new finfo();
+                        $mime_type = $file_info->file($path, FILEINFO_MIME_TYPE);
+                        break;
+                }
                 //TODO Tim: Add headers for caching and other stuff
                 header('Content-Type: ' . $mime_type);
                 readfile($path);

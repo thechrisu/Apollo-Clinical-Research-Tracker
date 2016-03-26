@@ -1,7 +1,7 @@
 <?php
 
-$title = 'Edit programme';
-$page = 'programme';
+$title = 'Edit activity';
+$page = 'activity';
 include 'templates/header.php';
 ?>
 <!--

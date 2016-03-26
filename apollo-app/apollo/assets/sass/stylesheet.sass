@@ -1,18 +1,46 @@
 /*
- Apollo stylesheet v0.0.1
+ Apollo stylesheet v0.0.2
  Copyright 2016 Timur Kuzhagaliyev
  https://opensource.org/licenses/mit-license.php MIT License
 
 @import "core/core"
+@import "partials/loader"
+@import "partials/record"
+@import "partials/menu"
 
+/* Extension to bootstrap
+.undefined
+  color: $apollo-secondary-colour
+  font-style: italic
+.panel-no-padding
+  padding-bottom: 0 !important
+  padding-top: 0 !important
+.clickable
+  cursor: pointer
 
+/* Loader-related CSS
+.loader-ready
+  position: relative
 
-// Bootstrap fixes
+/* Bootstrap fixes
 
+// Do not display the top border on some tables
+.table.no-border-top
+  tr:first-child
+    td
+      border-top: none !important
+
+// Add an extra margin for icons inside buttons
+.btn
+  & > .glyphicon
+    margin-right: 8px
+
+// Remove margin on breadcrumbs for better appearance
 .panel-heading
   .breadcrumb
     margin-bottom: 0
 
+// Removing the margin on the error page
 .jumbotron.error-page
   margin-bottom: 0
 
