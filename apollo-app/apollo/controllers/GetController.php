@@ -27,7 +27,7 @@ use Apollo\Entities\ActivityEntity;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.7
+ * @version 0.0.8
  */
 class GetController extends GenericController
 {
@@ -53,46 +53,43 @@ class GetController extends GenericController
     }
 
     /**
-     * Returns the records
-     *
+     * Posts a JSON that contains information of the records (for the overview-view)
+     * TODO: Contemplate over putting extracted functions somewhere else
+     * @since 0.0.8 Extracted a lot more functions
      * @since 0.0.5 Extracted sorting
      * @since 0.0.2 Implemented quick search
      * @since 0.0.1
-     * TODO: Refactor this (extract!)
      */
     public function actionRecords()
     {
-        $em = DB::getEntityManager();
         $data = $this->parseRequest(['page' => 1, 'sort' => 1, 'search' => null]);
         $page = $data['page'] > 0 ? $data['page'] : 1;
 
+        $peopleQB = $this->createQueryForRecordsRequest($data);
+        $peopleQuery = $peopleQB->getQuery();
+        $people =  $peopleQuery->getResult();
+        $response = $this->getFormattedRecordsOfPeople($people, $page);
+        echo json_encode($response);
+    }
+
+    /**
+     * @param $request
+     * @return \Doctrine\ORM\QueryBuilder|mixed
+     */
+    private function createQueryForRecordsRequest($request)
+    {
+        $em = DB::getEntityManager();
         $peopleRepo = $em->getRepository(Person::getEntityNamespace());
         $peopleQB = $peopleRepo->createQueryBuilder('person');
         $peopleQB->innerJoin('person.records', 'record');
         $peopleQB->where('person.organisation = ' . Apollo::getInstance()->getUser()->getOrganisationId());
         $peopleQB->andWhere('person.is_hidden = 0');
-        $peopleQB = $this->orderRecords($peopleQB, $data['sort']);
-        if(!empty($data['search'])) {
-            $this->addPersonSearch($peopleQB, $data['search']);
+        $peopleQB = $this->orderRecords($peopleQB, $request['sort']);
+        if (!empty($request['search'])) {
+            $this->addPersonSearch($peopleQB, $request['search']);
+            return $peopleQB;
         }
-        $peopleQuery = $peopleQB->getQuery();
-        $people =  $peopleQuery->getResult();
-        $response['error'] = null;
-        $response['count'] = count($people);
-        /**
-         * @var PersonEntity $person
-         */
-        for($i = 10 * ($page - 1); $i < min($response['count'], $page * 10); $i++) {
-            $person = $people[$i];
-            $personRecords = $person->getRecords();
-            if(count($personRecords) < 1) {
-                $response['error'] = ['id' => 1, 'description' => 'Person #' . $person->getId() . ' has 0 records!'];
-            } else {
-                $responsePerson = $this->getFormattedPersonData($person);
-                $response['data'][] = $responsePerson;
-            }
-        }
-        echo json_encode($response);
+        return $peopleQB;
     }
 
     /**
@@ -124,6 +121,7 @@ class GetController extends GenericController
 
     /**
      * TODO: Add description for function
+     *
      * @param $queryBuilder
      * @param $search
      */
@@ -139,19 +137,46 @@ class GetController extends GenericController
 
     /**
      * Given a person (retrieved from the data base), returns an object containing all the data of the person
+     * TODO: Put this function somewhere else, this is a controller
      * @param $person
      * @return mixed
      */
     private function getFormattedPersonData($person)
     {
         $responsePerson = [];
-        $recentRecord = $person->getMostRecentRecord();
+        $recentRecord = Person::getMostRecentRecord($person->getId());
         $responsePerson['id'] = $recentRecord->getId();
         $responsePerson['given_name'] = $person->getGivenName();
         $responsePerson['last_name'] = $person->getLastName();
         $responsePerson['phone'] = $recentRecord->findVarchar(FIELD_PHONE);
         $responsePerson['email'] = $recentRecord->findVarchar(FIELD_EMAIL);
         return $responsePerson;
+    }
+
+    /**
+     * For a given number of people, return a formatted object of the people's record data
+     * TODO: Put this somewhere else, this is a controller
+     * @param $people
+     * @param $page
+     * @return $response
+     */
+    private function getFormattedRecordsOfPeople($people, $page)
+    {
+        $response['error'] = null;
+        $response['count'] = count($people);
+        /**
+         * @var PersonEntity $person
+         */
+        for ($i = 10 * ($page - 1); $i < min($response['count'], $page * 10); $i++) {
+            $person = $people[$i];
+            $personRecords = $person->getRecords();
+            if (count($personRecords) < 1) {
+                $response['error'] = ['id' => 1, 'description' => 'Person #' . $person->getId() . ' has 0 records!'];
+            } else {
+                $response['data'][] = $this->getFormattedPersonData($person);
+            }
+        }
+        return $response;
     }
 
     /**
@@ -393,5 +418,4 @@ class GetController extends GenericController
         }
         return $parsedData;
     }
-
 }

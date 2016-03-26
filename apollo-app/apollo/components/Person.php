@@ -23,4 +23,30 @@ class Person extends DBComponent
      * @var string
      */
     protected static $entityNamespace = 'Apollo\\Entities\\PersonEntity';
+
+    /**
+     * For a given person, returns its current record
+     * @param $person_id
+     * @return $recentRecord
+     * @since 0.0.6
+     */
+    public static function getMostRecentRecord($person_id)
+    {
+        $recentRecord = null;
+        $recentDate = null;
+
+        $people = Person::getRepository();
+        $person = $people->find($person_id);
+
+        foreach ($person->getRecords() as $currentRecord) {
+            if (!$currentRecord->isHidden()) {
+                $currentDate = $currentRecord->findDateTime(FIELD_START_DATE);
+                if ($recentDate == null || $recentDate < $currentDate) {
+                    $recentDate = $currentDate;
+                    $recentRecord = $currentRecord;
+                }
+            }
+        }
+        return $recentRecord;
+    }
 }

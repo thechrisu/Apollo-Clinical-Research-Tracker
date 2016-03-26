@@ -182,25 +182,4 @@ class PersonEntity
     {
         $this->is_hidden = $is_hidden;
     }
-
-    /**
-     * For a given person, returns its current record
-     * @return $recentRecord
-     * @since 0.0.6
-     */
-    public function getMostRecentRecord()
-    {
-        $recentRecord = null;
-        $recentDate = null;
-        foreach ($this->getRecords() as $currentRecord) {
-            if (!$currentRecord->isHidden()) {
-                $currentDate = $currentRecord->findDateTime(FIELD_START_DATE);
-                if ($recentDate == null || $recentDate < $currentDate) {
-                    $recentDate = $currentDate;
-                    $recentRecord = $currentRecord;
-                }
-            }
-        }
-        return $recentRecord;
-    }
 }
