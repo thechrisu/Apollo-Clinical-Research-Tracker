@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
+use Doctrine\ORM\Mapping\OrderBy;
 
 
 /**
@@ -19,7 +20,7 @@ use Doctrine\ORM\Mapping\OneToMany;
  *
  * @package Apollo\Entities
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  * @Entity @Table("fields")
  */
 class FieldEntity
@@ -58,6 +59,7 @@ class FieldEntity
 
     /**
      * @OneToMany(targetEntity="DefaultEntity", mappedBy="field")
+     * @OrderBy({"order" = "ASC"})
      * @var DefaultEntity[]
      */
     protected $defaults = null;
