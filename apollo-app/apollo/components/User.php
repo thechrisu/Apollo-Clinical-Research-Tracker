@@ -54,7 +54,7 @@ class User extends DBComponent
     {
         if(!empty($id)) {
             /** @var UserEntity $entity */
-            $entity = self::getRepository()->find($id);
+            $entity = self::find($id);
             $this->id = $id;
             $this->entity = $entity;
         } else {
@@ -64,7 +64,7 @@ class User extends DBComponent
                 /**
                  * @var UserEntity $temp_entity
                  */
-                $temp_entity = DB::getEntityManager()->getRepository('\\Apollo\\Entities\\UserEntity')->find($this->id);
+                $temp_entity = self::find($this->id);
                 if ($temp_entity != null && $fingerprint == Session::getFingerprint(md5($temp_entity->getPassword()))) {
                     $this->entity = $temp_entity;
                 }

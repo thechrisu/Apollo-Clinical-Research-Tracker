@@ -17,7 +17,7 @@ use Apollo\Entities\RecordEntity;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  */
 class Record extends DBComponent
 {
@@ -31,6 +31,7 @@ class Record extends DBComponent
      * Checks that default data exists for all fields, if not, adds the missing fields.
      *
      * @param RecordEntity $record
+     * @since 0.0.3 Now uses serialization correctly
      * @since 0.0.2
      */
     public static function prepare($record) {
@@ -39,12 +40,11 @@ class Record extends DBComponent
          * @var FieldEntity[] $fields
          */
         $fields = $fieldRepo->findBy(['is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
-        $dataRepo = Data::getRepository();
         /**
          * @var FieldEntity $field
          */
         foreach($fields as $field) {
-            $record->findOrCreateData($field->getId());
+            $record->findOrCreateData($field->getId(), $field->hasDefault(), $field->isAllowOther(), $field->isMultiple());
         }
     }
 }
