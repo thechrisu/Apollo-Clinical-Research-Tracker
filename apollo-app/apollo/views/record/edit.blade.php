@@ -18,10 +18,10 @@ use Apollo\Helpers\URLHelper;
     <div class="panel panel-default loader-ready" id="essential-panel">
         <div class="panel-heading">
             <span class="pull-right">Record actions:<!--
-             --><a href="#" id="record-add" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-ok"
-                                                                                 aria-hidden="true"></span>Save changes</a><!--
-             --><a href="#" id="record-hide" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove"
-                                                                                 aria-hidden="true"></span>Discard changes</a>
+             --><a href="#" id="record-save" class="btn btn-sm btn-success disabled"><span class="glyphicon glyphicon-ok"
+                                                                                 aria-hidden="true"></span>Changes saved.</a><!--
+             --><a href="#" id="record-view" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-eye-open"
+                                                                                 aria-hidden="true"></span>View Record</a>
             </span>
             <span>
                 <span>Currently editing:</span><!--
