@@ -7,6 +7,7 @@
 
 
 namespace Apollo\Components;
+
 use Doctrine\ORM\EntityRepository;
 
 
@@ -15,15 +16,28 @@ use Doctrine\ORM\EntityRepository;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  */
 abstract class DBComponent
 {
     /**
      * @return EntityRepository
      */
-    public static function getRepository() {
+    public static function getRepository()
+    {
         return DB::getEntityManager()->getRepository(self::getEntityNamespace());
+    }
+
+    /**
+     * Finds a user by ID
+     *
+     * @param int $id
+     * @return mixed
+     * @since 0.0.2
+     */
+    public static function find($id)
+    {
+        return self::getRepository()->find($id);
     }
 
     /**
