@@ -6,8 +6,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.3
- * TODO: Add documentation
+ * @version 0.0.4
  */
 
 /**
@@ -48,7 +47,7 @@ abstract class InputField implements Renderable {
  */
 class InputText extends InputField {
 
-    private attributes:Attributes;
+    protected attributes:Attributes;
     public input:JQuery;
 
     public constructor(id:number, callback: (id:number, value:string) => void, attributes:Attributes, value:string = null) {
@@ -64,8 +63,45 @@ class InputText extends InputField {
         this.setupCallback();
     }
 
-    private prepareNode() {
+    protected prepareNode() {
         this.input = Util.buildNode('input', this.attributes, null, true);
+        this.parentNode.append(this.input);
+    }
+
+    private setupCallback() {
+        var that = this;
+        this.input.on({
+            keyup: function () {
+                that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
+            }
+        });
+    }
+}
+
+/**
+ * Field with a text area
+ *
+ * @since 0.0.4
+ */
+class InputLongText extends InputField {
+
+    protected attributes:Attributes;
+    public input:JQuery;
+
+    public constructor(id:number, callback: (id:number, value:string) => void, attributes:Attributes, value:string = null) {
+        super(id, callback);
+        this.attributes = <Attributes> Util.mergeObjects(attributes, {
+            'data-id': this.id.toString(),
+            'id': 'input-text-' + this.id,
+            'class': 'form-control input-sm',
+            'type': 'text'
+        });
+        this.prepareNode(value);
+        this.setupCallback();
+    }
+
+    protected prepareNode(value:string) {
+        this.input = Util.buildNode('textarea', this.attributes, value);
         this.parentNode.append(this.input);
     }
 
@@ -256,3 +292,4 @@ class InputDropdown extends InputField {
         }
     }
 }
+

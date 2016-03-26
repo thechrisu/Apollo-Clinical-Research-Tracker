@@ -17,7 +17,7 @@ var SingleView = (function () {
     }
     SingleView.prototype.load = function (id) {
         var test = $('#test');
-        var type = 4;
+        var type = 5;
         var input;
         switch (type) {
             case 1:
@@ -42,6 +42,10 @@ var SingleView = (function () {
                     placeholder: 'Tester'
                 }, ['First', 'Second']);
                 break;
+            case 5:
+                input = new InputLongText(5, function (id, value) {
+                    console.log(value);
+                }, { placeholder: 'Test' }, 'Some Value');
         }
         input.render(test);
         //     this.id = id;

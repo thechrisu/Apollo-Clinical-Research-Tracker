@@ -6,8 +6,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.3
- * TODO: Add documentation
+ * @version 0.0.4
  */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -69,6 +68,39 @@ var InputText = (function (_super) {
         });
     };
     return InputText;
+}(InputField));
+/**
+ * Field with a text area
+ *
+ * @since 0.0.4
+ */
+var InputLongText = (function (_super) {
+    __extends(InputLongText, _super);
+    function InputLongText(id, callback, attributes, value) {
+        if (value === void 0) { value = null; }
+        _super.call(this, id, callback);
+        this.attributes = Util.mergeObjects(attributes, {
+            'data-id': this.id.toString(),
+            'id': 'input-text-' + this.id,
+            'class': 'form-control input-sm',
+            'type': 'text'
+        });
+        this.prepareNode(value);
+        this.setupCallback();
+    }
+    InputLongText.prototype.prepareNode = function (value) {
+        this.input = Util.buildNode('textarea', this.attributes, value);
+        this.parentNode.append(this.input);
+    };
+    InputLongText.prototype.setupCallback = function () {
+        var that = this;
+        this.input.on({
+            keyup: function () {
+                that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
+            }
+        });
+    };
+    return InputLongText;
 }(InputField));
 var InputTextMultiple = (function (_super) {
     __extends(InputTextMultiple, _super);

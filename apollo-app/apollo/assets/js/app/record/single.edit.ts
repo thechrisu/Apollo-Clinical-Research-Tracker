@@ -47,7 +47,7 @@ class SingleView {
     public load(id:number) {
 
         var test = $('#test');
-        var type = 4;
+        var type = 5;
         var input;
         switch (type) {
             case 1:
@@ -72,6 +72,10 @@ class SingleView {
                     placeholder: 'Tester'
                 }, ['First', 'Second']);
                 break;
+            case 5:
+                input = new InputLongText(5, function(id:number, value:string) {
+                    console.log(value)
+                }, { placeholder: 'Test' }, 'Some Value');
         }
         input.render(test);
 
