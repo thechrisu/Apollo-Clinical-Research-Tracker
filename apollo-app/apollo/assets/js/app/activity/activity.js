@@ -10,9 +10,9 @@
  *
  */
 /**
- * Class to store the token field (the field to add/remove users from a program)
+ * Class to store the token field (the field to add/remove users from a activity)
  * @version 0.0.2
- * TODO get people's names (--> or display more information?) from the database who are not yet in the program
+ * TODO get people's names (--> or display more information?) from the database who are not yet in the activity
  */
 var ValidatorTokenField = (function () {
     function ValidatorTokenField() {
@@ -68,18 +68,18 @@ var ValidatorTokenField = (function () {
 })();
 /**
  * Defines the menu/table on the left of the view.
- * TODO hook up to API (display first programme)
+ * TODO hook up to API (display first activity)
  * TODO do quick search
- * TODO do the animation of displaying the programme on the right if the user clicks on it
+ * TODO do the animation of displaying the activity on the right if the user clicks on it
  * @version 0.0.6
  */
-var ProgrammeTable = (function () {
-    function ProgrammeTable() {
+var ActivityTable = (function () {
+    function ActivityTable() {
     }
     /**
      * Loads up all of the information and sets up the instance variables
      */
-    ProgrammeTable.prototype.load = function () {
+    ActivityTable.prototype.load = function () {
         this.pagination = $('#pagination');
         this.table = $('#table-body');
         this.search = '';
@@ -90,13 +90,13 @@ var ProgrammeTable = (function () {
     /**
      * Creates the basic structure of the table
      */
-    ProgrammeTable.prototype.setUp = function () {
+    ActivityTable.prototype.setUp = function () {
         var that = this;
         LoaderManager.showLoader((that.loader), function () {
             that.makeAddButton();
             that.setUpPagination();
             var timer = null;
-            $('#programmes-search').keyup(function () {
+            $('#activities-search').keyup(function () {
                 clearTimeout(timer);
                 that.search = encodeURIComponent($(this).val());
                 timer = setTimeout(function () {
@@ -112,9 +112,9 @@ var ProgrammeTable = (function () {
      * Adding the content to the table.
      * @since 0.0.6
      */
-    ProgrammeTable.prototype.updateTable = function () {
+    ActivityTable.prototype.updateTable = function () {
         var that = this;
-        AJAX.get(Util.url('get/programmes/?page=' + that.page + '&search=' + that.search, false), function (data) {
+        AJAX.get(Util.url('get/activities/?page=' + that.page + '&search=' + that.search, false), function (data) {
             if (data.count < (that.page - 1) * 10) {
                 that.pagination.pagination('selectPage', data.count / 10 - data.count % 10);
                 return;
@@ -128,20 +128,20 @@ var ProgrammeTable = (function () {
                 that.table.append('<tr><td colspan="4" class="text-center"><b>Nothing to display . . .</b></td></tr>');
             }
         }, function (message) {
-            Util.error('An error has occurred during the loading of the list of programmes. Please reload the page or contact the administrator. Error message: ' + message);
+            Util.error('An error has occurred during the loading of the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
         });
     };
     /**
-     * Creates a new programme specified by the user. Pops up a modal to get name/start/end date and then goes to the view
+     * Creates a new activity specified by the user. Pops up a modal to get name/start/end date and then goes to the view
      */
-    ProgrammeTable.prototype.addProgramme = function () {
-        //console.log("adding programme...");
+    ActivityTable.prototype.addActivity = function () {
+        //console.log("adding activity...");
     };
     /**
      * Sets up the pagination
      * @since 0.0.4
      */
-    ProgrammeTable.prototype.setUpPagination = function () {
+    ActivityTable.prototype.setUpPagination = function () {
         var that = this;
         this.pagination.pagination({
             items: 0,
@@ -155,18 +155,18 @@ var ProgrammeTable = (function () {
         });
     };
     /**
-     * Links up the button for adding programmes with the JS
+     * Links up the button for adding activities with the JS
      */
-    ProgrammeTable.prototype.makeAddButton = function () {
-        $('#add-programme').click(this.addProgramme);
+    ActivityTable.prototype.makeAddButton = function () {
+        $('#add-activity').click(this.addActivity);
     };
     /**
-     * With the data of all the programmes, it successively creates the rows for each programme
+     * With the data of all the activities, it successively creates the rows for each activity
      * @param data
      */
-    ProgrammeTable.prototype.addDataToTable = function (data) {
-        for (var i = 0; i < data.programmes.length; i++) {
-            var item = data.programmes[i];
+    ActivityTable.prototype.addDataToTable = function (data) {
+        for (var i = 0; i < data.activities.length; i++) {
+            var item = data.activities[i];
             this.addRowToTable(item);
         }
     };
@@ -174,7 +174,7 @@ var ProgrammeTable = (function () {
      * Successively adds the parameters to one row and adds it to the DOM
      * @param data
      */
-    ProgrammeTable.prototype.addRowToTable = function (data) {
+    ActivityTable.prototype.addRowToTable = function (data) {
         var row;
         var startD;
         var endD;
@@ -185,28 +185,28 @@ var ProgrammeTable = (function () {
         row.append('<td>' + data.name + '</td>');
         row.append('<td>' + startD + ' - ' + endD + '</td>');
         row.click(function () {
-            that.displayProgramme.call(null, data.id);
+            that.displayActivity.call(null, data.id);
         });
         this.table.append(row);
     };
-    ProgrammeTable.prototype.displayProgramme = function (programmeId) {
-        window.location.href = window.location.origin + '/programme/view/' + programmeId;
+    ActivityTable.prototype.displayActivity = function (activityId) {
+        window.location.href = window.location.origin + '/activity/view/' + activityId;
     };
-    return ProgrammeTable;
+    return ActivityTable;
 })();
 /**
- * carries out all the tasks related to displaying the actual information of one programme on the right of the view
+ * carries out all the tasks related to displaying the actual information of one activity on the right of the view
  * @since 0.0.4
  * TODO: Make the add new person thing work
  * TODO: autosave
  */
-var ProgrammeInformation = (function () {
-    function ProgrammeInformation() {
+var ActivityInformation = (function () {
+    function ActivityInformation() {
     }
     /**
      * Loads up all of the information and sets up the instance variables
      */
-    ProgrammeInformation.prototype.load = function () {
+    ActivityInformation.prototype.load = function () {
         this.peopleTable = $('#existingPeople');
         this.id = 1;
         this.setUp();
@@ -214,11 +214,11 @@ var ProgrammeInformation = (function () {
     /**
      * Creates the basic structure of the table
      */
-    ProgrammeInformation.prototype.setUp = function () {
+    ActivityInformation.prototype.setUp = function () {
         var that = this;
-        var loader = LoaderManager.createLoader($('#programmeContent'));
+        var loader = LoaderManager.createLoader($('#activityContent'));
         LoaderManager.showLoader((loader), function () {
-            AJAX.get(Util.url('get/programme/' + that.id, false), function (data) {
+            AJAX.get(Util.url('get/activity/' + that.id, false), function (data) {
                 that.displayTitle("Second year placements");
                 that.displayPeople(data.participants);
                 that.displayTargetGroup(data.target_group, data.current_target_group);
@@ -226,7 +226,7 @@ var ProgrammeInformation = (function () {
                 that.displayStartDate(data.start_date);
                 that.displayEndDate(data.end_date);
             }, function (message) {
-                Util.error('An error has occurred during the loading of the list of programmes. Please reload the page or contact the administrator. Error message: ' + message);
+                Util.error('An error has occurred during the loading of the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
             });
         });
         LoaderManager.hideLoader(loader, function () {
@@ -234,18 +234,18 @@ var ProgrammeInformation = (function () {
         });
     };
     /**
-     * Displays the title of the programme in the dedicated textfield
+     * Displays the title of the activity in the dedicated textfield
      * @param title
      */
-    ProgrammeInformation.prototype.displayTitle = function (title) {
-        $('#programme-title').val(title);
+    ActivityInformation.prototype.displayTitle = function (title) {
+        $('#activity-title').val(title);
     };
     /**
      * Shows the target group as dropdown
      * @param options
      * @param active
      */
-    ProgrammeInformation.prototype.displayTargetGroup = function (options, active) {
+    ActivityInformation.prototype.displayTargetGroup = function (options, active) {
         var dropD = $('#target-dropdown');
         dropD.append('<li class="dropdown-header">Choose a target group:</li>');
         $('#target-button').append(options[active]);
@@ -257,32 +257,32 @@ var ProgrammeInformation = (function () {
      * Displays the comment for the target group
      * @param initialData
      */
-    ProgrammeInformation.prototype.displayComment = function (initialData) {
+    ActivityInformation.prototype.displayComment = function (initialData) {
         $('#target-comment').val(initialData);
     };
     /**
-     * Displays the start date of the programme
+     * Displays the start date of the activity
      * @param sqlDate
      */
-    ProgrammeInformation.prototype.displayStartDate = function (sqlDate) {
+    ActivityInformation.prototype.displayStartDate = function (sqlDate) {
         var startD = Util.formatNumberDate(Util.parseSQLDate(sqlDate));
         var startDate = Util.getDatePicker(startD, "add-start-date");
         $('#start-date').append(startDate);
     };
     /**
-     * Displays the end date of the programme
+     * Displays the end date of the activity
      * @param sqldate
      */
-    ProgrammeInformation.prototype.displayEndDate = function (sqldate) {
+    ActivityInformation.prototype.displayEndDate = function (sqldate) {
         var endD = Util.formatNumberDate(Util.parseSQLDate(sqldate));
         var endDate = Util.getDatePicker(endD, "add-start-date");
         $('#end-date').append(endDate);
     };
     /**
-     * Creates the table with all the people in a programme
+     * Creates the table with all the people in a activity
      * @param people
      */
-    ProgrammeInformation.prototype.displayPeople = function (people) {
+    ActivityInformation.prototype.displayPeople = function (people) {
         for (var i = 0; i < people.length; i++) {
             var row = $('<td></td>');
             row.append(people[i].given_name + ' ' + people[i].last_name);
@@ -297,15 +297,15 @@ var ProgrammeInformation = (function () {
      * @param row
      * @param id
      */
-    ProgrammeInformation.prototype.addOnClickToRow = function (row, id) {
+    ActivityInformation.prototype.addOnClickToRow = function (row, id) {
         row.click(function () {
             Util.to('record/view/' + id);
         });
     };
-    return ProgrammeInformation;
+    return ActivityInformation;
 })();
 $(document).ready(function () {
     new ValidatorTokenField().load();
-    new ProgrammeInformation().load();
-    new ProgrammeTable().load();
+    new ActivityInformation().load();
+    new ActivityTable().load();
 });

@@ -55,7 +55,7 @@
                     <ul class="nav navbar-nav navbar-right">
                         <?php $active = ' class="active"'; ?>
                         <li<?= $page == 'record' || $page == 'records' ? $active : '' ?>><a href="records.php">Records</a></li>
-                        <li<?= $page == 'programme' || $page == 'programmes' ? $active : '' ?>><a href="programmes.php">Programmes</a></li>
+                        <li<?= $page == 'activity' || $page == 'programmes' ? $active : '' ?>><a href="programmes.php">Programmes</a></li>
                         <li<?= $page == 'field' || $page == 'fields' ? $active : '' ?>><a href="fields.php">Fields</a></li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"

@@ -14,7 +14,7 @@ use Apollo\Helpers\URLHelper;
 $controller = Apollo::getInstance()->getRequest()->getController();
 $menu_points = [
         ['Record', 'record', 'Records'],
-        ['Programme', 'programme', 'Programmes'],
+        ['Activity', 'activity', 'Activities'],
         ['Field', 'field', 'Fields'],
         ['Help', 'help', 'Help'],
 ]

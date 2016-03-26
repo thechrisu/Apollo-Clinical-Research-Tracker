@@ -1,9 +1,9 @@
 {
   "error": null,
-  "name": "Some programme",
+  "name": "Some activity",
   "target_group": ["Young people", "Old people", "Twentysomething people"],
   "current_target_group": 0,
-  "target_group_comment": "This is an exceptional programme",
+  "target_group_comment": "This is an exceptional activity",
   "start_date": "1834-01-22 02:00:00",
   "end_date": "1834-02-22 02:00:00",
   "participants": [

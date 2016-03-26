@@ -15,6 +15,8 @@ use Apollo\Entities\PersonEntity;
 use Apollo\Components\DB;
 use Apollo\Components\Person;
 use Apollo\Entities\RecordEntity;
+use Apollo\Components\Activity;
+use Apollo\Entities\ActivityEntity;
 
 
 /**
@@ -25,7 +27,7 @@ use Apollo\Entities\RecordEntity;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.6
+ * @version 0.0.7
  */
 class GetController extends GenericController
 {
@@ -71,13 +73,7 @@ class GetController extends GenericController
         $peopleQB->andWhere('person.is_hidden = 0');
         $peopleQB = $this->orderRecords($peopleQB, $data['sort']);
         if(!empty($data['search'])) {
-            $peopleQB->andWhere($peopleQB->expr()->orX(
-                $peopleQB->expr()->like('person.given_name', ':search'),
-                $peopleQB->expr()->like('person.middle_name', ':search'),
-                $peopleQB->expr()->like('person.last_name', ':search')
-            ));
-            $peopleQB->setParameter('search', '%' . $data['search'] . '%');
-        } else {
+            $this->addPersonSearch($peopleQB, $data['search']);
         }
         $peopleQuery = $peopleQB->getQuery();
         $people =  $peopleQuery->getResult();
@@ -88,33 +84,23 @@ class GetController extends GenericController
          */
         for($i = 10 * ($page - 1); $i < min($response['count'], $page * 10); $i++) {
             $person = $people[$i];
-            $responsePerson = [];
             $personRecords = $person->getRecords();
             if(count($personRecords) < 1) {
                 $response['error'] = ['id' => 1, 'description' => 'Person #' . $person->getId() . ' has 0 records!'];
             } else {
-                $recentRecord = null;
-                $recentDate =  null;
-                foreach($person->getRecords() as $currentRecord) {
-                    if(!$currentRecord->isHidden()) {
-                        $currentDate = $currentRecord->findDateTime(FIELD_START_DATE);
-                        if ($recentDate == null || $recentDate < $currentDate) {
-                            $recentDate = $currentDate;
-                            $recentRecord = $currentRecord;
-                        }
-                    }
-                }
-                $responsePerson['id'] = $recentRecord->getId();
-                $responsePerson['given_name'] = $person->getGivenName();
-                $responsePerson['last_name'] = $person->getLastName();
-                $responsePerson['phone'] = $recentRecord->findVarchar(FIELD_PHONE);
-                $responsePerson['email'] = $recentRecord->findVarchar(FIELD_EMAIL);
+                $responsePerson = $this->getFormattedPersonData($person);
                 $response['data'][] = $responsePerson;
             }
         }
         echo json_encode($response);
     }
 
+    /**
+     * Given a query bulider for records and an ordering, set up the ordering depending on how it is requested
+     * @param $queryBuilder
+     * @param $ordering
+     * @return mixed
+     */
     private function orderRecords($queryBuilder, $ordering)
     {
         switch ($ordering) {
@@ -133,6 +119,39 @@ class GetController extends GenericController
                 $queryBuilder->addOrderBy('person.last_name', 'ASC');
         }
         return $queryBuilder;
+    }
+
+
+    /**
+     * TODO: Add description for function
+     * @param $queryBuilder
+     * @param $search
+     */
+    private function addPersonSearch($queryBuilder, $search)
+    {
+        $queryBuilder->andWhere($queryBuilder->expr()->orX(
+            $queryBuilder->expr()->like('person.given_name', ':search'),
+            $queryBuilder->expr()->like('person.middle_name', ':search'),
+            $queryBuilder->expr()->like('person.last_name', ':search')
+        ));
+        $queryBuilder->setParameter('search', '%' . $search . '%');
+    }
+
+    /**
+     * Given a person (retrieved from the data base), returns an object containing all the data of the person
+     * @param $person
+     * @return mixed
+     */
+    private function getFormattedPersonData($person)
+    {
+        $responsePerson = [];
+        $recentRecord = $person->getMostRecentRecord();
+        $responsePerson['id'] = $recentRecord->getId();
+        $responsePerson['given_name'] = $person->getGivenName();
+        $responsePerson['last_name'] = $person->getLastName();
+        $responsePerson['phone'] = $recentRecord->findVarchar(FIELD_PHONE);
+        $responsePerson['email'] = $recentRecord->findVarchar(FIELD_EMAIL);
+        return $responsePerson;
     }
 
     /**
@@ -231,49 +250,105 @@ class GetController extends GenericController
     }
 
     /**
-     * It returns short information about several programmes
+     * It returns short information about several activities
      * Currently serves dummy data
      * @since 0.0.5
      * TODO: Serve real data
      */
-    public function actionProgrammes()
+    public function actionActivities()
     {
+        $activityRepo = $em->getRepository(Person::getEntityNamespace());
+        $peopleQB = $peopleRepo->createQueryBuilder('person');
         $data['error'] = null;
-        $data['count'] = 3;
-        $data['programmes'] = [
+        $data['count'] = 12;
+        $data['activities'] = [
             [
-            "name" => "Programme 1",
-            "start_date" => "1834-02-22 02:00:00",
-            "end_date" => "1834-02-22 02:00:00",
-            "id" => "1"
-        ],
-        [
-            "name" => "Programme 2",
-            "start_date" => "1834-02-22 02:00:00",
-            "end_date" => "1834-02-22 02:00:00",
-            "id" => "2"
-        ],
-        [
-            "name" => "Programme 3",
-            "start_date" => "1834-02-22 02:00:00",
-            "end_date" => "1834-02-22 02:00:00",
-            "id" => "3"
-        ]
+                "name" => "Programme 1",
+                "start_date" => "1834-02-22 02:00:00",
+                "end_date" => "1834-02-22 02:00:00",
+                "id" => "1"
+            ],
+            [
+                "name" => "Programme 2",
+                "start_date" => "1834-02-22 02:00:00",
+                "end_date" => "1834-02-22 02:00:00",
+                "id" => "2"
+            ],
+            [
+                "name" => "Programme 3",
+                "start_date" => "1834-02-22 02:00:00",
+                "end_date" => "1834-02-22 02:00:00",
+                "id" => "3"
+            ],
+            [
+                "name" => "Programme 1",
+                "start_date" => "1834-02-22 02:00:00",
+                "end_date" => "1834-02-22 02:00:00",
+                "id" => "1"
+            ],
+            [
+                "name" => "Programme 2",
+                "start_date" => "1834-02-22 02:00:00",
+                "end_date" => "1834-02-22 02:00:00",
+                "id" => "2"
+            ],
+            [
+                "name" => "Programme 3",
+                "start_date" => "1834-02-22 02:00:00",
+                "end_date" => "1834-02-22 02:00:00",
+                "id" => "3"
+            ],
+            [
+                "name" => "Programme 1",
+                "start_date" => "1834-02-22 02:00:00",
+                "end_date" => "1834-02-22 02:00:00",
+                "id" => "1"
+            ],
+            [
+                "name" => "Programme 2",
+                "start_date" => "1834-02-22 02:00:00",
+                "end_date" => "1834-02-22 02:00:00",
+                "id" => "2"
+            ],
+            [
+                "name" => "Programme 3",
+                "start_date" => "1834-02-22 02:00:00",
+                "end_date" => "1834-02-22 02:00:00",
+                "id" => "3"
+            ],
+            [
+                "name" => "Programme 1",
+                "start_date" => "1834-02-22 02:00:00",
+                "end_date" => "1834-02-22 02:00:00",
+                "id" => "1"
+            ],
+            [
+                "name" => "Programme 2",
+                "start_date" => "1834-02-22 02:00:00",
+                "end_date" => "1834-02-22 02:00:00",
+                "id" => "2"
+            ],
+            [
+                "name" => "Programme 3",
+                "start_date" => "1834-02-22 02:00:00",
+                "end_date" => "1834-02-22 02:00:00",
+                "id" => "3"
+            ]
         ];
         echo json_encode($data);
     }
 
     /**
-     * Returns detailed information on one programme
+     * Returns detailed information on one activity
      * @since 0.0.6
      */
-    public function actionProgramme()
+    public function actionActivity()
     {
         $data['error'] = null;
-        $data['name'] = "Some programme";
+        $data['name'] = "Some activity";
         $data['target_group'] = ["Young people", "Old people", "Twentysomething people"];
         $data['current_target_group'] = 0;
-        $data['target_group_comment'] = "This is an exceptional programme";
+        $data['target_group_comment'] = "This is an exceptional activity";
         $data['start_date'] = "1834-01-22 02:00:00";
         $data['end_date'] = "1834-02-22 02:00:00";
         $data['participants'] = [
@@ -318,4 +393,5 @@ class GetController extends GenericController
         }
         return $parsedData;
     }
+
 }

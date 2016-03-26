@@ -10,7 +10,7 @@
  *
  */
 
-interface ShortProgrammeData {
+interface ShortActivityData {
     name:string,
     start_date:string,
     end_date:string,
@@ -20,7 +20,7 @@ interface ShortProgrammeData {
 interface MenuData {
     error:Error,
     count:number,
-    programmes:ShortProgrammeData[]
+    activities:ShortActivityData[]
 }
 
 interface ParticipantData {
@@ -29,7 +29,7 @@ interface ParticipantData {
     id:string
 }
 
-interface DetailProgrammeData {
+interface DetailActivityData {
     error:Error,
     name:string,
     target_group:string[],
@@ -41,9 +41,9 @@ interface DetailProgrammeData {
 }
 
 /**
- * Class to store the token field (the field to add/remove users from a program)
+ * Class to store the token field (the field to add/remove users from a activity)
  * @version 0.0.2
- * TODO get people's names (--> or display more information?) from the database who are not yet in the program
+ * TODO get people's names (--> or display more information?) from the database who are not yet in the activity
  */
 class ValidatorTokenField {
     private engine:BloodHound;
@@ -103,12 +103,12 @@ class ValidatorTokenField {
 
 /**
  * Defines the menu/table on the left of the view.
- * TODO hook up to API (display first programme)
+ * TODO hook up to API (display first activity)
  * TODO do quick search
- * TODO do the animation of displaying the programme on the right if the user clicks on it
+ * TODO do the animation of displaying the activity on the right if the user clicks on it
  * @version 0.0.6
  */
-class ProgrammeTable {
+class ActivityTable {
 
     private pagination:JQuery;
     private table:JQuery;
@@ -137,7 +137,7 @@ class ProgrammeTable {
             that.makeAddButton();
             that.setUpPagination();
         var timer = null;
-            $('#programmes-search').keyup(function () {
+            $('#activities-search').keyup(function () {
                 clearTimeout(timer);
                 that.search = encodeURIComponent($(this).val());
                 timer = setTimeout(function () {
@@ -156,7 +156,7 @@ class ProgrammeTable {
      */
     private updateTable(){
         var that = this;
-        AJAX.get(Util.url('get/programmes/?page=' + that.page + '&search=' + that.search, false), function(data:MenuData) {
+        AJAX.get(Util.url('get/activities/?page=' + that.page + '&search=' + that.search, false), function(data:MenuData) {
                 if(data.count < (that.page - 1) * 10) {
                     that.pagination.pagination('selectPage', data.count / 10 - data.count % 10);
                     return;
@@ -169,15 +169,15 @@ class ProgrammeTable {
                     that.table.append('<tr><td colspan="4" class="text-center"><b>Nothing to display . . .</b></td></tr>');
                 }
         }, function (message:string) {
-            Util.error('An error has occurred during the loading of the list of programmes. Please reload the page or contact the administrator. Error message: ' + message);
+            Util.error('An error has occurred during the loading of the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
         });
     }
 
     /**
-     * Creates a new programme specified by the user. Pops up a modal to get name/start/end date and then goes to the view
+     * Creates a new activity specified by the user. Pops up a modal to get name/start/end date and then goes to the view
      */
-    private addProgramme() {
-        //console.log("adding programme...");
+    private addActivity() {
+        //console.log("adding activity...");
     }
 
     /**
@@ -199,19 +199,19 @@ class ProgrammeTable {
     }
 
     /**
-     * Links up the button for adding programmes with the JS
+     * Links up the button for adding activities with the JS
      */
     private makeAddButton() {
-        $('#add-programme').click(this.addProgramme);
+        $('#add-activity').click(this.addActivity);
     }
 
     /**
-     * With the data of all the programmes, it successively creates the rows for each programme
+     * With the data of all the activities, it successively creates the rows for each activity
      * @param data
      */
     private addDataToTable(data:MenuData) {
-        for (var i = 0; i < data.programmes.length; i++) {
-            var item:ShortProgrammeData = data.programmes[i];
+        for (var i = 0; i < data.activities.length; i++) {
+            var item:ShortActivityData = data.activities[i];
             this.addRowToTable(item);
         }
     }
@@ -220,7 +220,7 @@ class ProgrammeTable {
      * Successively adds the parameters to one row and adds it to the DOM
      * @param data
      */
-    private addRowToTable(data:ShortProgrammeData) {
+    private addRowToTable(data:ShortActivityData) {
         var row:JQuery;
         var startD;
         var endD;
@@ -231,23 +231,23 @@ class ProgrammeTable {
         row.append('<td>' + data.name + '</td>');
         row.append('<td>' + startD + ' - ' + endD + '</td>');
         row.click(function() {
-            that.displayProgramme.call(null, data.id);
+            that.displayActivity.call(null, data.id);
         });
         this.table.append(row);
     }
 
-    private displayProgramme(programmeId:string) {
-        window.location.href = window.location.origin + '/programme/view/' + programmeId;
+    private displayActivity(activityId:string) {
+        window.location.href = window.location.origin + '/activity/view/' + activityId;
     }
 }
 
 /**
- * carries out all the tasks related to displaying the actual information of one programme on the right of the view
+ * carries out all the tasks related to displaying the actual information of one activity on the right of the view
  * @since 0.0.4
  * TODO: Make the add new person thing work
  * TODO: autosave
  */
-class ProgrammeInformation {
+class ActivityInformation {
 
     private peopleTable:JQuery;
     private id:number;
@@ -266,9 +266,9 @@ class ProgrammeInformation {
      */
     private setUp(){
         var that = this;
-        var loader = LoaderManager.createLoader($('#programmeContent'));
+        var loader = LoaderManager.createLoader($('#activityContent'));
         LoaderManager.showLoader((loader), function() {
-            AJAX.get(Util.url('get/programme/' + that.id, false), function(data:DetailProgrammeData) {
+            AJAX.get(Util.url('get/activity/' + that.id, false), function(data:DetailActivityData) {
                 that.displayTitle("Second year placements");
                 that.displayPeople(data.participants);
                 that.displayTargetGroup(data.target_group, data.current_target_group);
@@ -276,7 +276,7 @@ class ProgrammeInformation {
                 that.displayStartDate(data.start_date);
                 that.displayEndDate(data.end_date);
             }, function (message:string) {
-                Util.error('An error has occurred during the loading of the list of programmes. Please reload the page or contact the administrator. Error message: ' + message);
+                Util.error('An error has occurred during the loading of the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
             });
         });
         LoaderManager.hideLoader(loader, function () {
@@ -285,11 +285,11 @@ class ProgrammeInformation {
     }
 
     /**
-     * Displays the title of the programme in the dedicated textfield
+     * Displays the title of the activity in the dedicated textfield
      * @param title
      */
     private displayTitle(title:string){
-        $('#programme-title').val(title);
+        $('#activity-title').val(title);
     }
 
     /**
@@ -316,7 +316,7 @@ class ProgrammeInformation {
 
 
     /**
-     * Displays the start date of the programme
+     * Displays the start date of the activity
      * @param sqlDate
      */
     private displayStartDate(sqlDate:string){
@@ -326,7 +326,7 @@ class ProgrammeInformation {
     }
 
     /**
-     * Displays the end date of the programme
+     * Displays the end date of the activity
      * @param sqldate
      */
     private displayEndDate(sqldate:string){
@@ -336,7 +336,7 @@ class ProgrammeInformation {
     }
 
     /**
-     * Creates the table with all the people in a programme
+     * Creates the table with all the people in a activity
      * @param people
      */
     private displayPeople(people:ParticipantData[]){
@@ -364,7 +364,7 @@ class ProgrammeInformation {
 
 $(document).ready(function () {
     new ValidatorTokenField().load();
-    new ProgrammeInformation().load();
-    new ProgrammeTable().load();
+    new ActivityInformation().load();
+    new ActivityTable().load();
 });
 

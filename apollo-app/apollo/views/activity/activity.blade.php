@@ -16,18 +16,18 @@ use Apollo\Helpers\URLHelper;
         <div class="panel-heading">
             <div class="row">
                 <div class="input-group-sm col-lg-4">
-                    <input type="text" class="form-control input-small" id="programmes-search"
-                           placeholder="Search programmes...">
+                    <input type="text" class="form-control input-small" id="activities-search"
+                           placeholder="Search activities...">
                 </div>
                 <div class="col-sm-2 btn-group-sm">
-                    <a href="#" id="add-programme" class="btn btn-default btn-block">Add a Programme</a>
+                    <a href="#" id="add-activity" class="btn btn-default btn-block">Add an activity</a>
                 </div>
             </div>
         </div>
 
         <div class="panel-body">
-            <div id="programme-wrapper" class="row">
-                <div class="col-lg-4 divider-vertical table-responsive menu-loader-ready" id="programmeTable">
+            <div id="activity-wrapper" class="row">
+                <div class="col-lg-4 divider-vertical table-responsive menu-loader-ready" id="activityTable">
                     <table class="table table-hover small-table no-border-top">
                         <tbody id="table-body">
                         </tbody>
@@ -39,11 +39,10 @@ use Apollo\Helpers\URLHelper;
                     </nav>
 
                 </div>
-
-                <div class="col-lg-8 content-loader-ready" id="programmeContent">
+                <div class="col-lg-8 content-loader-ready" id="activityContent">
                     <div class="row">
                         <div class="col-lg-8 col-md-6 col-sx-12 top-buffer">
-                            <input class="form-control input-medium" id="programme-title"/>
+                            <input class="form-control input-medium" id="activity-title"/>
                         </div>
                         <div class="col-lg-4 col-md-6 col-sm-12 col-sx-12 top-buffer top-buffer">
                             <div class="btn-group btn-block">
@@ -71,7 +70,7 @@ use Apollo\Helpers\URLHelper;
                         </div>
                         <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
                             <div class="form-group">
-                                <textarea class="form-control" id="target-comment" rows="5" placeholder="Enter programme description"></textarea>
+                                <textarea class="form-control" id="target-comment" rows="5" placeholder="Enter activity description"></textarea>
                             </div>
                         </div>
                     </div>
@@ -93,5 +92,5 @@ use Apollo\Helpers\URLHelper;
 @stop
 @section('scripts')
     @parent
-    <script src="{{ AssetHelper::js('app/programme/programme') }}"></script>
+    <script src="{{ AssetHelper::js('app/activity/activity') }}"></script>
 @stop
