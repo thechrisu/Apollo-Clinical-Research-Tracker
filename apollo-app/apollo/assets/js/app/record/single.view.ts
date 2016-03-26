@@ -95,7 +95,7 @@ class SingleView {
                 if (field.type == 3) {
                     value = Util.formatDate(Util.parseSQLDate(<string> value));
                 }
-                columnManager.add(new ColumnRow(field.name, value));
+                columnManager.add(new ColumnRowStatic(field.name, value));
             }
             columnManager.render(false);
             LoaderManager.hideLoader(loader, function () {

@@ -35,7 +35,7 @@ var InputField = (function () {
         }, AJAX_DELAY);
     };
     return InputField;
-})();
+}());
 /**
  * Input expecting text, i.e. <input type="text" ... />
  *
@@ -69,28 +69,80 @@ var InputText = (function (_super) {
         });
     };
     return InputText;
-})(InputField);
-/**
- * Text with an option to add new fields
- *
- * @since 0.0.3
- */
+}(InputField));
 var InputTextMultiple = (function (_super) {
     __extends(InputTextMultiple, _super);
     function InputTextMultiple(id, callback, attributes, values) {
         if (values === void 0) { values = []; }
         _super.call(this, id, callback);
-        this.prepareNode();
+        this.counter = 0;
+        this.inputPairs = [];
+        this.attributes = attributes;
+        this.prepareNodes(values);
     }
-    InputTextMultiple.prototype.prepareNode = function () {
-        //TODO Tim: complete this code
-        for (;;) {
+    InputTextMultiple.prototype.prepareNodes = function (values) {
+        if (values.length == 0) {
+            this.createInputPair();
+        }
+        else {
+            for (var value in values) {
+                this.createInputPair(value);
+            }
         }
     };
-    InputTextMultiple.prototype.createInputNode = function () {
+    InputTextMultiple.prototype.createInputPair = function (value) {
+        if (value === void 0) { value = ''; }
+        var that = this;
+        var id = this.counter++;
+        var node = $('<div class="apollo-input-text-multiple row" data-id="' + id + '"></div>');
+        var column = $('<div class="col-md-10"></div>');
+        node.append(column);
+        var input = new InputText(id, this.parseCallback.bind(this), this.attributes, value);
+        input.render(column);
+        var addButton = $('<button class="btn btn-block btn-sm btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>');
+        addButton.on({
+            click: function (e) {
+                e.preventDefault();
+                that.createInputPair().input.input.focus();
+                that.parseCallback();
+            }
+        });
+        node.append($('<div class="col-md-1"></div>').append(addButton));
+        var removeButton = $('<button class="btn btn-block btn-sm btn-primary"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>');
+        node.append($('<div class="col-md-1"></div>').append(removeButton));
+        var inputPair = {
+            node: node,
+            input: input
+        };
+        removeButton.on({
+            click: function (e) {
+                e.preventDefault();
+                that.removeInputPair(inputPair);
+                that.parseCallback();
+            }
+        });
+        this.inputPairs.push(inputPair);
+        this.parentNode.append(node);
+        return inputPair;
+    };
+    InputTextMultiple.prototype.removeInputPair = function (inputPair) {
+        if (this.inputPairs.length > 1) {
+            inputPair.node.remove();
+            this.inputPairs.splice(this.inputPairs.indexOf(inputPair), 1);
+        }
+    };
+    InputTextMultiple.prototype.parseCallback = function (id, value) {
+        if (id === void 0) { id = 0; }
+        if (value === void 0) { value = null; }
+        var values = [];
+        for (var i = 0; i < this.inputPairs.length; i++) {
+            var inputPair = this.inputPairs[i];
+            values.push(inputPair.input.input.val());
+        }
+        this.callbackWrapper(this.callback.bind(this, this.id, values));
     };
     return InputTextMultiple;
-})(InputField);
+}(InputField));
 /**
  * Bootstrap dropdown
  *
@@ -181,4 +233,4 @@ var InputDropdown = (function (_super) {
         }
     };
     return InputDropdown;
-})(InputField);
+}(InputField));

@@ -22,7 +22,7 @@ abstract class InputField implements Renderable {
     protected parentNode:JQuery;
     protected timeout:number;
 
-    constructor(id:number, callback:Function) {
+    constructor(id:number, callback: (id:number, value:string|string[]|number|number[]) => void) {
         this.id = id;
         this.callback = callback;
         this.parentNode = $('<div class="apollo-input-container"></div>');
@@ -49,9 +49,9 @@ abstract class InputField implements Renderable {
 class InputText extends InputField {
 
     private attributes:Attributes;
-    private input:JQuery;
+    public input:JQuery;
 
-    public constructor(id:number, callback:Function, attributes:Attributes, value:string = null) {
+    public constructor(id:number, callback: (id:number, value:string) => void, attributes:Attributes, value:string = null) {
         super(id, callback);
         this.attributes = <Attributes> Util.mergeObjects(attributes, {
             'data-id': this.id.toString(),
@@ -84,25 +84,84 @@ class InputText extends InputField {
  *
  * @since 0.0.3
  */
+interface InputTextPair {
+    node:JQuery,
+    input:InputText
+}
 class InputTextMultiple extends InputField {
 
-    private inputNodes: JQuery[];
+    private counter:number;
+    private inputPairs:InputTextPair[];
+    private attributes:Attributes;
 
-    public constructor(id:number, callback:Function, attributes:Attributes, values:string[] = []) {
+
+    public constructor(id:number, callback:(id:number, value:string[]) => void, attributes:Attributes, values:string[] = []) {
         super(id, callback);
-        this.prepareNode();
+        this.counter = 0;
+        this.inputPairs = [];
+        this.attributes = attributes;
+        this.prepareNodes( values);
     }
 
-    private prepareNode() {
-
-        //TODO Tim: complete this code
-        for(;;) {
-
+    private prepareNodes(values:string[]) {
+        if(values.length == 0) {
+            this.createInputPair();
+        } else {
+            for(var value in values) {
+                this.createInputPair(value);
+            }
         }
     }
 
-    private createInputNode() {
+    private createInputPair(value:string = ''):InputTextPair {
+        var that = this;
+        var id = this.counter++;
+        var node = $('<div class="apollo-input-text-multiple row" data-id="' + id + '"></div>');
+        var column = $('<div class="col-md-10"></div>');
+        node.append(column);
+        var input = new InputText(id, this.parseCallback.bind(this), this.attributes, value);
+        input.render(column);
+        var addButton = $('<button class="btn btn-block btn-sm btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>');
+        addButton.on({
+            click: function(e) {
+                e.preventDefault();
+                that.createInputPair().input.input.focus();
+                that.parseCallback();
+            }
+        });
+        node.append($('<div class="col-md-1"></div>').append(addButton));
+        var removeButton = $('<button class="btn btn-block btn-sm btn-primary"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>');
+        node.append($('<div class="col-md-1"></div>').append(removeButton));
+        var inputPair:InputTextPair = {
+            node:node,
+            input:input
+        };
+        removeButton.on({
+            click: function(e) {
+                e.preventDefault();
+                that.removeInputPair(inputPair);
+                that.parseCallback();
+            }
+        });
+        this.inputPairs.push(inputPair);
+        this.parentNode.append(node);
+        return inputPair;
+    }
 
+    private removeInputPair(inputPair:InputTextPair) {
+        if(this.inputPairs.length > 1) {
+            inputPair.node.remove();
+            this.inputPairs.splice(this.inputPairs.indexOf(inputPair), 1);
+        }
+    }
+
+    private parseCallback(id:number = 0, value:string = null) {
+        var values = [];
+        for(var i = 0; i < this.inputPairs.length; i++) {
+            var inputPair = this.inputPairs[i];
+            values.push(inputPair.input.input.val());
+        }
+        this.callbackWrapper(this.callback.bind(this, this.id, values));
     }
 
 }
@@ -122,7 +181,7 @@ class InputDropdown extends InputField {
     private select:JQuery;
     private input:JQuery;
 
-    public constructor(id:number, callback:Function, options:string[], selected:number = 0, allowOther:boolean = false, value:string = null, multiple:boolean = false) {
+    public constructor(id:number, callback:(id:number, value:string|number|number[]) => void, options:string[], selected:number = 0, allowOther:boolean = false, value:string = null, multiple:boolean = false) {
         super(id, callback);
         this.options = options;
         this.selected = selected;

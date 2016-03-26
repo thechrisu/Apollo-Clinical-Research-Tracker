@@ -17,7 +17,7 @@ var SingleView = (function () {
     }
     SingleView.prototype.load = function (id) {
         var test = $('#test');
-        var type = 2;
+        var type = 4;
         var input;
         switch (type) {
             case 1:
@@ -27,29 +27,36 @@ var SingleView = (function () {
                 break;
             case 2:
                 input = new InputDropdown(2, function (id, value) {
-                    console.log(value);
+                    alert(value);
                 }, ['First option', 'Second option'], 1, true, 'test');
                 break;
             case 3:
                 input = new InputDropdown(2, function (id, value) {
-                    console.log(value);
+                    alert(value);
                 }, ['First option', 'Second option'], 1, false, null, true);
+                break;
+            case 4:
+                input = new InputTextMultiple(4, function (id, value) {
+                    console.log(value);
+                }, {
+                    placeholder: 'Tester'
+                }, ['First', 'Second']);
                 break;
         }
         input.render(test);
-        return;
-        this.id = id;
-        var that = this;
-        AJAX.get(Util.url('get/record?id=' + this.id, false), function (data) {
-            var breadcrumbs = $('#nav-breadcrumbs');
-            breadcrumbs.find('li:nth-child(3)').text(data.essential.given_name + ' ' + data.essential.last_name);
-            breadcrumbs.find('li:nth-child(4)').text('Record #' + data.essential.record_id + ': ' + data.essential.record_name);
-            that.parseEssentials(data.essential);
-            that.parseFields(data.data);
-            that.setupButtons(data.essential);
-        }, function (message) {
-            Util.error('An error has occurred during the loading of single record data. Please reload the page or contact the administrator. Error message: ' + message);
-        });
+        //     this.id = id;
+        //     var that = this;
+        //
+        //     AJAX.get(Util.url('get/record?id=' + this.id, false), function (data:RecordData) {
+        //         var breadcrumbs = $('#nav-breadcrumbs');
+        //         breadcrumbs.find('li:nth-child(3)').text(data.essential.given_name + ' ' + data.essential.last_name);
+        //         breadcrumbs.find('li:nth-child(4)').text('Record #' + data.essential.record_id + ': ' + data.essential.record_name);
+        //         that.parseEssentials(data.essential);
+        //         that.parseFields(data.data);
+        //         that.setupButtons(data.essential);
+        //     }, function (message:string) {
+        //         Util.error('An error has occurred during the loading of single record data. Please reload the page or contact the administrator. Error message: ' + message);
+        //     });
     };
     SingleView.prototype.parseEssentials = function (data) {
         var loader = LoaderManager.createLoader($('#essential-panel'));
@@ -203,7 +210,7 @@ var SingleView = (function () {
         });
     };
     return SingleView;
-})();
+}());
 $(document).ready(function () {
     var single = new SingleView();
     var id = Util.extractId(window.location.toString());

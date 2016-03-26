@@ -65,7 +65,7 @@ var ValidatorTokenField = (function () {
         });
     };
     return ValidatorTokenField;
-})();
+}());
 /**
  * Defines the menu/table on the left of the view.
  * TODO hook up to API (display first activity)
@@ -194,7 +194,7 @@ var ActivityTable = (function () {
         window.location.href = window.location.origin + '/activity/view/' + activityId;
     };
     return ActivityTable;
-})();
+}());
 /**
  * carries out all the tasks related to displaying the actual information of one activity on the right of the view
  * @since 0.0.4
@@ -304,7 +304,7 @@ var ActivityInformation = (function () {
         });
     };
     return ActivityInformation;
-})();
+}());
 $(document).ready(function () {
     new ValidatorTokenField().load();
     new ActivityInformation().load();

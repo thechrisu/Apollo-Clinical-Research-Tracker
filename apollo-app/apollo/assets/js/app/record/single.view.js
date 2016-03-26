@@ -64,7 +64,7 @@ var SingleView = (function () {
                 if (field.type == 3) {
                     value = Util.formatDate(Util.parseSQLDate(value));
                 }
-                columnManager.add(new ColumnRow(field.name, value));
+                columnManager.add(new ColumnRowStatic(field.name, value));
             }
             columnManager.render(false);
             LoaderManager.hideLoader(loader, function () {
@@ -173,7 +173,7 @@ var SingleView = (function () {
         });
     };
     return SingleView;
-})();
+}());
 $(document).ready(function () {
     new SingleView().load();
 });
