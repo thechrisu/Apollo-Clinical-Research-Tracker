@@ -6,7 +6,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.4
+ * @version 0.0.5
  */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -35,6 +35,40 @@ var InputField = (function () {
     };
     return InputField;
 }());
+/**
+ * Input number
+ *
+ *
+ */
+var InputNumber = (function (_super) {
+    __extends(InputNumber, _super);
+    function InputNumber(id, callback, attributes, value) {
+        if (value === void 0) { value = null; }
+        _super.call(this, id, callback);
+        this.attributes = Util.mergeObjects(attributes, {
+            'data-id': this.id.toString(),
+            'id': 'input-number-' + this.id,
+            'class': 'form-control input-sm',
+            'type': 'number',
+            'value': (value == null ? '' : value.toString())
+        });
+        this.prepareNode();
+        this.setupCallback();
+    }
+    InputNumber.prototype.prepareNode = function () {
+        this.input = Util.buildNode('input', this.attributes, null, true);
+        this.parentNode.append(this.input);
+    };
+    InputNumber.prototype.setupCallback = function () {
+        var that = this;
+        this.input.on({
+            keyup: function () {
+                that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
+            }
+        });
+    };
+    return InputNumber;
+}(InputField));
 /**
  * Input expecting text, i.e. <input type="text" ... />
  *
@@ -174,6 +208,41 @@ var InputTextMultiple = (function (_super) {
         this.callbackWrapper(this.callback.bind(this, this.id, values));
     };
     return InputTextMultiple;
+}(InputField));
+/**
+ * Input with a date
+ */
+var InputDate = (function (_super) {
+    __extends(InputDate, _super);
+    function InputDate(id, callback, attributes, value) {
+        if (value === void 0) { value = null; }
+        _super.call(this, id, callback);
+        this.attributes = Util.mergeObjects(attributes, {
+            'data-id': this.id.toString(),
+            'id': 'input-date-' + this.id,
+            'class': 'form-control input-sm',
+            'type': 'text',
+            'value': (value == null ? '' : value)
+        });
+        this.prepareNode();
+        this.setupCallback();
+    }
+    InputDate.prototype.prepareNode = function () {
+        var node = $('<div class="input-group date" data-provide="datepicker"></div>');
+        this.input = Util.buildNode('input', this.attributes, null, true);
+        node.append(this.input);
+        node.append('<span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>');
+        this.parentNode.append(node);
+    };
+    InputDate.prototype.setupCallback = function () {
+        var that = this;
+        this.input.on({
+            change: function () {
+                that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
+            }
+        });
+    };
+    return InputDate;
 }(InputField));
 /**
  * Bootstrap dropdown

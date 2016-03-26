@@ -6,7 +6,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.4
+ * @version 0.0.5
  */
 
 /**
@@ -41,13 +41,51 @@ abstract class InputField implements Renderable {
 }
 
 /**
+ * Input number
+ *
+ *
+ */
+class InputNumber extends InputField {
+
+    private attributes:Attributes;
+    public input:JQuery;
+
+    public constructor(id:number, callback: (id:number, value:string) => void, attributes:Attributes, value:number = null) {
+        super(id, callback);
+        this.attributes = <Attributes> Util.mergeObjects(attributes, {
+            'data-id': this.id.toString(),
+            'id': 'input-number-' + this.id,
+            'class': 'form-control input-sm',
+            'type': 'number',
+            'value': (value == null ? '' : value.toString())
+        });
+        this.prepareNode();
+        this.setupCallback();
+    }
+
+    private prepareNode() {
+        this.input = Util.buildNode('input', this.attributes, null, true);
+        this.parentNode.append(this.input);
+    }
+
+    private setupCallback() {
+        var that = this;
+        this.input.on({
+            keyup: function () {
+                that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
+            }
+        });
+    }
+}
+
+/**
  * Input expecting text, i.e. <input type="text" ... />
  *
  * @since 0.0.1
  */
 class InputText extends InputField {
 
-    protected attributes:Attributes;
+    private attributes:Attributes;
     public input:JQuery;
 
     public constructor(id:number, callback: (id:number, value:string) => void, attributes:Attributes, value:string = null) {
@@ -63,7 +101,7 @@ class InputText extends InputField {
         this.setupCallback();
     }
 
-    protected prepareNode() {
+    private prepareNode() {
         this.input = Util.buildNode('input', this.attributes, null, true);
         this.parentNode.append(this.input);
     }
@@ -85,7 +123,7 @@ class InputText extends InputField {
  */
 class InputLongText extends InputField {
 
-    protected attributes:Attributes;
+    private attributes:Attributes;
     public input:JQuery;
 
     public constructor(id:number, callback: (id:number, value:string) => void, attributes:Attributes, value:string = null) {
@@ -100,7 +138,7 @@ class InputLongText extends InputField {
         this.setupCallback();
     }
 
-    protected prepareNode(value:string) {
+    private prepareNode(value:string) {
         this.input = Util.buildNode('textarea', this.attributes, value);
         this.parentNode.append(this.input);
     }
@@ -200,6 +238,45 @@ class InputTextMultiple extends InputField {
         this.callbackWrapper(this.callback.bind(this, this.id, values));
     }
 
+}
+
+/**
+ * Input with a date
+ */
+class InputDate extends InputField {
+
+    private attributes:Attributes;
+    public input:JQuery;
+
+    public constructor(id:number, callback: (id:number, value:string) => void, attributes:Attributes, value:string = null) {
+        super(id, callback);
+        this.attributes = <Attributes> Util.mergeObjects(attributes, {
+            'data-id': this.id.toString(),
+            'id': 'input-date-' + this.id,
+            'class': 'form-control input-sm',
+            'type': 'text',
+            'value': (value == null ? '' : value)
+        });
+        this.prepareNode();
+        this.setupCallback();
+    }
+
+    private prepareNode() {
+        var node = $('<div class="input-group date" data-provide="datepicker"></div>');
+        this.input = Util.buildNode('input', this.attributes, null, true);
+        node.append(this.input);
+        node.append('<span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>');
+        this.parentNode.append(node);
+    }
+
+    private setupCallback() {
+        var that = this;
+        this.input.on({
+            change: function () {
+                that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
+            }
+        });
+    }
 }
 
 /**

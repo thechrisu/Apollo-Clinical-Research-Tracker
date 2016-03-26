@@ -47,7 +47,7 @@ class SingleView {
     public load(id:number) {
 
         var test = $('#test');
-        var type = 5;
+        var type = 7;
         var input;
         switch (type) {
             case 1:
@@ -76,6 +76,17 @@ class SingleView {
                 input = new InputLongText(5, function(id:number, value:string) {
                     console.log(value)
                 }, { placeholder: 'Test' }, 'Some Value');
+                break;
+            case 6:
+                input = new InputDate(6, function(id:number, value:string) {
+                    console.log(value)
+                }, { placeholder: 'Test' }, '22/03/2014');
+                break;
+            case 7:
+                input = new InputNumber(1, function(id:number, value:string) {
+                    alert('Value is: ' + value);
+                }, { placeholder: 'Test' }, 4);
+                break;
         }
         input.render(test);
 
