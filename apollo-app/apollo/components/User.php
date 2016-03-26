@@ -21,10 +21,16 @@ use Apollo\Helpers\StringHelper;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.9
+ * @version 0.1.0
  */
-class User
+class User extends DBComponent
 {
+    /**
+     * Namespace of entity class
+     * @var string
+     */
+    protected static $entityNamespace = 'Apollo\\Entities\\UserEntity';
+
     /**
      * An instance of UserEntity created if the user is logged in
      * @var UserEntity
@@ -40,19 +46,28 @@ class User
     /**
      * User constructor.
      * Checks if the user is logged in
+     * @param int $id
+     * @since 0.1.0 Now allows creating user object by id
      * @since 0.0.1
      */
-    public function __construct()
+    public function __construct($id = null)
     {
-        $fingerprint = Session::get('fingerprint');
-        $this->id = Session::get('user_id');
-        if ($fingerprint != null && $this->id != null) {
-            /**
-             * @var UserEntity $temp_entity
-             */
-            $temp_entity = DB::getEntityManager()->getRepository('\\Apollo\\Entities\\UserEntity')->find($this->id);
-            if ($temp_entity != null && $fingerprint == Session::getFingerprint(md5($temp_entity->getPassword()))) {
-                $this->entity = $temp_entity;
+        if(!empty($id)) {
+            /** @var UserEntity $entity */
+            $entity = self::getRepository()->find($id);
+            $this->id = $id;
+            $this->entity = $entity;
+        } else {
+            $fingerprint = Session::get('fingerprint');
+            $this->id = Session::get('user_id');
+            if ($fingerprint != null && $this->id != null) {
+                /**
+                 * @var UserEntity $temp_entity
+                 */
+                $temp_entity = DB::getEntityManager()->getRepository('\\Apollo\\Entities\\UserEntity')->find($this->id);
+                if ($temp_entity != null && $fingerprint == Session::getFingerprint(md5($temp_entity->getPassword()))) {
+                    $this->entity = $temp_entity;
+                }
             }
         }
     }

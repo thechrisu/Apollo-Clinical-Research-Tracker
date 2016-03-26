@@ -25,7 +25,7 @@ use ReflectionMethod;
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.1.1
+ * @version 0.1.2
  */
 class Apollo
 {
@@ -34,6 +34,13 @@ class Apollo
      * @var Apollo
      */
     private static $instance;
+
+    /**
+     * Console object
+     *
+     * @var User
+     */
+    private $console;
 
     /**
      * Object containing the request information
@@ -54,12 +61,14 @@ class Apollo
      *
      * Populates the class variables
      *
+     * @since 0.1.2 Added console object
      * @since 0.0.1
      */
     public function __construct()
     {
+        $this->user = new User(1);
         $this->request = new Request();
-        $this->user = new User();
+        $this->console = new User();
     }
 
     /**
@@ -159,6 +168,14 @@ class Apollo
     public static function getInstance()
     {
         return self::$instance;
+    }
+
+    /**
+     * @return User
+     */
+    public function getConsole()
+    {
+        return $this->console;
     }
 
     /**

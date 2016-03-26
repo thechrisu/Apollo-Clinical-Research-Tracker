@@ -7,7 +7,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.2
+ * @version 0.1.3
  */
 
 /**
@@ -38,6 +38,12 @@ define('BASE_URL', BASE_URL_AUTO_DETECT ? "http://$_SERVER[HTTP_HOST]/" : 'http:
  * @since 0.0.9
  */
 define('DEFAULT_CONTROLLER', 'record');
+
+/**
+ * ID of the console user
+ * @since 0.1.3
+ */
+define('CONSOLE_ID', 1);
 
 /**
  * Absolute path to the 'apollo' folder
