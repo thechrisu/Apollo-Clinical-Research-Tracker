@@ -1,4 +1,5 @@
 ///<reference path="jquery.d.ts"/>
+///<reference path="scripts.ts"/>
 /**
  * Column manager typescript
  *
@@ -82,48 +83,67 @@ var Column = (function () {
     };
     return Column;
 }());
-var ColumnRowStatic = (function () {
-    function ColumnRowStatic(key, value) {
+var ColumnRow = (function () {
+    function ColumnRow(key, value) {
         this.key = key;
         this.value = value;
     }
-    ColumnRowStatic.prototype.render = function (target) {
-        if (this.value instanceof Array) {
-            var array = this.value;
-            var length = array.length;
-            for (var k = 0; k < length; k++) {
-                var rowHTML = $('<tr></tr>');
-                if (k == 0) {
-                    rowHTML.append($('<td rowspan="' + length + '">' + this.decorateKey(this.key) + '</td>'));
-                }
-                rowHTML.append($('<td>' + this.decorateValue(array[k]) + '</td>'));
-                target.append(rowHTML);
-            }
-        }
-        else {
-            var rowHTML = $('<tr></tr>');
-            rowHTML.append($('<td>' + this.decorateKey(this.key) + '</td>'));
-            rowHTML.append($('<td>' + this.decorateValue(this.value) + '</td>'));
-            target.append(rowHTML);
-        }
+    ColumnRow.prototype.render = function (target) {
+        var rowHTML = $('<tr></tr>');
+        rowHTML.append($('<td><small>' + this.key + '</small></td>'));
+        var valueTD = $('<td></td>');
+        this.value.render(valueTD);
+        rowHTML.append(valueTD);
+        target.append(rowHTML);
     };
-    ColumnRowStatic.prototype.decorateKey = function (key) {
-        key = '<small>' + key + '</small>';
-        return key;
-    };
-    ColumnRowStatic.prototype.decorateValue = function (value) {
-        if (value == null || value.length == 0) {
-            value = '<span class="undefined">None</span>';
-        }
-        else {
-            value = '<strong>' + value + '</strong>';
-        }
-        return value;
-    };
-    return ColumnRowStatic;
+    return ColumnRow;
 }());
-var ColumnRowEditable = (function () {
-    function ColumnRowEditable() {
-    }
-    return ColumnRowEditable;
-}());
+// class ColumnRowStatic implements ColumnRow {
+//
+//     private key:string;
+//     private value:string|string[];
+//
+//     constructor(key:string, value:string|string[]) {
+//         this.key = key;
+//         this.value = value;
+//     }
+//
+//     public render(target:JQuery) {
+//         if (this.value instanceof Array) {
+//             var array = <string[]> this.value;
+//             var length = array.length;
+//             for (var k = 0; k < length; k++) {
+//                 var rowHTML = $('<tr></tr>');
+//                 if (k == 0) {
+//                     rowHTML.append($('<td rowspan="' + length + '">' + this.decorateKey(this.key) + '</td>'));
+//                 }
+//                 rowHTML.append($('<td>' + this.decorateValue(array[k]) + '</td>'));
+//                 target.append(rowHTML);
+//             }
+//         } else {
+//             var rowHTML = $('<tr></tr>');
+//             rowHTML.append($('<td>' + this.decorateKey(this.key) + '</td>'));
+//             rowHTML.append($('<td>' + this.decorateValue(<string> this.value) + '</td>'));
+//             target.append(rowHTML);
+//         }
+//     }
+//
+//     private decorateKey(key:string):string {
+//         key = '<small>' + key + '</small>'
+//         return key;
+//     }
+//
+//     private decorateValue(value:string):string {
+//         if (value == null || value.length == 0) {
+//             value = '<span class="undefined">None</span>'
+//         } else {
+//             value = '<strong>' + value + '</strong>'
+//         }
+//         return value;
+//     }
+//
+// }
+//
+// class ColumnRowEditable {
+//
+// } 
