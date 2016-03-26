@@ -10,7 +10,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.5
+ * @version 0.1.0
  */
 
 interface EssentialData {
@@ -29,15 +29,19 @@ interface EssentialData {
     record_names:string[]
 
 }
-interface FieldData {
+interface FieldEditData {
+    id:number,
     name:string,
     type:number,
-    value:string|string[]
+    defaults:string[],
+    allow_other:boolean,
+    is_multiple:boolean,
+    value:number|number[]|string|string[]
 }
 interface RecordData {
     error:Error,
     essential:EssentialData,
-    data:FieldData[]
+    data:FieldEditData[]
 }
 
 class SingleView {
@@ -119,12 +123,24 @@ class SingleView {
             columnManager.addToColumn(0, new ColumnRow('Last name', new InputText(FIELD_LAST_NAME, function(id:number, value:string) {
                 that.submitCallback('text', id, value);
             }, { placeholder: 'Last name' }, data.last_name)));
-            // columnManager.addToColumn(0, new ColumnRow('Email', wrap(data.email)));
-            // columnManager.addToColumn(1, new ColumnRow('Phone', wrap(data.phone)));
-            // columnManager.addToColumn(1, new ColumnRow('Record name', wrap(data.record_name)));
-            // columnManager.addToColumn(1, new ColumnRow('Record start date', wrap(data.start_date, 3)));
-            // columnManager.addToColumn(1, new ColumnRow('Record end date', wrap(data.end_date, 3)));
-            // columnManager.addToColumn(2, new ColumnRow('Address', wrap(data.address)));
+            columnManager.addToColumn(0, new ColumnRow('Email', new InputText(FIELD_EMAIL, function(id:number, value:string) {
+                that.submitCallback('text', id, value);
+            }, { placeholder: 'Email' }, data.email)));
+            columnManager.addToColumn(1, new ColumnRow('Phone', new InputText(FIELD_PHONE, function(id:number, value:string) {
+                that.submitCallback('text', id, value);
+            }, { placeholder: 'Phone' }, data.phone)));
+            columnManager.addToColumn(1, new ColumnRow('Record name', new InputText(FIELD_RECORD_NAME, function(id:number, value:string) {
+                that.submitCallback('text', id, value);
+            }, { placeholder: 'Record name' }, data.record_name)));
+            columnManager.addToColumn(1, new ColumnRow('Record start date', new InputDate(FIELD_START_DATE, function(id:number, value:string) {
+                that.submitCallback('date', id, value);
+            }, { placeholder: 'Start date' }, Util.formatNumberDate(Util.parseSQLDate(data.start_date)))));
+            columnManager.addToColumn(1, new ColumnRow('Record end date', new InputDate(FIELD_END_DATE, function(id:number, value:string) {
+                that.submitCallback('date', id, value);
+            }, { placeholder: 'End date' }, Util.formatNumberDate(Util.parseSQLDate(data.end_date)))));
+            columnManager.addToColumn(2, new ColumnRow('Address', new InputTextMultiple(FIELD_ADDRESS, function(id:number, value:string[]) {
+                that.submitCallback('text-multiple', id, value);
+            }, { placeholder: 'Address line' }, data.address)));
             columnManager.render();
             LoaderManager.hideLoader(loader, function () {
                 LoaderManager.destroyLoader(loader);
@@ -133,7 +149,9 @@ class SingleView {
     }
 
     private submitCallback(type:string, id:number, value:string|string[]|number|number[]) {
-        
+        console.log('ID: ' + type + ' ' + id + '. Values:');
+        console.log(value);
+
     }
 
     private parseFields(data:FieldData[]) {

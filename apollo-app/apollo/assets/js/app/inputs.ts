@@ -6,7 +6,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.5
+ * @version 0.0.6
  */
 
 /**
@@ -182,7 +182,7 @@ class InputTextMultiple extends InputField {
             this.createInputPair();
         } else {
             for(var value in values) {
-                this.createInputPair(value);
+                this.createInputPair(values[value]);
             }
         }
     }
@@ -191,7 +191,7 @@ class InputTextMultiple extends InputField {
         var that = this;
         var id = this.counter++;
         var node = $('<div class="apollo-input-text-multiple row" data-id="' + id + '"></div>');
-        var column = $('<div class="col-md-10"></div>');
+        var column = $('<div class="col-md-8"></div>');
         node.append(column);
         var input = new InputText(id, this.parseCallback.bind(this), this.attributes, value);
         input.render(column);
@@ -203,9 +203,9 @@ class InputTextMultiple extends InputField {
                 that.parseCallback();
             }
         });
-        node.append($('<div class="col-md-1"></div>').append(addButton));
+        node.append($('<div class="col-md-2"></div>').append(addButton));
         var removeButton = $('<button class="btn btn-block btn-sm btn-primary"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>');
-        node.append($('<div class="col-md-1"></div>').append(removeButton));
+        node.append($('<div class="col-md-2"></div>').append(removeButton));
         var inputPair:InputTextPair = {
             node:node,
             input:input
@@ -262,10 +262,10 @@ class InputDate extends InputField {
     }
 
     private prepareNode() {
-        var node = $('<div class="input-group date" data-provide="datepicker"></div>');
+        var node = $('<div class="input-group input-sm input-block-level date" data-provide="datepicker"></div>');
         this.input = Util.buildNode('input', this.attributes, null, true);
         node.append(this.input);
-        node.append('<span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>');
+        node.append('<span class="input-group-addon input-sm"><i class="glyphicon glyphicon-th"></i></span>');
         this.parentNode.append(node);
     }
 

@@ -1,5 +1,5 @@
 /*
- Apollo stylesheet v0.0.2
+ Apollo stylesheet v0.0.3
  Copyright 2016 Timur Kuzhagaliyev
  https://opensource.org/licenses/mit-license.php MIT License
 
@@ -34,6 +34,19 @@
 .btn
   & > .glyphicon
     margin-right: 8px
+
+// Fix padding for multiple text inputs and resetting button padding
+.apollo-input-text-multiple
+  margin-right: 0 !important
+  margin-left: 0 !important
+  [class^="col-"]
+    padding-right: 2px !important
+    padding-left: 2px !important
+  .btn
+    padding-right: 8px !important
+    padding-left: 8px !important
+    & > .glyphicon
+      margin-right: 0 !important
 
 // Remove margin on breadcrumbs for better appearance
 .panel-heading
