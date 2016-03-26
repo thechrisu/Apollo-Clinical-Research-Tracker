@@ -8,15 +8,15 @@
 
 require_once 'vendor/autoload.php';
 
+use Apollo\Apollo;
 use Apollo\Components\DB;
-use Apollo\Entities\DataEntity;
-use Apollo\Entities\FieldEntity;
 use Apollo\Entities\OrganisationEntity;
 use Apollo\Entities\PersonEntity;
 use Apollo\Entities\RecordEntity;
 use Apollo\Entities\UserEntity;
 use Faker\Factory;
 
+Apollo::prepare();
 $entity_manager = DB::getEntityManager();
 $organisationRepo = $entity_manager->getRepository('Apollo\\Entities\\OrganisationEntity');
 /**
@@ -52,7 +52,7 @@ for($i = 0; $i < 5; $i++) {
     $record->setVarchar(FIELD_RECORD_NAME, 'First Record');
     $record->setVarchar(FIELD_EMAIL, $faker->email);
     $record->setVarchar(FIELD_PHONE, $faker->phoneNumber);
-    $record->setVarchar(FIELD_ADDRESS, $faker->address);
+    $record->setVarchar(FIELD_ADDRESS, [$faker->address]);
     $record->setDateTime(FIELD_START_DATE, new DateTime());
     $record->setDateTime(FIELD_END_DATE, new DateTime());
 

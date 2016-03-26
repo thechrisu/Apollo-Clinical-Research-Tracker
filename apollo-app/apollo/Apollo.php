@@ -25,7 +25,7 @@ use ReflectionMethod;
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.1.3
+ * @version 0.1.4
  */
 class Apollo
 {
@@ -34,6 +34,13 @@ class Apollo
      * @var Apollo
      */
     private static $instance;
+
+    /**
+     * Determines whether the app is in debug mode
+     *
+     * @var bool
+     */
+    private $debug;
 
     /**
      * Console object
@@ -61,24 +68,32 @@ class Apollo
      *
      * Populates the class variables
      *
+     * @param bool $debug
+     * @since 0.1.4 Now supports debug bool
      * @since 0.1.3 Security fix
      * @since 0.1.2 Added console object
      * @since 0.0.1
      */
-    public function __construct()
+    public function __construct($debug)
     {
+        $this->debug = $debug;
         $this->console = new User(1);
-        $this->request = new Request();
-        $this->user = new User();
+        if(!$this->debug) {
+            $this->request = new Request();
+            $this->user = new User();
+        }
     }
 
     /**
      * Function to create an instance of Apollo
+     *
+     * @param bool $debug
+     * @since 0.1.4 Added $debug argument
      * @since 0.0.2
      */
-    public static function prepare()
+    public static function prepare($debug = false)
     {
-        self::$instance = new Apollo();
+        self::$instance = new Apollo($debug);
     }
 
     /**
@@ -169,6 +184,14 @@ class Apollo
     public static function getInstance()
     {
         return self::$instance;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDebug()
+    {
+        return $this->debug;
     }
 
     /**
