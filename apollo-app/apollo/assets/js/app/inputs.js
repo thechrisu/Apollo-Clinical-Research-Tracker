@@ -7,6 +7,7 @@
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
  * @version 0.0.3
+ * TODO: Add documentation
  */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -34,7 +35,7 @@ var InputField = (function () {
         }, AJAX_DELAY);
     };
     return InputField;
-}());
+})();
 /**
  * Input expecting text, i.e. <input type="text" ... />
  *
@@ -68,7 +69,7 @@ var InputText = (function (_super) {
         });
     };
     return InputText;
-}(InputField));
+})(InputField);
 /**
  * Text with an option to add new fields
  *
@@ -89,7 +90,7 @@ var InputTextMultiple = (function (_super) {
     InputTextMultiple.prototype.createInputNode = function () {
     };
     return InputTextMultiple;
-}(InputField));
+})(InputField);
 /**
  * Bootstrap dropdown
  *
@@ -180,4 +181,4 @@ var InputDropdown = (function (_super) {
         }
     };
     return InputDropdown;
-}(InputField));
+})(InputField);

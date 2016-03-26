@@ -125,6 +125,7 @@ class ActivityTable {
         this.search = '';
         this.page = 1;
         this.loader = LoaderManager.createLoader(this.table);
+        this.updateTable();
         this.setUp();
     }
 

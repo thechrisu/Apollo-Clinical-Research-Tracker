@@ -87,7 +87,6 @@ class GetController extends GenericController
         $peopleQB = $this->orderRecords($peopleQB, $request['sort']);
         if (!empty($request['search'])) {
             $this->addPersonSearch($peopleQB, $request['search']);
-            return $peopleQB;
         }
         return $peopleQB;
     }
@@ -282,11 +281,16 @@ class GetController extends GenericController
      */
     public function actionActivities()
     {
-        $activityRepo = $em->getRepository(Person::getEntityNamespace());
-        $peopleQB = $peopleRepo->createQueryBuilder('person');
-        $data['error'] = null;
-        $data['count'] = 12;
-        $data['activities'] = [
+
+        $data = $this->parseRequest(['page' => 1, 'sort' => 1, 'search' => null]);
+        $page = $data['page'] > 0 ? $data['page'] : 1;
+       /* $activityQB = $this->createQueryForActivitiesRequest($data);
+        $activityQuery = $activityQB->getQuery();
+        $activities =  $activityQuery->getResult();
+        $response = $this->getFormattedActivities($activities, $page);*/
+        $response['error'] = null;
+        $response['count'] = 12;
+        $response['activities'] = [
             [
                 "name" => "Programme 1",
                 "start_date" => "1834-02-22 02:00:00",
@@ -360,7 +364,63 @@ class GetController extends GenericController
                 "id" => "3"
             ]
         ];
-        echo json_encode($data);
+        echo json_encode($response);
+    }
+
+    /**
+     * @param $data
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    private function createQueryForActivitiesRequest($data)
+    {
+        $em = DB::getEntityManager();
+        $activityRepo = $em->getRepository(Activity::getEntityNamespace());
+        $activityQB = $activityRepo->createQueryBuilder('activities');
+        $activityQB->select('activities');
+        $activityQB->from('activities', 'a');
+        $organisation_id = Apollo::getInstance()->getUser()->getOrganisationId();
+        $activityQB->where(
+            $activityQB->expr()->andX(
+                $activityQB->expr()->eq('a.is_hidden', '0'),
+                $activityQB->expr()->eq('a.organisation_id', $organisation_id)
+            )
+        );
+        if (!empty($data['search'])) {
+            $this->addActivitySearch($activityQB, $data['search']);
+            return $activityQB;
+        }
+        return $activityQB;
+    }
+
+    /**
+     * @param $queryBuilder
+     * @param $search
+     */
+    private function addActivitySearch($queryBuilder, $search){
+        $queryBuilder->andWhere($queryBuilder->expr()->orX(
+            $queryBuilder->expr()->like('a.name', ':search'),
+            $queryBuilder->expr()->like('a.target_group_comment', ':search')
+        ));
+        $queryBuilder->setParameter('search', '%' . $search . '%');
+    }
+
+    private function getFormattedActivities($activities, $page){
+        $response['error'] = null;
+        $response['count'] = count($activities);
+        for ($i = 10 * ($page - 1); $i < min($response['count'], $page * 10); $i++) {
+            $activity = $activities[$i];
+            $response['activities'][] = $this->getFormattedShortActivityData($activity);
+        }
+        return $response;
+    }
+
+    private function getFormattedShortActivityData($activity){
+        $responseActivity = [];
+        $responseActivity['id'] = $activity->getId();
+        $responseActivity['name'] = $activity->getName();
+        $responseActivity['start_date'] = $activity->getStartDate();
+        $responseActivity['end_date'] = $activity->getEndDate();
+        return $responseActivity;
     }
 
     /**
