@@ -98,7 +98,7 @@ class SingleView {
             breadcrumbs.find('li:nth-child(3)').text(data.essential.given_name + ' ' + data.essential.last_name);
             breadcrumbs.find('li:nth-child(4)').text('Record #' + data.essential.record_id + ': ' + data.essential.record_name);
             that.parseEssentials(data.essential);
-            that.parseFields(data.data);
+            //that.parseFields(data.data);
             that.setupButtons(data.essential);
         }, function (message:string) {
             Util.error('An error has occurred during the loading of single record data. Please reload the page or contact the administrator. Error message: ' + message);
@@ -106,35 +106,34 @@ class SingleView {
     }
     
     private parseEssentials(data:EssentialData) {
+        var that = this;
         var loader = LoaderManager.createLoader($('#essential-panel'));
         LoaderManager.showLoader(loader, function () {
             var columnManager = new ColumnManager('#essential');
-            //TODO Tim: Refactor this
-            function wrap(value:string|string[], type:number = 2) {
-                if (type == 3) {
-                    return '<div class="input-group date" data-provide="datepicker">' +
-                        '<input id="add-end-date" type="text" value="' + value + '" class="form-control input-sm input-block-level"' +
-                        '><span class="input-group-addon" style="padding: 0 18px !important; font-size: 0.8em !important;"><i class="glyphicon glyphicon-th"></i></span>' +
-                        '</div>';
-                } else {
-                    return '<input type="text" class="form-control input-sm input-block-level" value="' + value + '">';
-                }
-            }
-    
-            columnManager.addToColumn(0, new ColumnRowStatic('Given name', wrap(data.given_name)));
-            columnManager.addToColumn(0, new ColumnRowStatic('Middle name', wrap(data.middle_name)));
-            columnManager.addToColumn(0, new ColumnRowStatic('Last name', wrap(data.last_name)));
-            columnManager.addToColumn(0, new ColumnRowStatic('Email', wrap(data.email)));
-            columnManager.addToColumn(1, new ColumnRowStatic('Phone', wrap(data.phone)));
-            columnManager.addToColumn(1, new ColumnRowStatic('Record name', wrap(data.record_name)));
-            columnManager.addToColumn(1, new ColumnRowStatic('Record start date', wrap(data.start_date, 3)));
-            columnManager.addToColumn(1, new ColumnRowStatic('Record end date', wrap(data.end_date, 3)));
-            columnManager.addToColumn(2, new ColumnRowStatic('Address', wrap(data.address)));
+            columnManager.addToColumn(0, new ColumnRow('Given name', new InputText(FIELD_GIVEN_NAME, function(id:number, value:string) {
+                that.submitCallback('text', id, value);
+            }, { placeholder: 'Given name' }, data.given_name)));
+            columnManager.addToColumn(0, new ColumnRow('Middle name', new InputText(FIELD_MIDDLE_NAME, function(id:number, value:string) {
+                that.submitCallback('text', id, value);
+            }, { placeholder: 'Middle name' }, data.middle_name)));
+            columnManager.addToColumn(0, new ColumnRow('Last name', new InputText(FIELD_LAST_NAME, function(id:number, value:string) {
+                that.submitCallback('text', id, value);
+            }, { placeholder: 'Last name' }, data.last_name)));
+            // columnManager.addToColumn(0, new ColumnRow('Email', wrap(data.email)));
+            // columnManager.addToColumn(1, new ColumnRow('Phone', wrap(data.phone)));
+            // columnManager.addToColumn(1, new ColumnRow('Record name', wrap(data.record_name)));
+            // columnManager.addToColumn(1, new ColumnRow('Record start date', wrap(data.start_date, 3)));
+            // columnManager.addToColumn(1, new ColumnRow('Record end date', wrap(data.end_date, 3)));
+            // columnManager.addToColumn(2, new ColumnRow('Address', wrap(data.address)));
             columnManager.render();
             LoaderManager.hideLoader(loader, function () {
                 LoaderManager.destroyLoader(loader);
             });
         });
+    }
+
+    private submitCallback(type:string, id:number, value:string|string[]|number|number[]) {
+        
     }
 
     private parseFields(data:FieldData[]) {
@@ -148,7 +147,7 @@ class SingleView {
                 if (field.type == 3) {
                     value = Util.formatDate(Util.parseSQLDate(<string> value));
                 }
-                columnManager.add(new ColumnRowStatic(field.name, value));
+                //columnManager.add(new ColumnRowStatic(field.name, value));
             }
             columnManager.render(false);
             LoaderManager.hideLoader(loader, function () {

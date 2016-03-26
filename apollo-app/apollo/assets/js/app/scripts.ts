@@ -15,6 +15,15 @@
  * @since 0.1.4
  */
 const AJAX_DELAY: number = 600;
+const FIELD_GIVEN_NAME = -1;
+const FIELD_MIDDLE_NAME = -2;
+const FIELD_LAST_NAME = -3;
+const FIELD_RECORD_NAME = 1;
+const FIELD_START_DATE = 2;
+const FIELD_END_DATE = 3;
+const FIELD_EMAIL = 4;
+const FIELD_PHONE = 5;
+const FIELD_ADDRESS = 6;
 
 /**
  * Default error interface

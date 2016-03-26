@@ -14,6 +14,15 @@
  * @since 0.1.4
  */
 var AJAX_DELAY = 600;
+var FIELD_GIVEN_NAME = -1;
+var FIELD_MIDDLE_NAME = -2;
+var FIELD_LAST_NAME = -3;
+var FIELD_RECORD_NAME = 1;
+var FIELD_START_DATE = 2;
+var FIELD_END_DATE = 3;
+var FIELD_EMAIL = 4;
+var FIELD_PHONE = 5;
+var FIELD_ADDRESS = 6;
 /**
  * Util class
  * @since 0.0.4
