@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping\OrderBy;
  *
  * @package Apollo\Entities
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.8
+ * @version 0.0.9
  * @Entity @Table("records")
  */
 class RecordEntity
@@ -108,6 +108,18 @@ class RecordEntity
         return $data->getVarchar();
     }
     /**
+     * Finds multiple data
+     *
+     * @param int $field_id
+     * @return mixed[]
+     * @since 0.0.8
+     */
+    public function findMultiple($field_id)
+    {
+        $data = $this->findOrCreateData($field_id);
+        return unserialize($data->getLongText());
+    }
+    /**
      * Finds DateTime data
      *
      * @param int $field_id
@@ -160,12 +172,12 @@ class RecordEntity
      * Sets multiple varchar values
      *
      * @param int $field_id
-     * @param string[] $_varchar
+     * @param mixed[] %data
      * @since 0.0.8
      */
-    public function setVarcharMultiple($field_id, $_varchar)
+    public function setMultiple($field_id, $data)
     {
-        $this->setLongText($field_id, serialize($_varchar));
+        $this->setLongText($field_id, serialize($data));
     }
 
     /**
@@ -207,9 +219,6 @@ class RecordEntity
          */
         $field = Field::getRepository()->find($field_id);
         $data = Data::getRepository()->findOneBy(['record' => $this->getId(), 'field' => $field_id]);
-        if($field->isMultiple()) {
-            $data = unserialize($data);
-        }
         if ($data == null) {
             $data = new DataEntity();
             $data->setRecord($this);

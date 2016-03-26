@@ -52,7 +52,7 @@ for($i = 0; $i < 5; $i++) {
     $record->setVarchar(FIELD_RECORD_NAME, 'First Record');
     $record->setVarchar(FIELD_EMAIL, $faker->email);
     $record->setVarchar(FIELD_PHONE, $faker->phoneNumber);
-    $record->setVarchar(FIELD_ADDRESS, [$faker->address]);
+    $record->setMultiple(FIELD_ADDRESS, [$faker->address]);
     $record->setDateTime(FIELD_START_DATE, new DateTime());
     $record->setDateTime(FIELD_END_DATE, new DateTime());
 
