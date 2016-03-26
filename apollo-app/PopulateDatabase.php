@@ -31,7 +31,7 @@ $user = $userRepo->find(1);
 date_default_timezone_set('Europe/London');
 $date = new DateTime();
 
-for($i = 0; $i < 200; $i++) {
+for($i = 0; $i < 5; $i++) {
 
     $faker = Factory::create();
     $person = new PersonEntity();

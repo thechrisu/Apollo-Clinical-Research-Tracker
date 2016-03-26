@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping\OrderBy;
  *
  * @package Apollo\Entities
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.6
+ * @version 0.0.7
  * @Entity @Table("records")
  */
 class RecordEntity
@@ -184,6 +184,7 @@ class RecordEntity
      *
      * @param int $field_id
      * @return DataEntity
+     * @since 0.0.7 Now takes into account the type of the field
      * @since 0.0.6
      */
     public function findOrCreateData($field_id)
@@ -197,7 +198,14 @@ class RecordEntity
             $data = new DataEntity();
             $data->setRecord($this);
             $data->setField($field);
-            $data->setUpdatedBy(DB::getEntityManager()->getRepository('Apollo\\Entities\\UserEntity')->find(1));//Apollo::getInstance()->getUser()->getEntity());
+            $data->setUpdatedBy(Apollo::getInstance()->getConsole()->getEntity());
+            if($field->isMultiple()) {
+                $value = [];
+                $data->setLongText(serialize($value));
+            } elseif($field->hasDefault()) {
+                $data->setInt(0);
+                $data->setIsDefault(true);
+            }
             DB::getEntityManager()->persist($data);
             DB::getEntityManager()->flush();
         }

@@ -44,7 +44,7 @@ class Record extends DBComponent
          * @var FieldEntity $field
          */
         foreach($fields as $field) {
-            $record->findOrCreateData($field->getId(), $field->hasDefault(), $field->isAllowOther(), $field->isMultiple());
+            $record->findOrCreateData($field->getId());
         }
     }
 }
