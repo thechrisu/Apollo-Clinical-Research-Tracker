@@ -19,6 +19,7 @@ use Apollo\Components\Person;
 use Apollo\Entities\RecordEntity;
 use Apollo\Components\Activity;
 use Apollo\Entities\ActivityEntity;
+use Doctrine\ORM\QueryBuilder;
 
 
 /**
@@ -95,8 +96,8 @@ class GetController extends GenericController
 
     /**
      * Given a query bulider for records and an ordering, set up the ordering depending on how it is requested
-     * @param $queryBuilder
-     * @param $ordering
+     * @param QueryBuilder $queryBuilder
+     * @param int $ordering
      * @return mixed
      */
     private function orderRecords($queryBuilder, $ordering)
@@ -123,7 +124,7 @@ class GetController extends GenericController
     /**
      * TODO: Add description for function
      *
-     * @param $queryBuilder
+     * @param QueryBuilder $queryBuilder
      * @param $search
      */
     private function addPersonSearch($queryBuilder, $search)
@@ -139,12 +140,13 @@ class GetController extends GenericController
     /**
      * Given a person (retrieved from the data base), returns an object containing all the data of the person
      * TODO: Put this function somewhere else, this is a controller
-     * @param $person
+     * @param PersonEntity $person
      * @return mixed
      */
     private function getFormattedPersonData($person)
     {
         $responsePerson = [];
+        /** @var RecordEntity $recentRecord */
         $recentRecord = Person::getMostRecentRecord($person->getId());
         $responsePerson['id'] = $recentRecord->getId();
         $responsePerson['given_name'] = $person->getGivenName();
@@ -218,7 +220,7 @@ class GetController extends GenericController
     }
 
     /**
-     * Returns dummy record data
+     * Returns record data for viewing
      *
      * @since 0.0.3
      */
@@ -479,7 +481,7 @@ class GetController extends GenericController
     }
 
     /**
-     * @param $queryBuilder
+     * @param QueryBuilder $queryBuilder
      * @param $search
      */
     private function addActivitySearch($queryBuilder, $search){
