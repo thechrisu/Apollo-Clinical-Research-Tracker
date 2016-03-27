@@ -99,7 +99,7 @@ var SingleView = (function () {
                     case 2:
                         var value = '';
                         var selected = field.value;
-                        if (typeof selected === 'string' || selected instanceof String) {
+                        if (Util.isString(selected)) {
                             value = selected;
                             selected = field.defaults.length;
                         }

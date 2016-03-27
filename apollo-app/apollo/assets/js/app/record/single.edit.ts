@@ -138,7 +138,7 @@ class SingleView {
                     case 2:
                         var value = '';
                         var selected = field.value;
-                        if(typeof selected === 'string' || selected instanceof String) {
+                        if(Util.isString(selected)) {
                             value = <string> selected;
                             selected = field.defaults.length;
                         }
