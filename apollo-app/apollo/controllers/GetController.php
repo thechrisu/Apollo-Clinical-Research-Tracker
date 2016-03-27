@@ -222,65 +222,67 @@ class GetController extends GenericController
      *
      * @since 0.0.3
      */
-    public function actionRecord() {
-        //TODO: refactor this to use actual data
-
+    public function actionRecordView() {
+        $data = $this->parseRequest(['id' => 0]);
+        $response['error'] = null;
         /**
          * @var RecordEntity $record
          */
-        $record = Record::getRepository()->find(intval($_GET['id']));
-        Record::prepare($record);
-
-        $data['error'] = null;
-        $data['essential'] = $this->getEssentialInformation($record);
-        $data['data'] = [
-            [
-                "name" => "Supervisor",
-                "type" => 2,
-                "value" => "M&Ms"
-            ],
-            [
-                "name" => "Car",
-                "type" => 2,
-                "value" => "Aston Martin DB5"
-            ],
-            [
-                "name" => "Work experience",
-                "type" => 2,
-                "value" => ['D-Wave Systems, Junior Research Scientist and Software Engineer', 'EXI Wireless, Bluetooth Group Software and Hardware Engineer', 'Nortel Networks, OPTera Solutions, Photonic Group']
-            ],
-            [
-                "name" => "Intentionally left blank",
-                "type" => 2,
-                "value" => null
-            ],
-            [
-                "name" => "Subjects",
-                "type" => 2,
-                "value" => ['Software Engineering', 'Compiling Techniques', 'Cryptography']
-            ],
-            [
-                "name" => "References",
-                "type" => 4,
-                "value" => "Mister Bond is one of our nicest employees. He even developed new applications in conjunction with Q."
-            ],
-            [
-                "name" => "Birthday",
-                "type" => 3,
-                "value" => "1974-02-22 02:00:00"
-            ],
-            [
-                "name" => "Some other date",
-                "type" => 3,
-                "value" => "2067-11-12 02:00:00"
-            ],
-            [
-            "name" => "Lab skills",
-            "type" => 2,
-            "value" => ['Digital/Analog Scopes', 'Spectrum Analyzer', 'Function Generators']
-        ]
-        ];
-        echo json_encode($data);
+        if($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
+            Record::prepare($record);
+            $response['essential'] = $this->getEssentialInformation($record);
+            $fieldsViewData = [];
+            $fieldRepo = Field::getRepository();
+            /**
+             * @var FieldEntity[] $fields
+             */
+            $fields = $fieldRepo->findBy(['is_essential' => false, 'is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
+            foreach($fields as $field) {
+                $fieldViewData['name'] = $field->getName();
+                $fieldViewData['type'] = $field->getType();
+                $defaults = $field->getDefaults();
+                $defaultArray = [];
+                foreach($defaults as $default) {
+                    $defaultArray[] = $default->getValue();
+                }
+                $fieldData = $record->findOrCreateData($field->getId());
+                $value = [];
+                if($field->hasDefault()) {
+                    if(!$field->isMultiple()) {
+                        if ($fieldData->isDefault() || !$field->isAllowOther()) {
+                            $value = $defaultArray[$fieldData->getInt()];
+                        } else {
+                            $value = $fieldData->getVarchar();
+                        }
+                    } else {
+                        $value = unserialize($fieldData->getLongText());
+                    }
+                } else if($field->isMultiple()) {
+                    $value = unserialize($fieldData->getLongText());
+                } else {
+                    switch($field->getType()) {
+                        case 1:
+                            $value = $fieldData->getInt();
+                            break;
+                        case 2:
+                            $value = $fieldData->getVarchar();
+                            break;
+                        case 3:
+                            $value = $fieldData->getDateTime()->format('Y-m-d H:i:s');
+                            break;
+                        case 4:
+                            $value = $fieldData->getLongText();
+                            break;
+                    }
+                }
+                $fieldViewData['value'] = $value;
+                $fieldsViewData[] = $fieldViewData;
+            }
+            $response['data'] = $fieldsViewData;
+        } else {
+            $response['error'] = ['id' => 1, 'description' => 'The supplied ID is invalid!'];
+        }
+        echo json_encode($response);
     }
 
     /**
@@ -295,6 +297,7 @@ class GetController extends GenericController
          * @var RecordEntity $record
          */
         if($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
+            Record::prepare($record);
             $response['essential'] = $this->getEssentialInformation($record);
             $fieldsEditData = [];
             $fieldRepo = Field::getRepository();

@@ -16,14 +16,7 @@ var SingleView = (function () {
     }
     SingleView.prototype.load = function () {
         var that = this;
-        //TODO Tim:
-        var url = window.location.toString();
-        var re = new RegExp("[^\/]+(?=\/*$)|$"); //Matches anything that comes after the last slash (and anything before final slashes)
-        var base = re.exec(url);
-        if (base == null) {
-            console.error("URL ending could not be found out correctly, URL: " + url);
-        }
-        AJAX.get(Util.url('get/record?id=' + base[0], false), function (data) {
+        AJAX.get(Util.url('get/record-view/-?id=' + Util.extractId(window.location.toString()), false), function (data) {
             var breadcrumbs = $('#nav-breadcrumbs');
             breadcrumbs.find('li:nth-child(3)').text(data.essential.given_name + ' ' + data.essential.last_name);
             breadcrumbs.find('li:nth-child(4)').text('Record #' + data.essential.record_id + ': ' + data.essential.record_name);
@@ -60,10 +53,29 @@ var SingleView = (function () {
             var columnManager = new ColumnManager('#fields', 3, count);
             for (var i = 0; i < count; i++) {
                 var field = data[i];
-                var value = field.value;
-                if (field.type == 3) {
-                    value = Util.formatDate(Util.parseSQLDate(value));
+                var renderable;
+                console.log(field.name);
+                console.log(field.value);
+                switch (field.type) {
+                    case 1:
+                        renderable = new DataText(field.value.toString());
+                        break;
+                    case 2:
+                        if (Util.isString(field.value)) {
+                            renderable = new DataText(field.value);
+                        }
+                        else {
+                            renderable = new DataTextMultiple(field.value);
+                        }
+                        break;
+                    case 3:
+                        renderable = new DataDate(field.value);
+                        break;
+                    case 4:
+                        renderable = new DataText(field.value);
+                        break;
                 }
+                columnManager.add(new ColumnRow(field.name, renderable));
             }
             columnManager.render(false);
             LoaderManager.hideLoader(loader, function () {

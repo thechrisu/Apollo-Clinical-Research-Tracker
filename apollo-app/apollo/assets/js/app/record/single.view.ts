@@ -31,7 +31,7 @@ interface EssentialData {
 interface FieldData {
     name:string,
     type:number,
-    value:string|string[]
+    value:number|string|string[]
 }
 interface RecordData {
     error:Error,
@@ -43,16 +43,7 @@ class SingleView {
 
     public load() {
         var that = this;
-
-        //TODO Tim:
-        var url = window.location.toString();
-        var re = new RegExp("[^\/]+(?=\/*$)|$"); //Matches anything that comes after the last slash (and anything before final slashes)
-        var base = re.exec(url);
-        if (base == null) {
-            console.error("URL ending could not be found out correctly, URL: " + url);
-        }
-
-        AJAX.get(Util.url('get/record?id=' + base[0], false), function (data:RecordData) {
+        AJAX.get(Util.url('get/record-view/-?id=' + Util.extractId(window.location.toString()), false), function (data:RecordData) {
             var breadcrumbs = $('#nav-breadcrumbs');
             breadcrumbs.find('li:nth-child(3)').text(data.essential.given_name + ' ' + data.essential.last_name);
             breadcrumbs.find('li:nth-child(4)').text('Record #' + data.essential.record_id + ': ' + data.essential.record_name);
@@ -91,11 +82,28 @@ class SingleView {
             var columnManager = new ColumnManager('#fields', 3, count);
             for (var i = 0; i < count; i++) {
                 var field = data[i];
-                var value = field.value;
-                if (field.type == 3) {
-                    value = Util.formatDate(Util.parseSQLDate(<string> value));
+                var renderable;
+                console.log(field.name);
+                console.log(field.value);
+                switch (field.type) {
+                    case 1:
+                        renderable = new DataText(field.value.toString());
+                        break;
+                    case 2:
+                        if(Util.isString(field.value)) {
+                            renderable = new DataText(<string> field.value);
+                        } else {
+                            renderable = new DataTextMultiple(<string[]> field.value);
+                        }
+                        break;
+                    case 3:
+                        renderable = new DataDate(<string> field.value);
+                        break;
+                    case 4:
+                        renderable = new DataText(<string> field.value);
+                        break;
                 }
-                //columnManager.add(new ColumnRowStatic(field.name, value));
+                columnManager.add(new ColumnRow(field.name, renderable));
             }
             columnManager.render(false);
             LoaderManager.hideLoader(loader, function () {
