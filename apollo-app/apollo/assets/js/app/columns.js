@@ -4,8 +4,13 @@
  * Column manager typescript
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  */
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var ColumnManager = (function () {
     function ColumnManager(target, columnCount, totalRows) {
         if (columnCount === void 0) { columnCount = 3; }
@@ -98,52 +103,69 @@ var ColumnRow = (function () {
     };
     return ColumnRow;
 }());
-// class ColumnRowStatic implements ColumnRow {
-//
-//     private key:string;
-//     private value:string|string[];
-//
-//     constructor(key:string, value:string|string[]) {
-//         this.key = key;
-//         this.value = value;
-//     }
-//
-//     public render(target:JQuery) {
-//         if (this.value instanceof Array) {
-//             var array = <string[]> this.value;
-//             var length = array.length;
-//             for (var k = 0; k < length; k++) {
-//                 var rowHTML = $('<tr></tr>');
-//                 if (k == 0) {
-//                     rowHTML.append($('<td rowspan="' + length + '">' + this.decorateKey(this.key) + '</td>'));
-//                 }
-//                 rowHTML.append($('<td>' + this.decorateValue(array[k]) + '</td>'));
-//                 target.append(rowHTML);
-//             }
-//         } else {
-//             var rowHTML = $('<tr></tr>');
-//             rowHTML.append($('<td>' + this.decorateKey(this.key) + '</td>'));
-//             rowHTML.append($('<td>' + this.decorateValue(<string> this.value) + '</td>'));
-//             target.append(rowHTML);
-//         }
-//     }
-//
-//     private decorateKey(key:string):string {
-//         key = '<small>' + key + '</small>'
-//         return key;
-//     }
-//
-//     private decorateValue(value:string):string {
-//         if (value == null || value.length == 0) {
-//             value = '<span class="undefined">None</span>'
-//         } else {
-//             value = '<strong>' + value + '</strong>'
-//         }
-//         return value;
-//     }
-//
-// }
-//
-// class ColumnRowEditable {
-//
-// } 
+var DataField = (function () {
+    function DataField(value) {
+        this.parentNode = $('<div class="apollo-data-container"></div>');
+        this.parentNode.html(this.parse(value));
+    }
+    DataField.prototype.parse = function (value) {
+        if (value == null || (value.length && value.length == 0)) {
+            return '<span class="undefined">None</span>';
+        }
+        return this.decorate(value);
+    };
+    DataField.prototype.render = function (target) {
+        target.append(this.parentNode);
+    };
+    return DataField;
+}());
+var DataText = (function (_super) {
+    __extends(DataText, _super);
+    function DataText() {
+        _super.apply(this, arguments);
+    }
+    DataText.prototype.decorate = function (value) {
+        return Util.strong(value);
+    };
+    return DataText;
+}(DataField));
+var DataTextMultiple = (function (_super) {
+    __extends(DataTextMultiple, _super);
+    function DataTextMultiple() {
+        _super.apply(this, arguments);
+    }
+    DataTextMultiple.prototype.decorate = function (value) {
+        var values = '';
+        for (var i = 0; i < value.length; i++) {
+            values += '<div class="apollo-data-text-multiple">' + Util.strong(value[i]) + '</div>';
+        }
+        return values;
+    };
+    return DataTextMultiple;
+}(DataField));
+var DataDate = (function (_super) {
+    __extends(DataDate, _super);
+    function DataDate() {
+        _super.apply(this, arguments);
+    }
+    DataDate.prototype.decorate = function (value) {
+        if (Util.isString(value)) {
+            value = Util.parseSQLDate(value);
+        }
+        return Util.strong(Util.formatDate(value));
+    };
+    return DataDate;
+}(DataField));
+var DataDateShort = (function (_super) {
+    __extends(DataDateShort, _super);
+    function DataDateShort() {
+        _super.apply(this, arguments);
+    }
+    DataDateShort.prototype.decorate = function (value) {
+        if (Util.isString(value)) {
+            value = Util.parseSQLDate(value);
+        }
+        return Util.strong(Util.formatShortDate(value));
+    };
+    return DataDateShort;
+}(DataField));

@@ -6,12 +6,13 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.7
+ * @version 0.0.8
  */
 
 /**
  * Skeleton for input objects
  *
+ * @since 0.0.8 Now uses AJAX_LAZY_DELAY instead of AJAX_DELAY
  * @since 0.0.1
  */
 abstract class InputField implements Renderable {
@@ -35,7 +36,7 @@ abstract class InputField implements Renderable {
         clearTimeout(this.timeout);
         this.timeout = setTimeout(function () {
             callback();
-        }, AJAX_DELAY);
+        }, AJAX_LAZY_DELAY);
     }
 
 }
@@ -182,7 +183,7 @@ class InputTextMultiple extends InputField {
             this.createInputPair();
         } else {
             for (var value in values) {
-                this.createInputPair(values[value]);
+                if(values.hasOwnProperty(value)) this.createInputPair(values[value]);
             }
         }
     }
@@ -231,7 +232,7 @@ class InputTextMultiple extends InputField {
         }
     }
 
-    private parseCallback(id:number = 0, value:string = null) {
+    private parseCallback() {
         var values = [];
         for (var i = 0; i < this.inputPairs.length; i++) {
             var inputPair = this.inputPairs[i];
@@ -340,7 +341,7 @@ class InputDropdown extends InputField {
                 'value': (this.value == null ? '' : this.value)
             }, null, true);
             this.parentNode.append(this.input);
-            if (this.selected == this.options.length) this.input.show();
+            if (this.selected[0] == this.options.length) this.input.show();
         }
     }
 

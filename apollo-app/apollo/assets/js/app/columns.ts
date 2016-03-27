@@ -4,7 +4,7 @@
  * Column manager typescript
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  */
 
 class ColumnManager {
@@ -122,52 +122,59 @@ class ColumnRow {
 
 }
 
-// class ColumnRowStatic implements ColumnRow {
-//
-//     private key:string;
-//     private value:string|string[];
-//
-//     constructor(key:string, value:string|string[]) {
-//         this.key = key;
-//         this.value = value;
-//     }
-//
-//     public render(target:JQuery) {
-//         if (this.value instanceof Array) {
-//             var array = <string[]> this.value;
-//             var length = array.length;
-//             for (var k = 0; k < length; k++) {
-//                 var rowHTML = $('<tr></tr>');
-//                 if (k == 0) {
-//                     rowHTML.append($('<td rowspan="' + length + '">' + this.decorateKey(this.key) + '</td>'));
-//                 }
-//                 rowHTML.append($('<td>' + this.decorateValue(array[k]) + '</td>'));
-//                 target.append(rowHTML);
-//             }
-//         } else {
-//             var rowHTML = $('<tr></tr>');
-//             rowHTML.append($('<td>' + this.decorateKey(this.key) + '</td>'));
-//             rowHTML.append($('<td>' + this.decorateValue(<string> this.value) + '</td>'));
-//             target.append(rowHTML);
-//         }
-//     }
-//
-//     private decorateKey(key:string):string {
-//         key = '<small>' + key + '</small>'
-//         return key;
-//     }
-//
-//     private decorateValue(value:string):string {
-//         if (value == null || value.length == 0) {
-//             value = '<span class="undefined">None</span>'
-//         } else {
-//             value = '<strong>' + value + '</strong>'
-//         }
-//         return value;
-//     }
-//
-// }
-//
-// class ColumnRowEditable {
-//
-// }
+abstract class DataField implements Renderable {
+
+    private parentNode;
+
+    public constructor(value:any) {
+        this.parentNode = $('<div class="apollo-data-container"></div>');
+        this.parentNode.html(this.parse(value));
+    }
+
+    private parse(value:any) {
+        if(value == null || (value.length && value.length == 0)) {
+            return '<span class="undefined">None</span>';
+        }
+        return this.decorate(value);
+    }
+
+    protected abstract decorate(value:any):string;
+
+    public render(target:JQuery) {
+        target.append(this.parentNode);
+    }
+}
+
+class DataText extends DataField {
+    protected decorate(value:string):string {
+        return Util.strong(value);
+    }
+}
+
+class DataTextMultiple extends DataField {
+    protected decorate(value:string[]):string {
+        var values = '';
+        for(var i = 0; i < value.length; i++) {
+            values += '<div class="apollo-data-text-multiple">' + Util.strong(value[i]) + '</div>';
+        }
+        return values;
+    }
+}
+
+class DataDate extends DataField {
+    protected decorate(value:Date|string):string {
+        if(Util.isString(value)) {
+            value = Util.parseSQLDate(<string> value);
+        }
+        return Util.strong(Util.formatDate(<Date> value));
+    }
+}
+
+class DataDateShort extends DataField {
+    protected decorate(value:Date|string):string {
+        if(Util.isString(value)) {
+            value = Util.parseSQLDate(<string> value);
+        }
+        return Util.strong(Util.formatShortDate(<Date> value));
+    }
+}

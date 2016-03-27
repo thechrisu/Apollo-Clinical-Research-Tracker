@@ -38,15 +38,15 @@ var SingleView = (function () {
         var loader = LoaderManager.createLoader($('#essential-panel'));
         LoaderManager.showLoader(loader, function () {
             var columnManager = new ColumnManager('#essential');
-            columnManager.addToColumn(0, new ColumnRowStatic('Given name', data.given_name));
-            columnManager.addToColumn(0, new ColumnRowStatic('Middle name', data.middle_name));
-            columnManager.addToColumn(0, new ColumnRowStatic('Last name', data.last_name));
-            columnManager.addToColumn(0, new ColumnRowStatic('Email', data.email));
-            columnManager.addToColumn(1, new ColumnRowStatic('Phone', data.phone));
-            columnManager.addToColumn(1, new ColumnRowStatic('Record name', data.record_name));
-            columnManager.addToColumn(1, new ColumnRowStatic('Record start date', Util.formatDate(Util.parseSQLDate(data.start_date))));
-            columnManager.addToColumn(1, new ColumnRowStatic('Record end date', Util.formatDate(Util.parseSQLDate(data.end_date))));
-            columnManager.addToColumn(2, new ColumnRowStatic('Address', data.address));
+            columnManager.addToColumn(0, new ColumnRow('Given name', new DataText(data.given_name)));
+            columnManager.addToColumn(0, new ColumnRow('Middle name', new DataText(data.middle_name)));
+            columnManager.addToColumn(0, new ColumnRow('Last name', new DataText(data.last_name)));
+            columnManager.addToColumn(0, new ColumnRow('Email', new DataText(data.email)));
+            columnManager.addToColumn(1, new ColumnRow('Phone', new DataText(data.phone)));
+            columnManager.addToColumn(1, new ColumnRow('Record name', new DataText(data.record_name)));
+            columnManager.addToColumn(1, new ColumnRow('Record start date', new DataDate(data.start_date)));
+            columnManager.addToColumn(1, new ColumnRow('Record end date', new DataDate(data.end_date)));
+            columnManager.addToColumn(2, new ColumnRow('Address', new DataTextMultiple(data.address)));
             columnManager.render();
             LoaderManager.hideLoader(loader, function () {
                 LoaderManager.destroyLoader(loader);
@@ -64,7 +64,6 @@ var SingleView = (function () {
                 if (field.type == 3) {
                     value = Util.formatDate(Util.parseSQLDate(value));
                 }
-                columnManager.add(new ColumnRowStatic(field.name, value));
             }
             columnManager.render(false);
             LoaderManager.hideLoader(loader, function () {
