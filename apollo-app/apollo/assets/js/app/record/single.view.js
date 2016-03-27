@@ -72,7 +72,7 @@ var SingleView = (function () {
                         renderable = new DataDate(field.value);
                         break;
                     case 4:
-                        renderable = new DataText(field.value);
+                        renderable = new DataLongText(field.value);
                         break;
                 }
                 columnManager.add(new ColumnRow(field.name, renderable));

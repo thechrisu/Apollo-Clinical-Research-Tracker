@@ -169,3 +169,13 @@ var DataDateShort = (function (_super) {
     };
     return DataDateShort;
 }(DataField));
+var DataLongText = (function (_super) {
+    __extends(DataLongText, _super);
+    function DataLongText() {
+        _super.apply(this, arguments);
+    }
+    DataLongText.prototype.decorate = function (value) {
+        return Util.strong(value.replace(/\n/gi, '<br>'));
+    };
+    return DataLongText;
+}(DataField));

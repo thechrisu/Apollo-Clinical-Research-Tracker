@@ -65,6 +65,9 @@ var InputNumber = (function (_super) {
         this.input.on({
             keyup: function () {
                 that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
+            },
+            change: function () {
+                that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
             }
         });
     };
@@ -297,7 +300,7 @@ var InputDropdown = (function (_super) {
                 'style': 'display:none;',
                 'data-id': this.id.toString(),
                 'id': 'input-dropdown-other-' + this.id,
-                'class': 'form-control input-sm',
+                'class': 'form-control input-sm input-dropdown-other',
                 'placeholder': 'Type here...',
                 'type': 'text',
                 'value': (this.value == null ? '' : this.value)

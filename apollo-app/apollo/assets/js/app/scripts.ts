@@ -6,7 +6,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.9
+ * @version 0.2.0
  */
 
 /**
@@ -114,6 +114,19 @@ class Util {
     public static parseSQLDate(sqlDate:string):Date {
         var parts = sqlDate.split(/[- :]/);
         return new Date(+parts[0], +parts[1] - 1, +parts[2], +parts[3], +parts[4], +parts[5]);
+    }
+
+    /**
+     * Converts number date time string into JS' Date object
+     * Initial format: dd/mm/yyyy
+     *
+     * @param numberDate
+     * @returns {Date}
+     * @since 0.2.0
+     */
+    public static parseNumberDate(numberDate:string):Date {
+        var parts = numberDate.split(/\//);
+        return new Date(+parts[2], +parts[1] - 1, +parts[0], 0, 0, 0);
     }
 
     /**
@@ -275,6 +288,17 @@ class Util {
      */
     public static isString(object:any):boolean {
         return typeof object === 'string' || object instanceof String;
+    }
+
+    /**
+     * Determines whether the supplied object is an array
+     *
+     * @param object
+     * @returns {boolean}
+     * @since 0.2.0
+     */
+    public static isArray(object:any):boolean {
+        return Object.prototype.toString.call(object) === '[object Array]';
     }
 
     /**

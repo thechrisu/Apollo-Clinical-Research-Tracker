@@ -88,12 +88,32 @@ body {
 .btn > .glyphicon {
   margin-right: 8px; }
 
+.apollo-input-container .input-group {
+  padding-right: 0 !important;
+  padding-left: 0 !important; }
+.apollo-input-container textarea {
+  resize: vertical; }
+
+.input-dropdown-other {
+  padding-top: 3px; }
+
+.apollo-data-text-multiple {
+  border-top: 1px solid #dddddd;
+  padding: 3px 0; }
+  .apollo-data-text-multiple:first-child {
+    border-top: none; }
+
 .apollo-input-text-multiple {
   margin-right: 0 !important;
-  margin-left: 0 !important; }
+  margin-left: 0 !important;
+  padding: 2px 0; }
   .apollo-input-text-multiple [class^="col-"] {
     padding-right: 2px !important;
     padding-left: 2px !important; }
+    .apollo-input-text-multiple [class^="col-"]:first-child {
+      padding-left: 0 !important; }
+    .apollo-input-text-multiple [class^="col-"]:last-child {
+      padding-right: 0 !important; }
   .apollo-input-text-multiple .btn {
     padding-right: 8px !important;
     padding-left: 8px !important; }

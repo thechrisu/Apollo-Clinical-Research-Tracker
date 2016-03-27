@@ -35,13 +35,37 @@
   & > .glyphicon
     margin-right: 8px
 
+// Fix padding on date input groups and textareas
+.apollo-input-container
+  .input-group
+    padding-right: 0 !important
+    padding-left: 0 !important
+  textarea
+    resize: vertical
+
+// Fix padding for dropdown other
+.input-dropdown-other
+  padding-top: 3px
+
+// Added a border to multiple text data
+.apollo-data-text-multiple
+  border-top: 1px solid #dddddd
+  padding: 3px 0
+  &:first-child
+    border-top: none
+
 // Fix padding for multiple text inputs and resetting button padding
 .apollo-input-text-multiple
   margin-right: 0 !important
   margin-left: 0 !important
+  padding: 2px 0
   [class^="col-"]
     padding-right: 2px !important
     padding-left: 2px !important
+    &:first-child
+      padding-left: 0 !important
+    &:last-child
+      padding-right: 0 !important
   .btn
     padding-right: 8px !important
     padding-left: 8px !important

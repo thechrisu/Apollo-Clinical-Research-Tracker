@@ -100,7 +100,7 @@ class SingleView {
                         renderable = new DataDate(<string> field.value);
                         break;
                     case 4:
-                        renderable = new DataText(<string> field.value);
+                        renderable = new DataLongText(<string> field.value);
                         break;
                 }
                 columnManager.add(new ColumnRow(field.name, renderable));

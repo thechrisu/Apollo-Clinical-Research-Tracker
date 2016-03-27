@@ -74,6 +74,9 @@ class InputNumber extends InputField {
         this.input.on({
             keyup: function () {
                 that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
+            },
+            change: function () {
+                that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
             }
         });
     }
@@ -183,7 +186,7 @@ class InputTextMultiple extends InputField {
             this.createInputPair();
         } else {
             for (var value in values) {
-                if(values.hasOwnProperty(value)) this.createInputPair(values[value]);
+                if (values.hasOwnProperty(value)) this.createInputPair(values[value]);
             }
         }
     }
@@ -300,7 +303,7 @@ class InputDropdown extends InputField {
     public constructor(id:number, callback:(id:number, value:string|number|number[]) => void, options:string[], selected:number|number[] = 0, allowOther:boolean = false, value:string = null, multiple:boolean = false) {
         super(id, callback);
         this.options = options;
-        if(Object.prototype.toString.call(selected) === '[object Array]') {
+        if (Object.prototype.toString.call(selected) === '[object Array]') {
             this.selected = <number[]> selected;
         } else {
             this.selected = [<number> selected];
@@ -335,7 +338,7 @@ class InputDropdown extends InputField {
                 'style': 'display:none;',
                 'data-id': this.id.toString(),
                 'id': 'input-dropdown-other-' + this.id,
-                'class': 'form-control input-sm',
+                'class': 'form-control input-sm input-dropdown-other',
                 'placeholder': 'Type here...',
                 'type': 'text',
                 'value': (this.value == null ? '' : this.value)

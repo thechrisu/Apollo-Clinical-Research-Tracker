@@ -178,3 +178,9 @@ class DataDateShort extends DataField {
         return Util.strong(Util.formatShortDate(<Date> value));
     }
 }
+
+class DataLongText extends DataField {
+    protected decorate(value:string):string {
+        return Util.strong(value.replace(/\n/gi, '<br>'));
+    }
+}
