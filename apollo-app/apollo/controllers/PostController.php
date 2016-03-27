@@ -108,7 +108,6 @@ class PostController extends GenericController
                 /** @var PersonEntity $person */
                 $person = Person::find($data['person_id']);
                 if ($person != null) {
-                    if ($data['id'] > 0 && ($sourceRecord = Record::find($data['id'])) != null) {
                         $em = DB::getEntityManager();
                         $record->setPerson($person);
                         $em->persist($record);
@@ -118,31 +117,34 @@ class PostController extends GenericController
                         $record->setVarchar(FIELD_RECORD_NAME, $data['record_name']);
                         $record->setDateTime(FIELD_START_DATE, $start_date);
                         $record->setDateTime(FIELD_END_DATE, $end_date);
-                        $fieldRepo = Field::getRepository();
-                        /**
-                         * @var FieldEntity[] $fields
-                         */
-                        $fields = $fieldRepo->findBy(['is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
-                        /**
-                         * @var FieldEntity $field
-                         */
-                        foreach ($fields as $field) {
-                            if (!in_array($field->getId(), [FIELD_RECORD_NAME, FIELD_START_DATE, FIELD_END_DATE])) {
-                                $sourceData = $sourceRecord->findOrCreateData($field->getId());
-                                /** @var DataEntity $data */
-                                $data = clone $sourceData;
-                                $data->setRecord($record);
-                                $em->persist($data);
+                        if ($data['id'] > 0) {
+                            if(($sourceRecord = Record::find($data['id'])) != null) {
+                                $fieldRepo = Field::getRepository();
+                                /**
+                                 * @var FieldEntity[] $fields
+                                 */
+                                $fields = $fieldRepo->findBy(['is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
+                                /**
+                                 * @var FieldEntity $field
+                                 */
+                                foreach ($fields as $field) {
+                                    if (!in_array($field->getId(), [FIELD_RECORD_NAME, FIELD_START_DATE, FIELD_END_DATE])) {
+                                        $sourceData = $sourceRecord->findOrCreateData($field->getId());
+                                        /** @var DataEntity $data */
+                                        $data = clone $sourceData;
+                                        $data->setRecord($record);
+                                        $em->persist($data);
+                                    }
+                                }
+                            } else {
+                                $response['error'] = [
+                                    'id' => 1,
+                                    'description' => 'Source record ID is invalid.'
+                                ];
                             }
                         }
                         $em->flush();
                         $response['record_id'] = $record->getId();
-                    } else {
-                        $response['error'] = [
-                            'id' => 1,
-                            'description' => 'Source record ID is invalid.'
-                        ];
-                    }
                 } else {
                     $response['error'] = [
                         'id' => 1,
