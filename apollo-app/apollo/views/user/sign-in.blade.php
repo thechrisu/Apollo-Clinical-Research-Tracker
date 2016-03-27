@@ -11,6 +11,7 @@
 
 @extends('layouts.basic')
 @section('head')
+    @parent
     <title>Sign In | Apollo</title>
     <style>
         body {
@@ -123,6 +124,7 @@
     </div>
 @stop
 @section('scripts')
+    @parent
     <script src="https://use.typekit.net/xfk8ylv.js"></script>
     <script>try{Typekit.load({ async: true });}catch(e){}</script>
 @stop
