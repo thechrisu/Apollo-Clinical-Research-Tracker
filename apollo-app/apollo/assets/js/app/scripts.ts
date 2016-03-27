@@ -6,15 +6,22 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.8
+ * @version 0.1.9
  */
 
 /**
  * Constant specifying a delay before the AJAX request after the user
  * has finished typing
+ * @since 0.1.9 Added AJAX_LAZY_DELAY for cases when instant updates are not required
  * @since 0.1.4
  */
 const AJAX_DELAY: number = 600;
+const AJAX_LAZY_DELAY: number = 1000;
+
+/**
+ * Constants specifying the IDs of the fields recognised by the backend
+ * @since 0.1.6
+ */
 const FIELD_GIVEN_NAME: number = -1;
 const FIELD_MIDDLE_NAME: number = -2;
 const FIELD_LAST_NAME: number = -3;
@@ -268,6 +275,17 @@ class Util {
      */
     public static isString(object:any):boolean {
         return typeof object === 'string' || object instanceof String;
+    }
+
+    /**
+     * Wraps a string in <strong> tags
+     *
+     * @param value
+     * @returns {string}
+     * @since 0.1.9
+     */
+    public static strong(value:string):string {
+        return '<strong>' + value + '</strong>';
     }
 }
 
