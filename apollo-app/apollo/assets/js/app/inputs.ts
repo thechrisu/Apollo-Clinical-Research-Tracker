@@ -6,7 +6,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.6
+ * @version 0.0.7
  */
 
 /**
@@ -21,7 +21,7 @@ abstract class InputField implements Renderable {
     protected parentNode:JQuery;
     protected timeout:number;
 
-    constructor(id:number, callback: (id:number, value:string|string[]|number|number[]) => void) {
+    constructor(id:number, callback:(id:number, value:string|string[]|number|number[]) => void) {
         this.id = id;
         this.callback = callback;
         this.parentNode = $('<div class="apollo-input-container"></div>');
@@ -50,7 +50,7 @@ class InputNumber extends InputField {
     private attributes:Attributes;
     public input:JQuery;
 
-    public constructor(id:number, callback: (id:number, value:string) => void, attributes:Attributes, value:number = null) {
+    public constructor(id:number, callback:(id:number, value:string) => void, attributes:Attributes, value:number = null) {
         super(id, callback);
         this.attributes = <Attributes> Util.mergeObjects(attributes, {
             'data-id': this.id.toString(),
@@ -88,7 +88,7 @@ class InputText extends InputField {
     private attributes:Attributes;
     public input:JQuery;
 
-    public constructor(id:number, callback: (id:number, value:string) => void, attributes:Attributes, value:string = null) {
+    public constructor(id:number, callback:(id:number, value:string) => void, attributes:Attributes, value:string = null) {
         super(id, callback);
         this.attributes = <Attributes> Util.mergeObjects(attributes, {
             'data-id': this.id.toString(),
@@ -126,7 +126,7 @@ class InputLongText extends InputField {
     private attributes:Attributes;
     public input:JQuery;
 
-    public constructor(id:number, callback: (id:number, value:string) => void, attributes:Attributes, value:string = null) {
+    public constructor(id:number, callback:(id:number, value:string) => void, attributes:Attributes, value:string = null) {
         super(id, callback);
         this.attributes = <Attributes> Util.mergeObjects(attributes, {
             'data-id': this.id.toString(),
@@ -174,14 +174,14 @@ class InputTextMultiple extends InputField {
         this.counter = 0;
         this.inputPairs = [];
         this.attributes = attributes;
-        this.prepareNodes( values);
+        this.prepareNodes(values);
     }
 
     private prepareNodes(values:string[]) {
-        if(values.length == 0) {
+        if (values.length == 0) {
             this.createInputPair();
         } else {
-            for(var value in values) {
+            for (var value in values) {
                 this.createInputPair(values[value]);
             }
         }
@@ -197,7 +197,7 @@ class InputTextMultiple extends InputField {
         input.render(column);
         var addButton = $('<button class="btn btn-block btn-sm btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>');
         addButton.on({
-            click: function(e) {
+            click: function (e) {
                 e.preventDefault();
                 that.createInputPair().input.input.focus();
                 that.parseCallback();
@@ -207,11 +207,11 @@ class InputTextMultiple extends InputField {
         var removeButton = $('<button class="btn btn-block btn-sm btn-primary"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>');
         node.append($('<div class="col-md-2"></div>').append(removeButton));
         var inputPair:InputTextPair = {
-            node:node,
-            input:input
+            node: node,
+            input: input
         };
         removeButton.on({
-            click: function(e) {
+            click: function (e) {
                 e.preventDefault();
                 that.removeInputPair(inputPair);
                 that.parseCallback();
@@ -223,15 +223,17 @@ class InputTextMultiple extends InputField {
     }
 
     private removeInputPair(inputPair:InputTextPair) {
-        if(this.inputPairs.length > 1) {
+        if (this.inputPairs.length > 1) {
             inputPair.node.remove();
             this.inputPairs.splice(this.inputPairs.indexOf(inputPair), 1);
+        } else {
+            this.inputPairs[0].input.input.val('');
         }
     }
 
     private parseCallback(id:number = 0, value:string = null) {
         var values = [];
-        for(var i = 0; i < this.inputPairs.length; i++) {
+        for (var i = 0; i < this.inputPairs.length; i++) {
             var inputPair = this.inputPairs[i];
             values.push(inputPair.input.input.val());
         }
@@ -248,7 +250,7 @@ class InputDate extends InputField {
     private attributes:Attributes;
     public input:JQuery;
 
-    public constructor(id:number, callback: (id:number, value:string) => void, attributes:Attributes, value:string = null) {
+    public constructor(id:number, callback:(id:number, value:string) => void, attributes:Attributes, value:string = null) {
         super(id, callback);
         this.attributes = <Attributes> Util.mergeObjects(attributes, {
             'data-id': this.id.toString(),
@@ -287,17 +289,21 @@ class InputDate extends InputField {
 class InputDropdown extends InputField {
 
     private options:string[];
-    private selected:number;
+    private selected:number[];
     private allowOther:boolean;
     private value:string;
     private multiple:boolean;
     private select:JQuery;
     private input:JQuery;
 
-    public constructor(id:number, callback:(id:number, value:string|number|number[]) => void, options:string[], selected:number = 0, allowOther:boolean = false, value:string = null, multiple:boolean = false) {
+    public constructor(id:number, callback:(id:number, value:string|number|number[]) => void, options:string[], selected:number|number[] = 0, allowOther:boolean = false, value:string = null, multiple:boolean = false) {
         super(id, callback);
         this.options = options;
-        this.selected = selected;
+        if(Object.prototype.toString.call(selected) === '[object Array]') {
+            this.selected = <number[]> selected;
+        } else {
+            this.selected = [<number> selected];
+        }
         this.allowOther = allowOther;
         this.value = value;
         this.multiple = multiple && !allowOther;
@@ -320,7 +326,7 @@ class InputDropdown extends InputField {
         for (var i = 0; i < this.options.length + (this.allowOther ? 1 : 0); i++) {
             var label = this.options[i];
             if (i == this.options.length) label = 'Other';
-            this.select.append($('<option' + (i == this.selected ? ' selected' : '') + ' value="' + i + '">' + label + '</option>'));
+            this.select.append($('<option' + (this.selected.indexOf(i) != -1 ? ' selected' : '') + ' value="' + i + '">' + label + '</option>'));
         }
         this.parentNode.append(this.select);
         if (this.allowOther) {

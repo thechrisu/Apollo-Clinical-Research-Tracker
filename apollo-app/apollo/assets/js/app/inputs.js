@@ -6,7 +6,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.6
+ * @version 0.0.7
  */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -196,6 +196,9 @@ var InputTextMultiple = (function (_super) {
             inputPair.node.remove();
             this.inputPairs.splice(this.inputPairs.indexOf(inputPair), 1);
         }
+        else {
+            this.inputPairs[0].input.input.val('');
+        }
     };
     InputTextMultiple.prototype.parseCallback = function (id, value) {
         if (id === void 0) { id = 0; }
@@ -258,7 +261,12 @@ var InputDropdown = (function (_super) {
         if (multiple === void 0) { multiple = false; }
         _super.call(this, id, callback);
         this.options = options;
-        this.selected = selected;
+        if (Object.prototype.toString.call(selected) === '[object Array]') {
+            this.selected = selected;
+        }
+        else {
+            this.selected = [selected];
+        }
         this.allowOther = allowOther;
         this.value = value;
         this.multiple = multiple && !allowOther;
@@ -281,7 +289,7 @@ var InputDropdown = (function (_super) {
             var label = this.options[i];
             if (i == this.options.length)
                 label = 'Other';
-            this.select.append($('<option' + (i == this.selected ? ' selected' : '') + ' value="' + i + '">' + label + '</option>'));
+            this.select.append($('<option' + (this.selected.indexOf(i) != -1 ? ' selected' : '') + ' value="' + i + '">' + label + '</option>'));
         }
         this.parentNode.append(this.select);
         if (this.allowOther) {

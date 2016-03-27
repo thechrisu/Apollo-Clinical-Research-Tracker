@@ -10,7 +10,9 @@
 namespace Apollo\Controllers;
 
 use Apollo\Apollo;
+use Apollo\Components\Field;
 use Apollo\Components\Record;
+use Apollo\Entities\FieldEntity;
 use Apollo\Entities\PersonEntity;
 use Apollo\Components\DB;
 use Apollo\Components\Person;
@@ -27,7 +29,7 @@ use Apollo\Entities\ActivityEntity;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.8
+ * @version 0.0.9
  */
 class GetController extends GenericController
 {
@@ -179,6 +181,43 @@ class GetController extends GenericController
     }
 
     /**
+     * Returns an object containing the essential information of a person
+     *
+     * @param RecordEntity $record
+     * @return array
+     * @since 0.0.9
+     */
+    private function getEssentialInformation($record) {
+        /**
+         * @var RecordEntity[] $other_records
+         */
+        $other_records = Record::getRepository()->findBy(['person' => $record->getPerson()->getId(), 'is_hidden' => 0]);
+        $id_array = [];
+        $name_array = [];
+        foreach($other_records as $other_record) {
+            if($other_record->getId() != intval($_GET['id'])) {
+                $id_array[] = $other_record->getId();
+                $name_array[] = $other_record->findVarchar(FIELD_RECORD_NAME);
+            }
+        }
+        return [
+            "given_name" => $record->getPerson()->getGivenName(),
+            "middle_name" => $record->getPerson()->getMiddleName(),
+            "last_name" => $record->getPerson()->getLastName(),
+            "email" => $record->findVarchar(FIELD_EMAIL),
+            "address" => $record->findMultiple(FIELD_ADDRESS),
+            "phone" => $record->findVarchar(FIELD_PHONE),
+            "start_date" => $record->findDateTime(FIELD_START_DATE)->format('Y-m-d H:i:s'),
+            "end_date" => $record->findDateTime(FIELD_END_DATE)->format('Y-m-d H:i:s'),
+            "person_id" => $record->getPerson()->getId(),
+            "record_id" => $record->getId(),
+            "record_name" => $record->findVarchar(FIELD_RECORD_NAME),
+            "record_ids" => $id_array,
+            "record_names" => $name_array
+        ];
+    }
+
+    /**
      * Returns dummy record data
      *
      * @since 0.0.3
@@ -193,36 +232,7 @@ class GetController extends GenericController
         Record::prepare($record);
 
         $data['error'] = null;
-
-        /**
-         * @var RecordEntity[] $other_records
-         */
-        $other_records = Record::getRepository()->findBy(['person' => $record->getPerson()->getId(), 'is_hidden' => 0]);
-        $id_array = [];
-        $name_array = [];
-        foreach($other_records as $other_record) {
-            if($other_record->getId() != intval($_GET['id'])) {
-                $id_array[] = $other_record->getId();
-                $name_array[] = $other_record->findVarchar(FIELD_RECORD_NAME);
-            }
-        }
-
-        $data['essential'] = [
-            "given_name" => $record->getPerson()->getGivenName(),
-            "middle_name" => $record->getPerson()->getMiddleName(),
-            "last_name" => $record->getPerson()->getLastName(),
-            "email" => $record->findOrCreateData(FIELD_EMAIL)->getVarchar(),
-            //TODO Tim: make a proper arrayifying of the address
-            "address" => [$record->findOrCreateData(FIELD_ADDRESS)->getVarchar(), "London, SE1 7TP"],
-            "phone" => $record->findOrCreateData(FIELD_PHONE)->getVarchar(),
-            "start_date" => $record->findOrCreateData(FIELD_START_DATE)->getDateTime()->format('Y-m-d H:i:s'),
-            "end_date" => $record->findOrCreateData(FIELD_END_DATE)->getDateTime()->format('Y-m-d H:i:s'),
-            "person_id" => $record->getPerson()->getId(),
-            "record_id" => $record->getId(),
-            "record_name" => $record->findOrCreateData(FIELD_RECORD_NAME)->getVarchar(),
-            "record_ids" => $id_array,
-            "record_names" => $name_array
-        ];
+        $data['essential'] = $this->getEssentialInformation($record);
         $data['data'] = [
             [
                 "name" => "Supervisor",
@@ -274,8 +284,81 @@ class GetController extends GenericController
     }
 
     /**
+     * Returns JSON containing information used to build the edit view for a record
+     *
+     * @since 0.0.9
+     */
+    public function actionRecordEdit() {
+        $data = $this->parseRequest(['id' => 0]);
+        $response['error'] = null;
+        /**
+         * @var RecordEntity $record
+         */
+        if($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
+            $response['essential'] = $this->getEssentialInformation($record);
+            $fieldsEditData = [];
+            $fieldRepo = Field::getRepository();
+            /**
+             * @var FieldEntity[] $fields
+             */
+            $fields = $fieldRepo->findBy(['is_essential' => false, 'is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
+            foreach($fields as $field) {
+                $fieldEditData['id'] = $field->getId();
+                $fieldEditData['name'] = $field->getName();
+                $fieldEditData['type'] = $field->getType();
+                $fieldEditData['has_default'] = $field->hasDefault();
+                $fieldEditData['allow_other'] = $field->isAllowOther();
+                $fieldEditData['is_multiple'] = $field->isMultiple();
+                $defaults = $field->getDefaults();
+                $defaultArray = [];
+                foreach($defaults as $default) {
+                    $defaultArray[] = $default->getValue();
+                }
+                $fieldEditData['defaults'] = $defaultArray;
+                $fieldData = $record->findOrCreateData($field->getId());
+                $value = [];
+                if($field->hasDefault()) {
+                    if($field->isMultiple()) {
+                        if ($fieldData->isDefault() || !$field->isAllowOther()) {
+                            $value = $defaultArray[$fieldData->getInt()];
+                        } else {
+                            $value = $fieldData->getVarchar();
+                        }
+                    } else {
+                        $value = unserialize($fieldData->getLongText());
+                    }
+                } else if($field->isMultiple()) {
+                    $value = unserialize($fieldData->getLongText());
+                } else {
+                    switch($field->getType()) {
+                        case 1:
+                            $value = $fieldData->getInt();
+                            break;
+                        case 2:
+                            $value = $fieldData->getVarchar();
+                            break;
+                        case 3:
+                            $value = $fieldData->getDateTime()->format('Y-m-d H:i:s');
+                            break;
+                        case 4:
+                            $value = $fieldData->getLongText();
+                            break;
+                    }
+                }
+                $fieldEditData['value'] = $value;
+                $fieldsEditData[] = $fieldEditData;
+            }
+            $response['data'] = $fieldsEditData;
+        } else {
+            $response['error'] = ['id' => 1, 'description' => 'The supplied ID is invalid!'];
+        }
+        echo json_encode($response);
+    }
+
+    /**
      * It returns short information about several activities
      * Currently serves dummy data
+     *
      * @since 0.0.5
      * TODO: Serve real data
      */

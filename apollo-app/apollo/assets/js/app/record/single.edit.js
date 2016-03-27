@@ -23,7 +23,7 @@ var SingleView = (function () {
             breadcrumbs.find('li:nth-child(3)').text(data.essential.given_name + ' ' + data.essential.last_name);
             breadcrumbs.find('li:nth-child(4)').text('Record #' + data.essential.record_id + ': ' + data.essential.record_name);
             that.parseEssentials(data.essential);
-            //that.parseFields(data.data);
+            that.parseFields(data.data);
             that.setupButtons(data.essential);
         }, function (message) {
             Util.error('An error has occurred during the loading of single record data. Please reload the page or contact the administrator. Error message: ' + message);
@@ -72,16 +72,57 @@ var SingleView = (function () {
         console.log(value);
     };
     SingleView.prototype.parseFields = function (data) {
+        var that = this;
         var loader = LoaderManager.createLoader($('#fields'));
         LoaderManager.showLoader(loader, function () {
             var count = data.length;
             var columnManager = new ColumnManager('#fields', 3, count);
+            /**
+             * interface FieldEditData {
+    id:number,
+    name:string,
+    type:number,
+    has_default:boolean,
+    allow_other:boolean,
+    is_multiple:boolean,
+    defaults:string[],
+    value:number|number[]|string|string[]
+}
+             */
             for (var i = 0; i < count; i++) {
                 var field = data[i];
-                var value = field.value;
-                if (field.type == 3) {
-                    value = Util.formatDate(Util.parseSQLDate(value));
+                var renderable;
+                switch (field.type) {
+                    case 1:
+                        renderable = new InputNumber(field.id, function (id, value) { that.submitCallback('number', id, value); }, { placeholder: field.name }, field.value);
+                        break;
+                    case 2:
+                        var value = '';
+                        var selected = field.value;
+                        if (typeof selected === 'string' || selected instanceof String) {
+                            value = selected;
+                            selected = field.defaults.length;
+                        }
+                        if (field.has_default) {
+                            renderable = new InputDropdown(field.id, function (id, value) {
+                                that.submitCallback('dropdown', id, value);
+                            }, field.defaults, selected, field.allow_other, value, field.is_multiple);
+                        }
+                        else if (field.is_multiple) {
+                            renderable = new InputTextMultiple(field.id, function (id, value) { that.submitCallback('text-multiple', id, value); }, { placeholder: field.name }, field.value);
+                        }
+                        else {
+                            renderable = new InputText(field.id, function (id, value) { that.submitCallback('text', id, value); }, { placeholder: field.name }, field.value);
+                        }
+                        break;
+                    case 3:
+                        renderable = new InputDate(field.id, function (id, value) { that.submitCallback('date', id, value); }, { placeholder: field.name }, field.value.toString());
+                        break;
+                    case 4:
+                        renderable = new InputLongText(field.id, function (id, value) { that.submitCallback('long-text', id, value); }, { placeholder: field.name }, field.value);
+                        break;
                 }
+                columnManager.add(new ColumnRow(field.name, renderable));
             }
             columnManager.render(false);
             LoaderManager.hideLoader(loader, function () {
