@@ -25,7 +25,7 @@ use ReflectionMethod;
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.1.4
+ * @version 0.1.5
  */
 class Apollo
 {
@@ -69,6 +69,7 @@ class Apollo
      * Populates the class variables
      *
      * @param bool $debug
+     * @since 0.1.5 Now sets the timezone to organisation timezone
      * @since 0.1.4 Now supports debug bool
      * @since 0.1.3 Security fix
      * @since 0.1.2 Added console object
@@ -82,6 +83,7 @@ class Apollo
             $this->request = new Request();
             $this->user = new User();
         }
+        date_default_timezone_set($this->user->getOrganisation()->getTimezone());
     }
 
     /**
