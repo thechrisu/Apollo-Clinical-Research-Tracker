@@ -50,8 +50,9 @@ var SingleView = (function () {
                 data['value'] = value;
                 break;
             case 'dropdown':
-                if (!Util.isArray(value))
-                    data['is_default'] = !Util.isString(value);
+                if (!Util.isString(value)) {
+                    data['is_default'] = true;
+                }
                 data['value'] = value;
                 break;
             case 'date':
@@ -151,7 +152,7 @@ var SingleView = (function () {
                     case 3:
                         renderable = new InputDate(field.id, function (id, value) {
                             that.submitCallback('date', id, value);
-                        }, { placeholder: field.name }, field.value.toString());
+                        }, { placeholder: field.name }, Util.formatNumberDate(Util.parseSQLDate(field.value)));
                         break;
                     case 4:
                         renderable = new InputLongText(field.id, function (id, value) {

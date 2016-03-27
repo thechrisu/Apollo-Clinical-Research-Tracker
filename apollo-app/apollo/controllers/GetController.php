@@ -70,7 +70,7 @@ class GetController extends GenericController
 
         $peopleQB = $this->createQueryForRecordsRequest($data);
         $peopleQuery = $peopleQB->getQuery();
-        $people =  $peopleQuery->getResult();
+        $people = $peopleQuery->getResult();
         $response = $this->getFormattedRecordsOfPeople($people, $page);
         echo json_encode($response);
     }
@@ -189,15 +189,16 @@ class GetController extends GenericController
      * @return array
      * @since 0.0.9
      */
-    private function getEssentialInformation($record) {
+    private function getEssentialInformation($record)
+    {
         /**
          * @var RecordEntity[] $other_records
          */
         $other_records = Record::getRepository()->findBy(['person' => $record->getPerson()->getId(), 'is_hidden' => 0]);
         $id_array = [];
         $name_array = [];
-        foreach($other_records as $other_record) {
-            if($other_record->getId() != intval($_GET['id'])) {
+        foreach ($other_records as $other_record) {
+            if ($other_record->getId() != intval($_GET['id'])) {
                 $id_array[] = $other_record->getId();
                 $name_array[] = $other_record->findVarchar(FIELD_RECORD_NAME);
             }
@@ -224,13 +225,14 @@ class GetController extends GenericController
      *
      * @since 0.0.3
      */
-    public function actionRecordView() {
+    public function actionRecordView()
+    {
         $data = $this->parseRequest(['id' => 0]);
         $response['error'] = null;
         /**
          * @var RecordEntity $record
          */
-        if($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
+        if ($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
             Record::prepare($record);
             $response['essential'] = $this->getEssentialInformation($record);
             $fieldsViewData = [];
@@ -239,30 +241,38 @@ class GetController extends GenericController
              * @var FieldEntity[] $fields
              */
             $fields = $fieldRepo->findBy(['is_essential' => false, 'is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
-            foreach($fields as $field) {
+            foreach ($fields as $field) {
                 $fieldViewData['name'] = $field->getName();
                 $fieldViewData['type'] = $field->getType();
                 $defaults = $field->getDefaults();
                 $defaultArray = [];
-                foreach($defaults as $default) {
+                foreach ($defaults as $default) {
                     $defaultArray[] = $default->getValue();
                 }
                 $fieldData = $record->findOrCreateData($field->getId());
                 $value = [];
-                if($field->hasDefault()) {
-                    if(!$field->isMultiple()) {
+                if ($field->hasDefault()) {
+                    if (!$field->isMultiple()) {
                         if ($fieldData->isDefault() || !$field->isAllowOther()) {
                             $value = $defaultArray[$fieldData->getInt()];
                         } else {
                             $value = $fieldData->getVarchar();
                         }
                     } else {
-                        $value = unserialize($fieldData->getLongText());
+                        $selected = unserialize($fieldData->getLongText());
+                        $fieldViewData['type'] = 2;
+                        if (count($selected) > 0) {
+                            for ($i = 0; $i < count($selected); $i++) {
+                                $value[] = $defaultArray[intval($selected[$i])];
+                            }
+                        } else {
+                            $value = '';
+                        }
                     }
-                } else if($field->isMultiple()) {
+                } else if ($field->isMultiple()) {
                     $value = unserialize($fieldData->getLongText());
                 } else {
-                    switch($field->getType()) {
+                    switch ($field->getType()) {
                         case 1:
                             $value = $fieldData->getInt();
                             break;
@@ -292,13 +302,14 @@ class GetController extends GenericController
      *
      * @since 0.0.9
      */
-    public function actionRecordEdit() {
+    public function actionRecordEdit()
+    {
         $data = $this->parseRequest(['id' => 0]);
         $response['error'] = null;
         /**
          * @var RecordEntity $record
          */
-        if($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
+        if ($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
             Record::prepare($record);
             $response['essential'] = $this->getEssentialInformation($record);
             $fieldsEditData = [];
@@ -307,7 +318,7 @@ class GetController extends GenericController
              * @var FieldEntity[] $fields
              */
             $fields = $fieldRepo->findBy(['is_essential' => false, 'is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
-            foreach($fields as $field) {
+            foreach ($fields as $field) {
                 $fieldEditData['id'] = $field->getId();
                 $fieldEditData['name'] = $field->getName();
                 $fieldEditData['type'] = $field->getType();
@@ -316,26 +327,26 @@ class GetController extends GenericController
                 $fieldEditData['is_multiple'] = $field->isMultiple();
                 $defaults = $field->getDefaults();
                 $defaultArray = [];
-                foreach($defaults as $default) {
+                foreach ($defaults as $default) {
                     $defaultArray[] = $default->getValue();
                 }
                 $fieldEditData['defaults'] = $defaultArray;
                 $fieldData = $record->findOrCreateData($field->getId());
                 $value = [];
-                if($field->hasDefault()) {
+                if ($field->hasDefault()) {
                     if($field->isMultiple()) {
+                        $value = unserialize($fieldData->getLongText());
+                    } else {
                         if ($fieldData->isDefault() || !$field->isAllowOther()) {
-                            $value = $defaultArray[$fieldData->getInt()];
+                            $value = $fieldData->getInt();
                         } else {
                             $value = $fieldData->getVarchar();
                         }
-                    } else {
-                        $value = unserialize($fieldData->getLongText());
                     }
-                } else if($field->isMultiple()) {
+                } else if ($field->isMultiple()) {
                     $value = unserialize($fieldData->getLongText());
                 } else {
-                    switch($field->getType()) {
+                    switch ($field->getType()) {
                         case 1:
                             $value = $fieldData->getInt();
                             break;
@@ -372,10 +383,10 @@ class GetController extends GenericController
 
         $data = $this->parseRequest(['page' => 1, 'sort' => 1, 'search' => null]);
         $page = $data['page'] > 0 ? $data['page'] : 1;
-       /* $activityQB = $this->createQueryForActivitiesRequest($data);
-        $activityQuery = $activityQB->getQuery();
-        $activities =  $activityQuery->getResult();
-        $response = $this->getFormattedActivities($activities, $page);*/
+        /* $activityQB = $this->createQueryForActivitiesRequest($data);
+         $activityQuery = $activityQB->getQuery();
+         $activities =  $activityQuery->getResult();
+         $response = $this->getFormattedActivities($activities, $page);*/
         $response['error'] = null;
         $response['count'] = 12;
         $response['activities'] = [
@@ -484,7 +495,8 @@ class GetController extends GenericController
      * @param QueryBuilder $queryBuilder
      * @param $search
      */
-    private function addActivitySearch($queryBuilder, $search){
+    private function addActivitySearch($queryBuilder, $search)
+    {
         $queryBuilder->andWhere($queryBuilder->expr()->orX(
             $queryBuilder->expr()->like('a.name', ':search'),
             $queryBuilder->expr()->like('a.target_group_comment', ':search')
@@ -492,7 +504,8 @@ class GetController extends GenericController
         $queryBuilder->setParameter('search', '%' . $search . '%');
     }
 
-    private function getFormattedActivities($activities, $page){
+    private function getFormattedActivities($activities, $page)
+    {
         $response['error'] = null;
         $response['count'] = count($activities);
         for ($i = 10 * ($page - 1); $i < min($response['count'], $page * 10); $i++) {
@@ -502,7 +515,8 @@ class GetController extends GenericController
         return $response;
     }
 
-    private function getFormattedShortActivityData($activity){
+    private function getFormattedShortActivityData($activity)
+    {
         $responseActivity = [];
         $responseActivity['id'] = $activity->getId();
         $responseActivity['name'] = $activity->getName();

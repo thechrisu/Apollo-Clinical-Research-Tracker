@@ -54,8 +54,6 @@ var SingleView = (function () {
             for (var i = 0; i < count; i++) {
                 var field = data[i];
                 var renderable;
-                console.log(field.name);
-                console.log(field.value);
                 switch (field.type) {
                     case 1:
                         renderable = new DataText(field.value.toString());

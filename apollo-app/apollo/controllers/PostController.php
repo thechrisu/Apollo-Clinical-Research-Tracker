@@ -207,11 +207,13 @@ class PostController extends GenericController
     /**
      * Parses the data/field info and saves it into database
      *
+     * TODO Tim: Fix dates
+     *
      * @since 0.0.4
      */
     public function actionData() {
         $em = DB::getEntityManager();
-        $data = $this->parseRequest(['record_id' => 0, 'field_id' => 0, 'value' => null, 'is_default' => true]);
+        $data = $this->parseRequest(['record_id' => 0, 'field_id' => 0, 'value' => null, 'is_default' => null]);
         $response['error'] = null;
         $organisation = Apollo::getInstance()->getUser()->getOrganisation();
         /** @var RecordEntity $record */
@@ -226,7 +228,8 @@ class PostController extends GenericController
                             break;
                         case 2:
                             if($field->hasDefault()) {
-                                if($data['is_default']) {
+                                if($data['is_default'] != null) {
+                                    $dataObject->setIsDefault(true);
                                     if($field->isMultiple()) {
                                         for($i = 0; $i < count($data['value']); $i++) {
                                             $data['value'][$i] = intval($data['value'][$i]);
@@ -236,6 +239,7 @@ class PostController extends GenericController
                                         $dataObject->setInt(intval($data['value']));
                                     }
                                 } else {
+                                    $dataObject->setIsDefault(false);
                                     $dataObject->setVarchar($data['value']);
                                 }
                             } elseif($field->isMultiple()) {
@@ -287,7 +291,9 @@ class PostController extends GenericController
         $parsedData = [];
         foreach ($data as $key => $default) {
             if (isset($_POST[$key])) {
-                $parsedData[$key] = is_int($default) ? intval($_POST[$key]) : $_POST[$key];
+                $value = $_POST[$key];
+                if(is_int($default)) $value = intval($value);
+                $parsedData[$key] = $value;
             } else {
                 $parsedData[$key] = $default;
             }

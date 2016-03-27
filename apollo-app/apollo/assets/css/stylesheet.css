@@ -101,7 +101,10 @@ body {
   border-top: 1px solid #dddddd;
   padding: 3px 0; }
   .apollo-data-text-multiple:first-child {
-    border-top: none; }
+    border-top: none;
+    padding-top: 0; }
+  .apollo-data-text-multiple:last-child {
+    padding-bottom: 0; }
 
 .apollo-input-text-multiple {
   margin-right: 0 !important;

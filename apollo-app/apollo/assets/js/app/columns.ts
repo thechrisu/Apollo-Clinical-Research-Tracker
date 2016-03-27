@@ -4,7 +4,7 @@
  * Column manager typescript
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.4
+ * @version 0.0.5
  */
 
 class ColumnManager {
@@ -155,7 +155,13 @@ class DataTextMultiple extends DataField {
     protected decorate(value:string[]):string {
         var values = '';
         for(var i = 0; i < value.length; i++) {
-            values += '<div class="apollo-data-text-multiple">' + Util.strong(value[i]) + '</div>';
+            var string = value[i];
+            if(string == null || string.length == 0) {
+                string = '<span class="undefined">None</span>';
+            } else {
+                string = Util.strong(string);
+            }
+            values += '<div class="apollo-data-text-multiple">' + string + '</div>';
         }
         return values;
     }

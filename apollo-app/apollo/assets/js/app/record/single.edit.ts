@@ -88,7 +88,9 @@ class SingleView {
                 data['value'] = <string[]> value;
                 break;
             case 'dropdown':
-                if(!Util.isArray(value)) data['is_default'] = !Util.isString(value);
+                if(!Util.isString(value)) {
+                    data['is_default'] = true;
+                }
                 data['value'] = value;
                 break;
             case 'date':
@@ -188,7 +190,7 @@ class SingleView {
                     case 3:
                         renderable = new InputDate(field.id, function (id:number, value:string) {
                             that.submitCallback('date', id, value);
-                        }, {placeholder: field.name}, <string> field.value.toString());
+                        }, {placeholder: field.name}, Util.formatNumberDate(Util.parseSQLDate(<string> field.value)));
                         break;
                     case 4:
                         renderable = new InputLongText(field.id, function (id:number, value:string) {
