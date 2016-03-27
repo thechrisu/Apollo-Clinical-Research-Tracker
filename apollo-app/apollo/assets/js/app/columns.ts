@@ -132,7 +132,7 @@ abstract class DataField implements Renderable {
     }
 
     private parse(value:any) {
-        if(value == null || (value.length && value.length == 0)) {
+        if(value == null || value.length == 0) {
             return '<span class="undefined">None</span>';
         }
         return this.decorate(value);
