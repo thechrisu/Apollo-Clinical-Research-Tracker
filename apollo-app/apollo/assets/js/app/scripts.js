@@ -6,7 +6,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.6
+ * @version 0.1.8
  */
 /**
  * Constant specifying a delay before the AJAX request after the user
@@ -234,11 +234,21 @@ var Util = (function () {
         }
         return object;
     };
+    /**
+     * Determines whether the supplied object is a string
+     *
+     * @param object
+     * @returns {boolean}
+     * @since 0.1.8
+     */
+    Util.isString = function (object) {
+        return typeof object === 'string' || object instanceof String;
+    };
     return Util;
 }());
 /**
  * Deals with loaders
- * @since 0.0.9 Added documnetation
+ * @since 0.0.9 Added documentation
  * @since 0.0.5
  */
 var LoaderManager = (function () {

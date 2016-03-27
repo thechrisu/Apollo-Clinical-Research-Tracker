@@ -6,7 +6,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.6
+ * @version 0.1.8
  */
 
 /**
@@ -15,15 +15,15 @@
  * @since 0.1.4
  */
 const AJAX_DELAY: number = 600;
-const FIELD_GIVEN_NAME = -1;
-const FIELD_MIDDLE_NAME = -2;
-const FIELD_LAST_NAME = -3;
-const FIELD_RECORD_NAME = 1;
-const FIELD_START_DATE = 2;
-const FIELD_END_DATE = 3;
-const FIELD_EMAIL = 4;
-const FIELD_PHONE = 5;
-const FIELD_ADDRESS = 6;
+const FIELD_GIVEN_NAME: number = -1;
+const FIELD_MIDDLE_NAME: number = -2;
+const FIELD_LAST_NAME: number = -3;
+const FIELD_RECORD_NAME: number = 1;
+const FIELD_START_DATE: number = 2;
+const FIELD_END_DATE: number = 3;
+const FIELD_EMAIL: number = 4;
+const FIELD_PHONE: number = 5;
+const FIELD_ADDRESS: number = 6;
 
 /**
  * Default error interface
@@ -258,11 +258,22 @@ class Util {
         }
         return object;
     }
+
+    /**
+     * Determines whether the supplied object is a string
+     *
+     * @param object
+     * @returns {boolean}
+     * @since 0.1.8
+     */
+    public static isString(object:any):boolean {
+        return typeof object === 'string' || object instanceof String;
+    }
 }
 
 /**
  * Deals with loaders
- * @since 0.0.9 Added documnetation
+ * @since 0.0.9 Added documentation
  * @since 0.0.5
  */
 class LoaderManager {
