@@ -28,7 +28,7 @@ use Doctrine\ORM\EntityRepository;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  */
 class PostController extends GenericController
 {
@@ -53,7 +53,7 @@ class PostController extends GenericController
     }
 
     /**
-     *
+     * Action parsing operations on records, such as hiding, adding, duplicating
      *
      * @since 0.0.2 Parses
      * @since 0.0.1
@@ -200,6 +200,76 @@ class PostController extends GenericController
                     'description' => 'Selected record is either already hidden or does not exist.'
                 ];
             }
+        }
+        echo json_encode($response);
+    }
+
+    /**
+     * Parses the data/field info and saves it into database
+     *
+     * @since 0.0.4
+     */
+    public function actionData() {
+        $em = DB::getEntityManager();
+        $data = $this->parseRequest(['record_id' => 0, 'field_id' => 0, 'value' => null, 'is_default' => true]);
+        $response['error'] = null;
+        $organisation = Apollo::getInstance()->getUser()->getOrganisation();
+        /** @var RecordEntity $record */
+        if($data['record_id'] > 0 && ($record = Record::getRepository()->find($data['record_id'])) != null) {
+            /** @var FieldEntity $field */
+            if($data['field_id'] > 0 && ($field = Field::getRepository()->findOneBy(['id' => $data['field_id'], 'organisation' => $organisation])) != null) {
+                if($data['value'] !== null) {
+                    $dataObject = $record->findOrCreateData($data['field_id']);
+                    switch($field->getType()) {
+                        case 1:
+                            $dataObject->setInt(intval($data['value']));
+                            break;
+                        case 2:
+                            if($field->hasDefault()) {
+                                if($data['is_default']) {
+                                    if($field->isMultiple()) {
+                                        for($i = 0; $i < count($data['value']); $i++) {
+                                            $data['value'][$i] = intval($data['value'][$i]);
+                                        }
+                                        $dataObject->setLongText(serialize($data['value']));
+                                    } else {
+                                        $dataObject->setInt(intval($data['value']));
+                                    }
+                                } else {
+                                    $dataObject->setVarchar($data['value']);
+                                }
+                            } elseif($field->isMultiple()) {
+                                $dataObject->setLongText(serialize($data['value']));
+                            } else {
+                                $dataObject->setVarchar($data['value']);
+                            }
+                            break;
+                        case 3:
+                            $date = new DateTime($data['value']);
+                            $dataObject->setDateTime($date);
+                            break;
+                        case 4:
+                            $dataObject->setLongText($data['value']);
+                            break;
+                    }
+                    $em->flush();
+                } else {
+                    $response['error'] = [
+                        'id' => 1,
+                        'description' => 'Value cannot be equal to null.'
+                    ];
+                }
+            } else {
+                $response['error'] = [
+                    'id' => 1,
+                    'description' => 'Supplied field ID is invalid.'
+                ];
+            }
+        } else {
+            $response['error'] = [
+                'id' => 1,
+                'description' => 'Supplied record ID is invalid.'
+            ];
         }
         echo json_encode($response);
     }
