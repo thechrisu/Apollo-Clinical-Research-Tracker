@@ -10,8 +10,11 @@ namespace Apollo\Controllers;
 
 use Apollo\Apollo;
 use Apollo\Components\DB;
+use Apollo\Components\Field;
 use Apollo\Components\Person;
 use Apollo\Components\Record;
+use Apollo\Entities\DataEntity;
+use Apollo\Entities\FieldEntity;
 use Apollo\Entities\PersonEntity;
 use Apollo\Entities\RecordEntity;
 use DateTime;
@@ -25,7 +28,7 @@ use Doctrine\ORM\EntityRepository;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  */
 class PostController extends GenericController
 {
@@ -102,20 +105,50 @@ class PostController extends GenericController
             $data = $this->parseRequest(['person_id' => 0, 'id' => 0, 'record_name' => null, 'start_date' => null, 'end_date' => null]);
             if (!empty($data['record_name'])) {
                 $record = new RecordEntity(Apollo::getInstance()->getUser()->getEntity());
-                //TODO Tim: Check that person ID is legit
-                $record->setPerson(Person::getRepository()->find($data['person_id']));
-                DB::getEntityManager()->persist($record);
-                DB::getEntityManager()->flush();
-                $start_date = new DateTime($data['start_date']);
-                $end_date = new DateTime($data['end_date']);
-                $record->setVarchar(FIELD_RECORD_NAME, $data['record_name']);
-                $record->setDateTime(FIELD_START_DATE, $start_date);
-                $record->setDateTime(FIELD_END_DATE, $end_date);
-                if($data['id'] > 0) {
-                    //TODO Tim: Check that record with that ID exists, copy the data
+                /** @var PersonEntity $person */
+                $person = Person::find($data['person_id']);
+                if($person != null) {
+                    if($data['id'] > 0 && ($sourceRecord = Record::find($data['id'])) != null) {
+                        $em = DB::getEntityManager();
+                        $record->setPerson($person);
+                        $em->persist($record);
+                        $em->flush();
+                        $start_date = new DateTime($data['start_date']);
+                        $end_date = new DateTime($data['end_date']);
+                        $record->setVarchar(FIELD_RECORD_NAME, $data['record_name']);
+                        $record->setDateTime(FIELD_START_DATE, $start_date);
+                        $record->setDateTime(FIELD_END_DATE, $end_date);
+                        $fieldRepo = Field::getRepository();
+                        /**
+                         * @var FieldEntity[] $fields
+                         */
+                        $fields = $fieldRepo->findBy(['is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
+                        /**
+                         * @var FieldEntity $field
+                         */
+                        foreach($fields as $field) {
+                            if(!in_array($field->getId(), [FIELD_RECORD_NAME, FIELD_START_DATE, FIELD_END_DATE])) {
+                                $sourceData = $sourceRecord->findOrCreateData($field->getId());
+                                /** @var DataEntity $data */
+                                $data = clone $sourceData;
+                                $data->setRecord($record);
+                                $em->persist($data);
+                            }
+                        }
+                        $em->flush();
+                        $response['record_id'] = $record->getId();
+                    } else {
+                        $response['error'] = [
+                            'id' => 1,
+                            'description' => 'Source record ID is invalid.'
+                        ];
+                    }
+                } else {
+                    $response['error'] = [
+                        'id' => 1,
+                        'description' => 'Invalid person ID.'
+                    ];
                 }
-                DB::getEntityManager()->flush();
-                $response['record_id'] = $record->getId();
             } else {
                 $response['error'] = [
                     'id' => 1,
