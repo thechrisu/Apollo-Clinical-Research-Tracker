@@ -20,7 +20,7 @@ use finfo;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  */
 class AssetController extends GenericController
 {
@@ -70,6 +70,15 @@ class AssetController extends GenericController
      */
     public function actionJs() {
         $this->serveFrom('js', ['js']);
+    }
+
+    /**
+     * Calls serveFrom() on directory "fonts"
+     *
+     * @since 0.0.3
+     */
+    public function actionFonts() {
+        $this->serveFrom('fonts', ['eot', 'svg', 'ttf', 'woff', 'woff2']);
     }
 
     /**
