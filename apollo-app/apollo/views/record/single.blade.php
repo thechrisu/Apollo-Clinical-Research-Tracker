@@ -51,19 +51,19 @@ use Apollo\Helpers\URLHelper;
     <div class="panel panel-default loader-ready" id="essential-panel">
         <div class="panel-heading">
             <span class="pull-right">Record actions:<!--
-             --><a href="#" id="record-add" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus"
+             --><a href="#" id="record-add" class="btn btn-sm btn-success disabled"><span class="glyphicon glyphicon-plus"
                                                                                  aria-hidden="true"></span>Add a record</a><!--
-             --><a href="#" id="record-duplicate" class="btn btn-sm btn-primary"><span
+             --><a href="#" id="record-duplicate" class="btn btn-sm btn-primary disabled"><span
                             class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>Duplicate record</a><!--
-             --><a href="#" id="record-edit" class="btn btn-sm btn-warning"><span class="glyphicon glyphicon-pencil"
+             --><a href="#" id="record-edit" class="btn btn-sm btn-warning disabled"><span class="glyphicon glyphicon-pencil"
                                                                                   aria-hidden="true"></span>Edit</a><!--
-             --><a href="#" id="record-hide" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove"
+             --><a href="#" id="record-hide" class="btn btn-sm btn-danger disabled"><span class="glyphicon glyphicon-remove"
                                                                                  aria-hidden="true"></span>Hide</a>
             </span>
             <span>
                 <span>Current record:</span><!--
              --><div class="dropdown">
-                    <button class="btn btn-primary btn-sm dropdown-toggle" id="current-record" type="button"
+                    <button class="btn btn-primary btn-sm dropdown-toggle disabled" id="current-record" type="button"
                             data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="true">
                         Current record

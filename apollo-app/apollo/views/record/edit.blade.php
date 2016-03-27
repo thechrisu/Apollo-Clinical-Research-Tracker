@@ -26,7 +26,7 @@ use Apollo\Helpers\URLHelper;
             <span>
                 <span>Currently editing:</span><!--
              --><div class="dropdown">
-                    <button class="btn btn-primary btn-sm dropdown-toggle" id="current-record" type="button"
+                    <button class="btn btn-primary btn-sm dropdown-toggle disabled" id="current-record" type="button"
                             data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="true">
                         Current record

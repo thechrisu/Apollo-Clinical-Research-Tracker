@@ -114,6 +114,7 @@ class SingleView {
 
     private setupButtons(data:EssentialData) {
         var dropdownCurrent = $('#current-record');
+        dropdownCurrent.removeClass('disabled');
         var dropdownOther = $('#other-records');
         dropdownCurrent.html(data.record_name + ' <span class="caret"></span>');
         if (data.record_ids.length > 0) {
@@ -125,9 +126,13 @@ class SingleView {
         }
 
         var addButton = $('#record-add');
+        addButton.removeClass('disabled');
         var duplicateButton = $('#record-duplicate');
+        duplicateButton.removeClass('disabled');
         var editButton = $('#record-edit');
+        editButton.removeClass('disabled');
         var hideButton = $('#record-hide');
+        hideButton.removeClass('disabled');
 
         addButton.click(function (e) {
             e.preventDefault();

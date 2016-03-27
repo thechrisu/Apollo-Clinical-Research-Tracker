@@ -169,6 +169,7 @@ var SingleView = (function () {
     };
     SingleView.prototype.setupButtons = function (data) {
         var dropdownCurrent = $('#current-record');
+        dropdownCurrent.removeClass('disabled');
         var dropdownOther = $('#other-records');
         dropdownCurrent.html(data.record_name + ' <span class="caret"></span>');
         if (data.record_ids.length > 0) {

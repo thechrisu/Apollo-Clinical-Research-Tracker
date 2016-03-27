@@ -85,6 +85,7 @@ var SingleView = (function () {
     };
     SingleView.prototype.setupButtons = function (data) {
         var dropdownCurrent = $('#current-record');
+        dropdownCurrent.removeClass('disabled');
         var dropdownOther = $('#other-records');
         dropdownCurrent.html(data.record_name + ' <span class="caret"></span>');
         if (data.record_ids.length > 0) {
@@ -96,9 +97,13 @@ var SingleView = (function () {
             dropdownOther.append('<li class="dropdown-header">Nothing to display . . .</li>');
         }
         var addButton = $('#record-add');
+        addButton.removeClass('disabled');
         var duplicateButton = $('#record-duplicate');
+        duplicateButton.removeClass('disabled');
         var editButton = $('#record-edit');
+        editButton.removeClass('disabled');
         var hideButton = $('#record-hide');
+        hideButton.removeClass('disabled');
         addButton.click(function (e) {
             e.preventDefault();
             bootbox.dialog({
