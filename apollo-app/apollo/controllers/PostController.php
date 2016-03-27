@@ -107,8 +107,8 @@ class PostController extends GenericController
                 $record = new RecordEntity(Apollo::getInstance()->getUser()->getEntity());
                 /** @var PersonEntity $person */
                 $person = Person::find($data['person_id']);
-                if($person != null) {
-                    if($data['id'] > 0 && ($sourceRecord = Record::find($data['id'])) != null) {
+                if ($person != null) {
+                    if ($data['id'] > 0 && ($sourceRecord = Record::find($data['id'])) != null) {
                         $em = DB::getEntityManager();
                         $record->setPerson($person);
                         $em->persist($record);
@@ -126,8 +126,8 @@ class PostController extends GenericController
                         /**
                          * @var FieldEntity $field
                          */
-                        foreach($fields as $field) {
-                            if(!in_array($field->getId(), [FIELD_RECORD_NAME, FIELD_START_DATE, FIELD_END_DATE])) {
+                        foreach ($fields as $field) {
+                            if (!in_array($field->getId(), [FIELD_RECORD_NAME, FIELD_START_DATE, FIELD_END_DATE])) {
                                 $sourceData = $sourceRecord->findOrCreateData($field->getId());
                                 /** @var DataEntity $data */
                                 $data = clone $sourceData;
@@ -205,33 +205,73 @@ class PostController extends GenericController
     }
 
     /**
+     * Parses the request searching for specified keys. If a key is not defined in the POST request,
+     * use the default value specified in the array.
+     *
+     * @param array $data
+     * @return array
+     * @since 0.0.1
+     */
+    public function parseRequest($data)
+    {
+        $parsedData = [];
+        foreach ($data as $key => $default) {
+            if (isset($_POST[$key])) {
+                $value = $_POST[$key];
+                if (is_int($default)) $value = intval($value);
+                $parsedData[$key] = $value;
+            } else {
+                $parsedData[$key] = $default;
+            }
+        }
+        return $parsedData;
+    }
+
+    /**
      * Parses the data/field info and saves it into database
      *
      * TODO Tim: Fix dates
      *
      * @since 0.0.4
      */
-    public function actionData() {
+    public function actionData()
+    {
         $em = DB::getEntityManager();
         $data = $this->parseRequest(['record_id' => 0, 'field_id' => 0, 'value' => null, 'is_default' => null]);
         $response['error'] = null;
         $organisation = Apollo::getInstance()->getUser()->getOrganisation();
         /** @var RecordEntity $record */
-        if($data['record_id'] > 0 && ($record = Record::getRepository()->find($data['record_id'])) != null) {
-            /** @var FieldEntity $field */
-            if($data['field_id'] > 0 && ($field = Field::getRepository()->findOneBy(['id' => $data['field_id'], 'organisation' => $organisation])) != null) {
-                if($data['value'] !== null) {
+        if ($data['record_id'] > 0 && ($record = Record::getRepository()->find($data['record_id'])) != null) {
+            if (in_array($data['field_id'], [FIELD_GIVEN_NAME, FIELD_MIDDLE_NAME, FIELD_LAST_NAME])) {
+                if ($data['value'] !== null) {
+                    if ($data['field_id'] == FIELD_GIVEN_NAME) {
+                        $record->getPerson()->setGivenName($data['value']);
+                    } elseif ($data['field_id'] == FIELD_MIDDLE_NAME) {
+                        $record->getPerson()->setMiddleName($data['value']);
+                    } elseif ($data['field_id'] == FIELD_LAST_NAME) {
+                        $record->getPerson()->setLastName($data['value']);
+                    }
+                    $em->flush();
+                } else {
+                    $response['error'] = [
+                        'id' => 1,
+                        'description' => 'Value cannot be equal to null.'
+                    ];
+                }
+                /** @var FieldEntity $field */
+            } elseif ($data['field_id'] > 0 && ($field = Field::getRepository()->findOneBy(['id' => $data['field_id'], 'organisation' => $organisation])) != null) {
+                if ($data['value'] !== null) {
                     $dataObject = $record->findOrCreateData($data['field_id']);
-                    switch($field->getType()) {
+                    switch ($field->getType()) {
                         case 1:
                             $dataObject->setInt(intval($data['value']));
                             break;
                         case 2:
-                            if($field->hasDefault()) {
-                                if($data['is_default'] != null) {
+                            if ($field->hasDefault()) {
+                                if ($data['is_default'] != null) {
                                     $dataObject->setIsDefault(true);
-                                    if($field->isMultiple()) {
-                                        for($i = 0; $i < count($data['value']); $i++) {
+                                    if ($field->isMultiple()) {
+                                        for ($i = 0; $i < count($data['value']); $i++) {
                                             $data['value'][$i] = intval($data['value'][$i]);
                                         }
                                         $dataObject->setLongText(serialize($data['value']));
@@ -242,7 +282,7 @@ class PostController extends GenericController
                                     $dataObject->setIsDefault(false);
                                     $dataObject->setVarchar($data['value']);
                                 }
-                            } elseif($field->isMultiple()) {
+                            } elseif ($field->isMultiple()) {
                                 $dataObject->setLongText(serialize($data['value']));
                             } else {
                                 $dataObject->setVarchar($data['value']);
@@ -276,28 +316,5 @@ class PostController extends GenericController
             ];
         }
         echo json_encode($response);
-    }
-
-    /**
-     * Parses the request searching for specified keys. If a key is not defined in the POST request,
-     * use the default value specified in the array.
-     *
-     * @param array $data
-     * @return array
-     * @since 0.0.1
-     */
-    public function parseRequest($data)
-    {
-        $parsedData = [];
-        foreach ($data as $key => $default) {
-            if (isset($_POST[$key])) {
-                $value = $_POST[$key];
-                if(is_int($default)) $value = intval($value);
-                $parsedData[$key] = $value;
-            } else {
-                $parsedData[$key] = $default;
-            }
-        }
-        return $parsedData;
     }
 }
