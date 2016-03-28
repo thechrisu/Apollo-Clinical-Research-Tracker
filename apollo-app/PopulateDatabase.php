@@ -31,7 +31,7 @@ $user = $userRepo->find(1);
 date_default_timezone_set('Europe/London');
 $date = new DateTime();
 
-for($i = 0; $i < 5; $i++) {
+for($i = 0; $i < 0; $i++) {
 
     $faker = Factory::create();
     $person = new PersonEntity();
@@ -57,6 +57,5 @@ for($i = 0; $i < 5; $i++) {
     $record->setDateTime(FIELD_END_DATE, new DateTime());
 
     $entity_manager->flush();
-
 
 }
