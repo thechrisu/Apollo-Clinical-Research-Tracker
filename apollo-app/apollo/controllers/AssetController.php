@@ -113,7 +113,12 @@ class AssetController extends GenericController
                         $mime_type = $file_info->file($path, FILEINFO_MIME_TYPE);
                         break;
                 }
-                //TODO Tim: Add headers for caching and other stuff
+                if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
+                    if(strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) < filemtime($path)) {
+                        header('HTTP/1.1 304 Not Modified');
+                        exit;
+                    }
+                }
                 header('Content-Type: ' . $mime_type);
                 readfile($path);
             } else {
