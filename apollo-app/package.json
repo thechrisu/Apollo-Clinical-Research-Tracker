@@ -1,0 +1,26 @@
+{
+  "name": "apollo",
+  "version": "1.0.0",
+  "description": "Apollo application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/culshoefer/COMP103P-App"
+  },
+  "keywords": [
+    "apollo"
+  ],
+  "author": "Timur Kuzhagaliyev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/culshoefer/COMP103P-App/issues"
+  },
+  "homepage": "https://github.com/culshoefer/COMP103P-App#readme",
+  "devDependencies": {
+    "browser-sync": "^2.11.1",
+    "gulp": "^3.9.1"
+  }
+}
