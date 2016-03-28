@@ -13,22 +13,6 @@
  * @version 0.1.1
  */
 
-interface EssentialData {
-    given_name:string,
-    middle_name:string,
-    last_name:string,
-    email:string,
-    address:string[],
-    phone:string,
-    start_date:string,
-    end_date:string,
-    person_id:number,
-    record_id:number,
-    record_name:string,
-    record_ids:number[],
-    record_names:string[]
-
-}
 interface FieldEditData {
     id:number,
     name:string,
@@ -147,6 +131,26 @@ class SingleView {
             columnManager.render();
             LoaderManager.hideLoader(loader, function () {
                 LoaderManager.destroyLoader(loader);
+            });
+        });
+        var loader2 = LoaderManager.createLoader($('#additional-panel'));
+        LoaderManager.showLoader(loader2, function () {
+            var awards = new InputTextMultiple(FIELD_AWARDS, function (id:number, value:string[]) {
+                that.submitCallback('text-multiple', id, value);
+            }, {placeholder: 'Award'}, data.awards);
+            var awardsContainer = $('#awards');
+            awardsContainer.html('');
+            awards.render(awardsContainer);
+            var publications = new InputTextMultiple(FIELD_PUBLICATIONS, function (id:number, value:string[]) {
+                that.submitCallback('text-multiple', id, value);
+            }, {placeholder: 'Publication'}, data.publications);
+            var publicationsContainer = $('#publications');
+            publicationsContainer.html('');
+            publications.render(publicationsContainer);
+            var activitiesContainer = $('#activities');
+            activitiesContainer.html('<div class="apollo-data-text-multiple"><span class="undefined">None</span></div>');
+            LoaderManager.hideLoader(loader2, function () {
+                LoaderManager.destroyLoader(loader2);
             });
         });
     }

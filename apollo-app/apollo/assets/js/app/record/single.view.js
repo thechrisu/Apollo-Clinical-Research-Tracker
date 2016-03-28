@@ -45,6 +45,22 @@ var SingleView = (function () {
                 LoaderManager.destroyLoader(loader);
             });
         });
+        var loader2 = LoaderManager.createLoader($('#additional-panel'));
+        LoaderManager.showLoader(loader2, function () {
+            var awards = new DataTextMultiple(data.awards);
+            var awardsContainer = $('#awards');
+            awardsContainer.html('');
+            awards.render(awardsContainer);
+            var publications = new DataTextMultiple(data.publications);
+            var publicationsContainer = $('#publications');
+            publicationsContainer.html('');
+            publications.render(publicationsContainer);
+            var activitiesContainer = $('#activities');
+            activitiesContainer.html('<div class="apollo-data-text-multiple"><span class="undefined">None</span></div>');
+            LoaderManager.hideLoader(loader2, function () {
+                LoaderManager.destroyLoader(loader2);
+            });
+        });
     };
     SingleView.prototype.parseFields = function (data) {
         var loader = LoaderManager.createLoader($('#fields'));

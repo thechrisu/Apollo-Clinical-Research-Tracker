@@ -52,8 +52,8 @@
   border-top: 1px solid #dddddd
   padding: 3px 0
   &:first-child
-    border-top: none
     padding-top: 0
+    border-top: none
   &:last-child
     padding-bottom: 0
 
@@ -74,6 +74,22 @@
     padding-left: 8px !important
     & > .glyphicon
       margin-right: 0 !important
+
+// Fix the padding for awards, publications and activites
+#additional
+  padding-bottom: 0 !important
+  padding-top: 0 !important
+  .panel-body
+    padding: 0 !important
+  .apollo-data-text-multiple
+    padding: 10px 15px !important
+  .apollo-input-text-multiple
+    margin-right: 4px !important
+    margin-left: 4px !important
+    &:first-child
+      margin-top: 2px !important
+    &:last-child
+      margin-bottom: 2px !important
 
 // Remove margin on breadcrumbs for better appearance
 .panel-heading

@@ -29,7 +29,8 @@ use Apollo\Helpers\URLHelper;
                     <div class="row">
                         <div class="col-md-6">
                             <div class="input-group date" data-provide="datepicker">
-                                <input id="add-start-date" type="text" placeholder="Start date" class="form-control"><span
+                                <input id="add-start-date" type="text" placeholder="Start date"
+                                       class="form-control"><span
                                         class="input-group-addon"><i
                                             class="glyphicon glyphicon-th"></i></span>
                             </div>
@@ -51,14 +52,17 @@ use Apollo\Helpers\URLHelper;
     <div class="panel panel-default loader-ready" id="essential-panel">
         <div class="panel-heading">
             <span class="pull-right">Record actions:<!--
-             --><a href="#" id="record-add" class="btn btn-sm btn-success disabled"><span class="glyphicon glyphicon-plus"
-                                                                                 aria-hidden="true"></span>Add a record</a><!--
+             --><a href="#" id="record-add" class="btn btn-sm btn-success disabled"><span
+                            class="glyphicon glyphicon-plus"
+                            aria-hidden="true"></span>Add a record</a><!--
              --><a href="#" id="record-duplicate" class="btn btn-sm btn-primary disabled"><span
                             class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>Duplicate record</a><!--
-             --><a href="#" id="record-edit" class="btn btn-sm btn-warning disabled"><span class="glyphicon glyphicon-pencil"
-                                                                                  aria-hidden="true"></span>Edit</a><!--
-             --><a href="#" id="record-hide" class="btn btn-sm btn-danger disabled"><span class="glyphicon glyphicon-remove"
-                                                                                 aria-hidden="true"></span>Hide</a>
+             --><a href="#" id="record-edit" class="btn btn-sm btn-warning disabled"><span
+                            class="glyphicon glyphicon-pencil"
+                            aria-hidden="true"></span>Edit</a><!--
+             --><a href="#" id="record-hide" class="btn btn-sm btn-danger disabled"><span
+                            class="glyphicon glyphicon-remove"
+                            aria-hidden="true"></span>Hide</a>
             </span>
             <span>
                 <span>Current record:</span><!--
@@ -160,6 +164,44 @@ use Apollo\Helpers\URLHelper;
 
     <div class="loader-ready" id="fields">
 
+    </div>
+
+    <div class="panel panel-default loader-ready" id="additional-panel">
+        <div class="panel-heading">Additional info</div>
+        <div class="panel-body" id="additional">
+
+            <div class="row top-buffer">
+
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Awards</div>
+                        <div class="panel-body" id="awards">
+                            <div class="apollo-data-text-multiple"><span class="undefined">Loading...</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Publications</div>
+                        <div class="panel-body" id="publications">
+                            <div class="apollo-data-text-multiple"><span class="undefined">Loading...</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Activities</div>
+                        <div class="panel-body" id="activities">
+                            <div class="apollo-data-text-multiple"><span class="undefined">Loading...</span></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
     </div>
 @stop
 @section('scripts')

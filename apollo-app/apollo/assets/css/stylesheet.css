@@ -101,8 +101,8 @@ body {
   border-top: 1px solid #dddddd;
   padding: 3px 0; }
   .apollo-data-text-multiple:first-child {
-    border-top: none;
-    padding-top: 0; }
+    padding-top: 0;
+    border-top: none; }
   .apollo-data-text-multiple:last-child {
     padding-bottom: 0; }
 
@@ -122,6 +122,21 @@ body {
     padding-left: 8px !important; }
     .apollo-input-text-multiple .btn > .glyphicon {
       margin-right: 0 !important; }
+
+#additional {
+  padding-bottom: 0 !important;
+  padding-top: 0 !important; }
+  #additional .panel-body {
+    padding: 0 !important; }
+  #additional .apollo-data-text-multiple {
+    padding: 10px 15px !important; }
+  #additional .apollo-input-text-multiple {
+    margin-right: 4px !important;
+    margin-left: 4px !important; }
+    #additional .apollo-input-text-multiple:first-child {
+      margin-top: 2px !important; }
+    #additional .apollo-input-text-multiple:last-child {
+      margin-bottom: 2px !important; }
 
 .panel-heading .breadcrumb {
   margin-bottom: 0; }

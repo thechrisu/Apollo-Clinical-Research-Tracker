@@ -6,7 +6,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.2.0
+ * @version 0.2.1
  */
 /**
  * Constant specifying a delay before the AJAX request after the user
@@ -18,6 +18,7 @@ var AJAX_DELAY = 600;
 var AJAX_LAZY_DELAY = 1000;
 /**
  * Constants specifying the IDs of the fields recognised by the backend
+ * @since 0.2.1 Added awards and publications
  * @since 0.1.6
  */
 var FIELD_GIVEN_NAME = -1;
@@ -29,6 +30,8 @@ var FIELD_END_DATE = 3;
 var FIELD_EMAIL = 4;
 var FIELD_PHONE = 5;
 var FIELD_ADDRESS = 6;
+var FIELD_AWARDS = 7;
+var FIELD_PUBLICATIONS = 8;
 /**
  * Util class
  * @since 0.0.4

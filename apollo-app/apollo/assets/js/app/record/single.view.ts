@@ -12,22 +12,6 @@
  * @version 0.0.5
  */
 
-interface EssentialData {
-    given_name:string,
-    middle_name:string,
-    last_name:string,
-    email:string,
-    address:string[],
-    phone:string,
-    start_date:string,
-    end_date:string,
-    person_id:number,
-    record_id:number,
-    record_name:string,
-    record_ids:number[],
-    record_names:string[]
-
-}
 interface FieldData {
     name:string,
     type:number,
@@ -71,6 +55,22 @@ class SingleView {
             columnManager.render();
             LoaderManager.hideLoader(loader, function () {
                 LoaderManager.destroyLoader(loader);
+            });
+        });
+        var loader2 = LoaderManager.createLoader($('#additional-panel'));
+        LoaderManager.showLoader(loader2, function () {
+            var awards = new DataTextMultiple(data.awards);
+            var awardsContainer = $('#awards');
+            awardsContainer.html('');
+            awards.render(awardsContainer);
+            var publications = new DataTextMultiple(data.publications);
+            var publicationsContainer = $('#publications');
+            publicationsContainer.html('');
+            publications.render(publicationsContainer);
+            var activitiesContainer = $('#activities');
+            activitiesContainer.html('<div class="apollo-data-text-multiple"><span class="undefined">None</span></div>');
+            LoaderManager.hideLoader(loader2, function () {
+                LoaderManager.destroyLoader(loader2);
             });
         });
     }

@@ -210,6 +210,8 @@ class GetController extends GenericController
             "email" => $record->findVarchar(FIELD_EMAIL),
             "address" => $record->findMultiple(FIELD_ADDRESS),
             "phone" => $record->findVarchar(FIELD_PHONE),
+            "awards" => $record->findMultiple(FIELD_AWARDS),
+            "publications" => $record->findMultiple(FIELD_PUBLICATIONS),
             "start_date" => $record->findDateTime(FIELD_START_DATE)->format('Y-m-d H:i:s'),
             "end_date" => $record->findDateTime(FIELD_END_DATE)->format('Y-m-d H:i:s'),
             "person_id" => $record->getPerson()->getId(),

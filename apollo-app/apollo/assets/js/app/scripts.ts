@@ -6,7 +6,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.2.0
+ * @version 0.2.1
  */
 
 /**
@@ -20,6 +20,7 @@ const AJAX_LAZY_DELAY: number = 1000;
 
 /**
  * Constants specifying the IDs of the fields recognised by the backend
+ * @since 0.2.1 Added awards and publications
  * @since 0.1.6
  */
 const FIELD_GIVEN_NAME: number = -1;
@@ -31,7 +32,31 @@ const FIELD_END_DATE: number = 3;
 const FIELD_EMAIL: number = 4;
 const FIELD_PHONE: number = 5;
 const FIELD_ADDRESS: number = 6;
+const FIELD_AWARDS: number = 7;
+const FIELD_PUBLICATIONS: number = 8;
 
+/**
+ * Record essential data interface
+ * @since 0.2.1
+ */
+interface EssentialData {
+    given_name:string,
+    middle_name:string,
+    last_name:string,
+    email:string,
+    address:string[],
+    phone:string,
+    awards:string[],
+    publications:string[],
+    start_date:string,
+    end_date:string,
+    person_id:number,
+    record_id:number,
+    record_name:string,
+    record_ids:number[],
+    record_names:string[]
+
+}
 /**
  * Default error interface
  * @since 0.0.3

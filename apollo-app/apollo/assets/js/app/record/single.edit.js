@@ -110,6 +110,26 @@ var SingleView = (function () {
                 LoaderManager.destroyLoader(loader);
             });
         });
+        var loader2 = LoaderManager.createLoader($('#additional-panel'));
+        LoaderManager.showLoader(loader2, function () {
+            var awards = new InputTextMultiple(FIELD_AWARDS, function (id, value) {
+                that.submitCallback('text-multiple', id, value);
+            }, { placeholder: 'Award' }, data.awards);
+            var awardsContainer = $('#awards');
+            awardsContainer.html('');
+            awards.render(awardsContainer);
+            var publications = new InputTextMultiple(FIELD_PUBLICATIONS, function (id, value) {
+                that.submitCallback('text-multiple', id, value);
+            }, { placeholder: 'Publication' }, data.publications);
+            var publicationsContainer = $('#publications');
+            publicationsContainer.html('');
+            publications.render(publicationsContainer);
+            var activitiesContainer = $('#activities');
+            activitiesContainer.html('<div class="apollo-data-text-multiple"><span class="undefined">None</span></div>');
+            LoaderManager.hideLoader(loader2, function () {
+                LoaderManager.destroyLoader(loader2);
+            });
+        });
     };
     SingleView.prototype.parseFields = function (data) {
         var that = this;
