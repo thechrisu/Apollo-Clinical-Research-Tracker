@@ -221,6 +221,20 @@ class InputTextMultiple extends InputField {
                 that.parseCallback();
             }
         });
+        input.input.on({
+            keyup: function (e) {
+                var key = e.keyCode || e.charCode;
+                if (key == 13) {
+                    that.createInputPair().input.input.focus();
+                } else if (key == 8) {
+                    if (that.inputPairs.length > 1 && inputPair.input.input.val().length == 0) {
+                        that.inputPairs[that.inputPairs.indexOf(inputPair) - 1].input.input.focus();
+                        that.removeInputPair(inputPair);
+                    }
+                }
+                that.parseCallback();
+            }
+        });
         this.inputPairs.push(inputPair);
         this.parentNode.append(node);
         return inputPair;
