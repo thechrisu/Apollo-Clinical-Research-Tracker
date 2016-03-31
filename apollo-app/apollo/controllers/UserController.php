@@ -21,7 +21,7 @@ use Doctrine\ORM\EntityRepository;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.4
+ * @version 0.0.5
  */
 class UserController extends GenericController
 {
@@ -95,6 +95,20 @@ class UserController extends GenericController
     {
         Session::destroy();
         Apollo::getInstance()->getRequest()->sendToIndex();
+    }
+
+    /**
+     * Page to add or delete new users to the app
+     *
+     * @since 0.0.5
+     */
+    public function actionManage() {
+
+        if(!Apollo::getInstance()->getUser()->isAdmin()) {
+            Apollo::getInstance()->getRequest()->sendToIndex();
+        }
+
+        Apollo::getInstance()->getRequest()->error('404', 'This page will be updated to use the UCL authorisation system.');
     }
 
     /**
