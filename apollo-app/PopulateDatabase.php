@@ -10,6 +10,7 @@ require_once 'vendor/autoload.php';
 
 use Apollo\Apollo;
 use Apollo\Components\DB;
+use Apollo\Components\User;
 use Apollo\Entities\OrganisationEntity;
 use Apollo\Entities\PersonEntity;
 use Apollo\Entities\RecordEntity;
@@ -23,7 +24,7 @@ $organisationRepo = $entity_manager->getRepository('Apollo\\Entities\\Organisati
  * @var OrganisationEntity $organisation
  */
 $organisation = $organisationRepo->find(1);
-$userRepo = $entity_manager->getRepository('Apollo\\Entities\\UserEntity');
+$userRepo = User::getRepository();
 /**
  * @var UserEntity $user
  */
