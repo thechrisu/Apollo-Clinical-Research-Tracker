@@ -20,6 +20,7 @@ use Apollo\Entities\PersonEntity;
 use Apollo\Entities\RecordEntity;
 use DateTime;
 use Doctrine\ORM\EntityRepository;
+use Exception;
 
 
 /**
@@ -30,7 +31,7 @@ use Doctrine\ORM\EntityRepository;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.5
+ * @version 0.0.6
  */
 class PostController extends GenericController
 {
@@ -322,51 +323,73 @@ class PostController extends GenericController
         echo json_encode($response);
     }
 
+    /**
+     * @since 0.0.6
+     */
     public function actionActivity()
     {
-        $em = DB::getEntityManager();
         $data = $this->parseRequest(['action' => null]);
         $action = strtolower($data['action']);
         if (!in_array($action, ['create', 'hide', 'update'])) {
             Apollo::getInstance()->getRequest()->error(400, 'Invalid action.');
         };
-        $response['error'] = null;
+        $response = [];
         if ($action == 'create') {
-            $data = $this->parseRequest(['activity_name' => null, 'start_date' => null, 'end_date' => null]);
-            $empty = false;
-            foreach ($data as $key => $value) {
-                if (empty($value)) $empty = true;
-            }
-            if (!$empty) {
-                $user = Apollo::getInstance()->getUser();
-                $start_date = new DateTime($data['start_date']);
-                $end_date = new DateTime($data['end_date']);
-                $activity = new ActivityEntity();
-                $activity->setOrganisation($user->getOrganisation());
-                $activity->setName($data['activity_name']);
-                $activity->setStartDate($start_date);
-                $activity->setEndDate($end_date);
-                $em->persist($activity);
-                try {
-                    $em->flush();
-                    $response['activity_id'] = $activity->getId();
-                } catch (Exception $e) {
-                    $response['errror'] = [
-                        'id' => 2,
-                        'description' => $e->getMessage()
-                    ];
-                }
-            } else {
-                $response['error'] = [
-                    'id' => 1,
-                    'description' => 'Some of the fields are empty!'
-                ];
-            }
+            $response = $this->activityCreate();
         }
-        $dummy = [
-            'error' => null,
-            'activity_id' => 1
-        ];
         echo json_encode($response);
     }
+
+    /**
+     * @param $data
+     * @return ActivityEntity
+     * @since 0.0.6
+     */
+    private function createActivityFromData($data)
+    {
+        $user = Apollo::getInstance()->getUser();
+        $activity = new ActivityEntity();
+        $activity->setOrganisation($user->getOrganisation());
+        $activity->setName($data['activity_name']);
+        $start_date = new DateTime($data['start_date']);
+        $end_date = new DateTime($data['end_date']);
+        $activity->setStartDate($start_date);
+        $activity->setEndDate($end_date);
+        return $activity;
+    }
+
+    /**
+     * @return mixed
+     * @since 0.0.6
+     */
+    private function activityCreate()
+    {
+        $response['error'] = null;
+        $data = $this->parseRequest(['activity_name' => null, 'start_date' => null, 'end_date' => null]);
+        $empty = false;
+        foreach ($data as $key => $value) {
+            if (empty($value)) $empty = true;
+        }
+        if (!$empty) {
+            $activity = $this->createActivityFromData($data);
+            try {
+                $em = DB::getEntityManager();
+                $em->persist($activity);
+                $em->flush();
+                $response['activity_id'] = $activity->getId();
+            } catch (Exception $e) {
+                $response['error'] = [
+                    'id' => 2,
+                    'description' => $e->getMessage()
+                ];
+            }
+        } else {
+            $response['error'] = [
+                'id' => 1,
+                'description' => 'Some of the fields are empty!'
+            ];
+        }
+        return $response;
+    }
+
 }

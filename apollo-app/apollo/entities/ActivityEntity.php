@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping\ManyToMany;
  * Class ActivityEntity
  * @package Apollo\Entities
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
-  * @version 0.0.2
+ * @version 0.0.2
  * @Entity @Table("activities")
  */
 class ActivityEntity
@@ -89,6 +89,7 @@ class ActivityEntity
     public function __construct()
     {
         $this->is_hidden = false;
+        $this->target_group_comment = '';
     }
 
     /**
