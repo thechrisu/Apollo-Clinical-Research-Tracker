@@ -10,8 +10,11 @@ namespace Apollo\Controllers;
 
 use Apollo\Apollo;
 use Apollo\Components\DB;
+use Apollo\Components\Field;
 use Apollo\Components\Person;
 use Apollo\Components\Record;
+use Apollo\Entities\DataEntity;
+use Apollo\Entities\FieldEntity;
 use Apollo\Entities\PersonEntity;
 use Apollo\Entities\RecordEntity;
 use DateTime;
@@ -25,7 +28,7 @@ use Doctrine\ORM\EntityRepository;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2
+ * @version 0.0.4
  */
 class PostController extends GenericController
 {
@@ -50,7 +53,7 @@ class PostController extends GenericController
     }
 
     /**
-     *
+     * Action parsing operations on records, such as hiding, adding, duplicating
      *
      * @since 0.0.2 Parses
      * @since 0.0.1
@@ -102,20 +105,52 @@ class PostController extends GenericController
             $data = $this->parseRequest(['person_id' => 0, 'id' => 0, 'record_name' => null, 'start_date' => null, 'end_date' => null]);
             if (!empty($data['record_name'])) {
                 $record = new RecordEntity(Apollo::getInstance()->getUser()->getEntity());
-                //TODO Tim: Check that person ID is legit
-                $record->setPerson(Person::getRepository()->find($data['person_id']));
-                DB::getEntityManager()->persist($record);
-                DB::getEntityManager()->flush();
-                $start_date = new DateTime($data['start_date']);
-                $end_date = new DateTime($data['end_date']);
-                $record->setVarchar(FIELD_RECORD_NAME, $data['record_name']);
-                $record->setDateTime(FIELD_START_DATE, $start_date);
-                $record->setDateTime(FIELD_END_DATE, $end_date);
-                if($data['id'] > 0) {
-                    //TODO Tim: Check that record with that ID exists, copy the data
+                /** @var PersonEntity $person */
+                $person = Person::find($data['person_id']);
+                if ($person != null) {
+                        $em = DB::getEntityManager();
+                        $record->setPerson($person);
+                        $em->persist($record);
+                        $em->flush();
+                        $start_date = new DateTime($data['start_date']);
+                        $end_date = new DateTime($data['end_date']);
+                        $record->setVarchar(FIELD_RECORD_NAME, $data['record_name']);
+                        $record->setDateTime(FIELD_START_DATE, $start_date);
+                        $record->setDateTime(FIELD_END_DATE, $end_date);
+                        if ($data['id'] > 0) {
+                            if(($sourceRecord = Record::find($data['id'])) != null) {
+                                $fieldRepo = Field::getRepository();
+                                /**
+                                 * @var FieldEntity[] $fields
+                                 */
+                                $fields = $fieldRepo->findBy(['is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
+                                /**
+                                 * @var FieldEntity $field
+                                 */
+                                foreach ($fields as $field) {
+                                    if (!in_array($field->getId(), [FIELD_RECORD_NAME, FIELD_START_DATE, FIELD_END_DATE])) {
+                                        $sourceData = $sourceRecord->findOrCreateData($field->getId());
+                                        /** @var DataEntity $data */
+                                        $data = clone $sourceData;
+                                        $data->setRecord($record);
+                                        $em->persist($data);
+                                    }
+                                }
+                            } else {
+                                $response['error'] = [
+                                    'id' => 1,
+                                    'description' => 'Source record ID is invalid.'
+                                ];
+                            }
+                        }
+                        $em->flush();
+                        $response['record_id'] = $record->getId();
+                } else {
+                    $response['error'] = [
+                        'id' => 1,
+                        'description' => 'Invalid person ID.'
+                    ];
                 }
-                DB::getEntityManager()->flush();
-                $response['record_id'] = $record->getId();
             } else {
                 $response['error'] = [
                     'id' => 1,
@@ -184,11 +219,104 @@ class PostController extends GenericController
         $parsedData = [];
         foreach ($data as $key => $default) {
             if (isset($_POST[$key])) {
-                $parsedData[$key] = is_int($default) ? intval($_POST[$key]) : $_POST[$key];
+                $value = $_POST[$key];
+                if (is_int($default)) $value = intval($value);
+                $parsedData[$key] = $value;
             } else {
                 $parsedData[$key] = $default;
             }
         }
         return $parsedData;
+    }
+
+    /**
+     * Parses the data/field info and saves it into database
+     *
+     * TODO Tim: Fix dates
+     *
+     * @since 0.0.4
+     */
+    public function actionData()
+    {
+        $em = DB::getEntityManager();
+        $data = $this->parseRequest(['record_id' => 0, 'field_id' => 0, 'value' => null, 'is_default' => null]);
+        $response['error'] = null;
+        $organisation = Apollo::getInstance()->getUser()->getOrganisation();
+        /** @var RecordEntity $record */
+        if ($data['record_id'] > 0 && ($record = Record::getRepository()->find($data['record_id'])) != null) {
+            if (in_array($data['field_id'], [FIELD_GIVEN_NAME, FIELD_MIDDLE_NAME, FIELD_LAST_NAME])) {
+                if ($data['value'] !== null) {
+                    if ($data['field_id'] == FIELD_GIVEN_NAME) {
+                        $record->getPerson()->setGivenName($data['value']);
+                    } elseif ($data['field_id'] == FIELD_MIDDLE_NAME) {
+                        $record->getPerson()->setMiddleName($data['value']);
+                    } elseif ($data['field_id'] == FIELD_LAST_NAME) {
+                        $record->getPerson()->setLastName($data['value']);
+                    }
+                    $em->flush();
+                } else {
+                    $response['error'] = [
+                        'id' => 1,
+                        'description' => 'Value cannot be equal to null.'
+                    ];
+                }
+                /** @var FieldEntity $field */
+            } elseif ($data['field_id'] > 0 && ($field = Field::getRepository()->findOneBy(['id' => $data['field_id'], 'organisation' => $organisation])) != null) {
+                if ($data['value'] !== null) {
+                    $dataObject = $record->findOrCreateData($data['field_id']);
+                    switch ($field->getType()) {
+                        case 1:
+                            $dataObject->setInt(intval($data['value']));
+                            break;
+                        case 2:
+                            if ($field->hasDefault()) {
+                                if ($data['is_default'] != null) {
+                                    $dataObject->setIsDefault(true);
+                                    if ($field->isMultiple()) {
+                                        for ($i = 0; $i < count($data['value']); $i++) {
+                                            $data['value'][$i] = intval($data['value'][$i]);
+                                        }
+                                        $dataObject->setLongText(serialize($data['value']));
+                                    } else {
+                                        $dataObject->setInt(intval($data['value']));
+                                    }
+                                } else {
+                                    $dataObject->setIsDefault(false);
+                                    $dataObject->setVarchar($data['value']);
+                                }
+                            } elseif ($field->isMultiple()) {
+                                $dataObject->setLongText(serialize($data['value']));
+                            } else {
+                                $dataObject->setVarchar($data['value']);
+                            }
+                            break;
+                        case 3:
+                            $date = new DateTime($data['value']);
+                            $dataObject->setDateTime($date);
+                            break;
+                        case 4:
+                            $dataObject->setLongText($data['value']);
+                            break;
+                    }
+                    $em->flush();
+                } else {
+                    $response['error'] = [
+                        'id' => 1,
+                        'description' => 'Value cannot be equal to null.'
+                    ];
+                }
+            } else {
+                $response['error'] = [
+                    'id' => 1,
+                    'description' => 'Supplied field ID is invalid.'
+                ];
+            }
+        } else {
+            $response['error'] = [
+                'id' => 1,
+                'description' => 'Supplied record ID is invalid.'
+            ];
+        }
+        echo json_encode($response);
     }
 }

@@ -6,14 +6,21 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.6
+ * @version 0.2.1
  */
 /**
  * Constant specifying a delay before the AJAX request after the user
  * has finished typing
+ * @since 0.1.9 Added AJAX_LAZY_DELAY for cases when instant updates are not required
  * @since 0.1.4
  */
 var AJAX_DELAY = 600;
+var AJAX_LAZY_DELAY = 1000;
+/**
+ * Constants specifying the IDs of the fields recognised by the backend
+ * @since 0.2.1 Added awards and publications
+ * @since 0.1.6
+ */
 var FIELD_GIVEN_NAME = -1;
 var FIELD_MIDDLE_NAME = -2;
 var FIELD_LAST_NAME = -3;
@@ -23,6 +30,8 @@ var FIELD_END_DATE = 3;
 var FIELD_EMAIL = 4;
 var FIELD_PHONE = 5;
 var FIELD_ADDRESS = 6;
+var FIELD_AWARDS = 7;
+var FIELD_PUBLICATIONS = 8;
 /**
  * Util class
  * @since 0.0.4
@@ -82,6 +91,18 @@ var Util = (function () {
     Util.parseSQLDate = function (sqlDate) {
         var parts = sqlDate.split(/[- :]/);
         return new Date(+parts[0], +parts[1] - 1, +parts[2], +parts[3], +parts[4], +parts[5]);
+    };
+    /**
+     * Converts number date time string into JS' Date object
+     * Initial format: dd/mm/yyyy
+     *
+     * @param numberDate
+     * @returns {Date}
+     * @since 0.2.0
+     */
+    Util.parseNumberDate = function (numberDate) {
+        var parts = numberDate.split(/\//);
+        return new Date(+parts[2], +parts[1] - 1, +parts[0], 0, 0, 0);
     };
     /**
      * Creates a MySQL date string based on JS Date object
@@ -234,11 +255,41 @@ var Util = (function () {
         }
         return object;
     };
+    /**
+     * Determines whether the supplied object is a string
+     *
+     * @param object
+     * @returns {boolean}
+     * @since 0.1.8
+     */
+    Util.isString = function (object) {
+        return typeof object === 'string' || object instanceof String;
+    };
+    /**
+     * Determines whether the supplied object is an array
+     *
+     * @param object
+     * @returns {boolean}
+     * @since 0.2.0
+     */
+    Util.isArray = function (object) {
+        return Object.prototype.toString.call(object) === '[object Array]';
+    };
+    /**
+     * Wraps a string in <strong> tags
+     *
+     * @param value
+     * @returns {string}
+     * @since 0.1.9
+     */
+    Util.strong = function (value) {
+        return '<strong>' + value + '</strong>';
+    };
     return Util;
 }());
 /**
  * Deals with loaders
- * @since 0.0.9 Added documnetation
+ * @since 0.0.9 Added documentation
  * @since 0.0.5
  */
 var LoaderManager = (function () {

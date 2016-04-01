@@ -6,12 +6,13 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.7
+ * @version 0.0.8
  */
 
 /**
  * Skeleton for input objects
  *
+ * @since 0.0.8 Now uses AJAX_LAZY_DELAY instead of AJAX_DELAY
  * @since 0.0.1
  */
 abstract class InputField implements Renderable {
@@ -35,7 +36,7 @@ abstract class InputField implements Renderable {
         clearTimeout(this.timeout);
         this.timeout = setTimeout(function () {
             callback();
-        }, AJAX_DELAY);
+        }, AJAX_LAZY_DELAY);
     }
 
 }
@@ -72,6 +73,9 @@ class InputNumber extends InputField {
         var that = this;
         this.input.on({
             keyup: function () {
+                that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
+            },
+            change: function () {
                 that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
             }
         });
@@ -182,7 +186,7 @@ class InputTextMultiple extends InputField {
             this.createInputPair();
         } else {
             for (var value in values) {
-                this.createInputPair(values[value]);
+                if (values.hasOwnProperty(value)) this.createInputPair(values[value]);
             }
         }
     }
@@ -217,6 +221,20 @@ class InputTextMultiple extends InputField {
                 that.parseCallback();
             }
         });
+        input.input.on({
+            keyup: function (e) {
+                var key = e.keyCode || e.charCode;
+                if (key == 13) {
+                    that.createInputPair().input.input.focus();
+                } else if (key == 8) {
+                    if (that.inputPairs.length > 1 && inputPair.input.input.val().length == 0) {
+                        that.inputPairs[that.inputPairs.indexOf(inputPair) - 1].input.input.focus();
+                        that.removeInputPair(inputPair);
+                    }
+                }
+                that.parseCallback();
+            }
+        });
         this.inputPairs.push(inputPair);
         this.parentNode.append(node);
         return inputPair;
@@ -231,7 +249,7 @@ class InputTextMultiple extends InputField {
         }
     }
 
-    private parseCallback(id:number = 0, value:string = null) {
+    private parseCallback() {
         var values = [];
         for (var i = 0; i < this.inputPairs.length; i++) {
             var inputPair = this.inputPairs[i];
@@ -299,7 +317,7 @@ class InputDropdown extends InputField {
     public constructor(id:number, callback:(id:number, value:string|number|number[]) => void, options:string[], selected:number|number[] = 0, allowOther:boolean = false, value:string = null, multiple:boolean = false) {
         super(id, callback);
         this.options = options;
-        if(Object.prototype.toString.call(selected) === '[object Array]') {
+        if (Object.prototype.toString.call(selected) === '[object Array]') {
             this.selected = <number[]> selected;
         } else {
             this.selected = [<number> selected];
@@ -334,13 +352,13 @@ class InputDropdown extends InputField {
                 'style': 'display:none;',
                 'data-id': this.id.toString(),
                 'id': 'input-dropdown-other-' + this.id,
-                'class': 'form-control input-sm',
+                'class': 'form-control input-sm input-dropdown-other',
                 'placeholder': 'Type here...',
                 'type': 'text',
                 'value': (this.value == null ? '' : this.value)
             }, null, true);
             this.parentNode.append(this.input);
-            if (this.selected == this.options.length) this.input.show();
+            if (this.selected[0] == this.options.length) this.input.show();
         }
     }
 

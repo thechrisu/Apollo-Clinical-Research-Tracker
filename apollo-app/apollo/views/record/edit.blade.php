@@ -18,15 +18,17 @@ use Apollo\Helpers\URLHelper;
     <div class="panel panel-default loader-ready" id="essential-panel">
         <div class="panel-heading">
             <span class="pull-right">Record actions:<!--
-             --><a href="#" id="record-save" class="btn btn-sm btn-success disabled"><span class="glyphicon glyphicon-ok"
-                                                                                 aria-hidden="true"></span>Changes saved.</a><!--
-             --><a href="#" id="record-view" class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-eye-open"
-                                                                                 aria-hidden="true"></span>View Record</a>
+             --><a href="#" id="record-save" class="btn btn-sm btn-warning disabled"><span
+                            class="glyphicon glyphicon-refresh"
+                            aria-hidden="true"></span>Loading...</a><!--
+             --><a href="#" id="record-view" class="btn btn-sm btn-primary disabled"><span
+                            class="glyphicon glyphicon-eye-open"
+                            aria-hidden="true"></span>View Record</a>
             </span>
             <span>
                 <span>Currently editing:</span><!--
              --><div class="dropdown">
-                    <button class="btn btn-primary btn-sm dropdown-toggle" id="current-record" type="button"
+                    <button class="btn btn-primary btn-sm dropdown-toggle disabled" id="current-record" type="button"
                             data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="true">
                         Current record
@@ -123,6 +125,44 @@ use Apollo\Helpers\URLHelper;
 
     <div class="loader-ready" id="fields">
 
+    </div>
+
+    <div class="panel panel-default loader-ready" id="additional-panel">
+        <div class="panel-heading">Additional info</div>
+        <div class="panel-body" id="additional">
+
+            <div class="row top-buffer">
+
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Awards</div>
+                        <div class="panel-body" id="awards">
+                            <div class="apollo-data-text-multiple"><span class="undefined">Loading...</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Publications</div>
+                        <div class="panel-body" id="publications">
+                            <div class="apollo-data-text-multiple"><span class="undefined">Loading...</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Activities</div>
+                        <div class="panel-body" id="activities">
+                            <div class="apollo-data-text-multiple"><span class="undefined">Loading...</span></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
     </div>
 @stop
 @section('scripts')

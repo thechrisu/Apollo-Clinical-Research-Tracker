@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping\ManyToOne;
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @Entity @Table("data")
- * @version 0.0.5
+ * @version 0.0.6
  */
 class DataEntity
 {
@@ -94,6 +94,14 @@ class DataEntity
         $this->_varchar = "";
         $this->_long_text = "";
         $this->updated_on = $date;
+    }
+
+    /**
+     * Clones the entity detaching it from the entity manager
+     */
+    public function __clone()
+    {
+        $this->id = null;
     }
 
     /**

@@ -224,12 +224,16 @@ class RecordEntity
             $data->setRecord($this);
             $data->setField($field);
             $data->setUpdatedBy(Apollo::getInstance()->getConsole()->getEntity());
-            if($field->isMultiple()) {
+            if($field->hasDefault()) {
+                if($field->isMultiple()) {
+                    $data->setLongText(serialize([0]));
+                } else {
+                    $data->setInt(0);
+                }
+                $data->setIsDefault(true);
+            } else if($field->isMultiple()) {
                 $value = [];
                 $data->setLongText(serialize($value));
-            } elseif($field->hasDefault()) {
-                $data->setInt(0);
-                $data->setIsDefault(true);
             }
             DB::getEntityManager()->persist($data);
             DB::getEntityManager()->flush();

@@ -17,7 +17,8 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
 @extends('layouts.basic')
 @section('head')
 
-    <link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.min.css" />
+    <link rel="stylesheet" href="{{ AssetHelper::css('bootstrap.min') }}" />
+    <link rel="stylesheet" href="{{ AssetHelper::css('bootstrap.cosmo.min') }}" />
     <link rel="stylesheet" href="{{ AssetHelper::css('stylesheet') }}" />
     <link rel="stylesheet" href="{{ AssetHelper::css('datepicker3.min') }}" />
     <link rel="stylesheet" href="{{ AssetHelper::css('bootstrap-tokenfield') }}" />
@@ -76,16 +77,18 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
     </div><!-- /.modal -->
 @stop
 @section('scripts')
+    <script src="{{ AssetHelper::js('plugins/jquery-2.2.2.min') }}"></script>
+    <script src="{{ AssetHelper::js('plugins/bootstrap.min') }}"></script>
+    <script src="{{ AssetHelper::js('plugins/jquery.simplePagination') }}"></script>
     <script src="{{ AssetHelper::js('app/scripts') }}"></script>
     <script src="{{ AssetHelper::js('app/ajax') }}"></script>
-    <script src="{{ AssetHelper::js('plugins/jquery.simplePagination') }}"></script>
     <script src="{{ AssetHelper::js('plugins/bootstrap-tokenfield.min') }}"></script>
     <script src="{{ AssetHelper::js('plugins/affix') }}"></script>
     <script src="{{ AssetHelper::js('plugins/docs.min') }}"></script>
     <script src="{{ AssetHelper::js('plugins/scrollspy') }}"></script>
     <script src="{{ AssetHelper::js('plugins/typeahead.bundle.min') }}"></script>
     <script src="{{ AssetHelper::js('plugins/bootbox.min') }}"></script>
-    <script src="http://eternicode.github.io/bootstrap-datepicker/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+    <script src="{{ AssetHelper::js('plugins/bootstrap-datepicker') }}"></script>
     <script>
         $.fn.datepicker.defaults.format = "dd/mm/yyyy";
     </script>

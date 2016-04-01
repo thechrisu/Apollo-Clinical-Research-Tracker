@@ -7,7 +7,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.3
+ * @version 0.1.4
  */
 
 /**
@@ -81,6 +81,7 @@ defined('DB_PASS') OR define('DB_PASS', '');
 
 /**
  * Constants for fields IDs
+ * @since 0.1.4 Added awards and publications
  * @since 0.1.2 Added pseudo-IDs for the name (to be used in API)
  * @since 0.1.1
  */
@@ -93,3 +94,5 @@ define('FIELD_END_DATE', 3);
 define('FIELD_EMAIL', 4);
 define('FIELD_PHONE', 5);
 define('FIELD_ADDRESS', 6);
+define('FIELD_AWARDS', 7);
+define('FIELD_PUBLICATIONS', 8);

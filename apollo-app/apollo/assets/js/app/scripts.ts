@@ -6,25 +6,57 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.6
+ * @version 0.2.1
  */
 
 /**
  * Constant specifying a delay before the AJAX request after the user
  * has finished typing
+ * @since 0.1.9 Added AJAX_LAZY_DELAY for cases when instant updates are not required
  * @since 0.1.4
  */
 const AJAX_DELAY: number = 600;
-const FIELD_GIVEN_NAME = -1;
-const FIELD_MIDDLE_NAME = -2;
-const FIELD_LAST_NAME = -3;
-const FIELD_RECORD_NAME = 1;
-const FIELD_START_DATE = 2;
-const FIELD_END_DATE = 3;
-const FIELD_EMAIL = 4;
-const FIELD_PHONE = 5;
-const FIELD_ADDRESS = 6;
+const AJAX_LAZY_DELAY: number = 1000;
 
+/**
+ * Constants specifying the IDs of the fields recognised by the backend
+ * @since 0.2.1 Added awards and publications
+ * @since 0.1.6
+ */
+const FIELD_GIVEN_NAME: number = -1;
+const FIELD_MIDDLE_NAME: number = -2;
+const FIELD_LAST_NAME: number = -3;
+const FIELD_RECORD_NAME: number = 1;
+const FIELD_START_DATE: number = 2;
+const FIELD_END_DATE: number = 3;
+const FIELD_EMAIL: number = 4;
+const FIELD_PHONE: number = 5;
+const FIELD_ADDRESS: number = 6;
+const FIELD_AWARDS: number = 7;
+const FIELD_PUBLICATIONS: number = 8;
+
+/**
+ * Record essential data interface
+ * @since 0.2.1
+ */
+interface EssentialData {
+    given_name:string,
+    middle_name:string,
+    last_name:string,
+    email:string,
+    address:string[],
+    phone:string,
+    awards:string[],
+    publications:string[],
+    start_date:string,
+    end_date:string,
+    person_id:number,
+    record_id:number,
+    record_name:string,
+    record_ids:number[],
+    record_names:string[]
+
+}
 /**
  * Default error interface
  * @since 0.0.3
@@ -107,6 +139,19 @@ class Util {
     public static parseSQLDate(sqlDate:string):Date {
         var parts = sqlDate.split(/[- :]/);
         return new Date(+parts[0], +parts[1] - 1, +parts[2], +parts[3], +parts[4], +parts[5]);
+    }
+
+    /**
+     * Converts number date time string into JS' Date object
+     * Initial format: dd/mm/yyyy
+     *
+     * @param numberDate
+     * @returns {Date}
+     * @since 0.2.0
+     */
+    public static parseNumberDate(numberDate:string):Date {
+        var parts = numberDate.split(/\//);
+        return new Date(+parts[2], +parts[1] - 1, +parts[0], 0, 0, 0);
     }
 
     /**
@@ -258,11 +303,44 @@ class Util {
         }
         return object;
     }
+
+    /**
+     * Determines whether the supplied object is a string
+     *
+     * @param object
+     * @returns {boolean}
+     * @since 0.1.8
+     */
+    public static isString(object:any):boolean {
+        return typeof object === 'string' || object instanceof String;
+    }
+
+    /**
+     * Determines whether the supplied object is an array
+     *
+     * @param object
+     * @returns {boolean}
+     * @since 0.2.0
+     */
+    public static isArray(object:any):boolean {
+        return Object.prototype.toString.call(object) === '[object Array]';
+    }
+
+    /**
+     * Wraps a string in <strong> tags
+     *
+     * @param value
+     * @returns {string}
+     * @since 0.1.9
+     */
+    public static strong(value:string):string {
+        return '<strong>' + value + '</strong>';
+    }
 }
 
 /**
  * Deals with loaders
- * @since 0.0.9 Added documnetation
+ * @since 0.0.9 Added documentation
  * @since 0.0.5
  */
 class LoaderManager {

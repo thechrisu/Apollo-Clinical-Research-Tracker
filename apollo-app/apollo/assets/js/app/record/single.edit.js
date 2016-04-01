@@ -10,7 +10,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.0
+ * @version 0.1.1
  */
 var SingleView = (function () {
     function SingleView() {
@@ -27,6 +27,50 @@ var SingleView = (function () {
             that.setupButtons(data.essential);
         }, function (message) {
             Util.error('An error has occurred during the loading of single record data. Please reload the page or contact the administrator. Error message: ' + message);
+        });
+    };
+    SingleView.prototype.submitCallback = function (type, id, value) {
+        var that = this;
+        this.saveButton.removeClass('btn-danger');
+        this.saveButton.removeClass('btn-success');
+        this.saveButton.addClass('btn-warning');
+        this.saveButton.html('<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>Saving...');
+        var data = {
+            record_id: this.id,
+            field_id: id
+        };
+        switch (type) {
+            case 'number':
+                data['value'] = Util.isString(value) ? parseInt(value) : value;
+                break;
+            case 'text':
+                data['value'] = value;
+                break;
+            case 'text-multiple':
+                data['value'] = value;
+                break;
+            case 'dropdown':
+                if (!Util.isString(value)) {
+                    data['is_default'] = true;
+                }
+                data['value'] = value;
+                break;
+            case 'date':
+                data['value'] = Util.toMysqlFormat(Util.parseNumberDate(value));
+                break;
+            case 'long-text':
+                data['value'] = value;
+                break;
+        }
+        AJAX.post(Util.url('post/data'), data, function (response) {
+            that.saveButton.removeClass('btn-warning');
+            that.saveButton.addClass('btn-success');
+            that.saveButton.html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Changes saved.');
+        }, function (message) {
+            that.saveButton.removeClass('btn-warning');
+            that.saveButton.addClass('btn-danger');
+            that.saveButton.html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Saving failed.');
+            Util.error('An error has occurred during the process of updating of the data. Error message: ' + message);
         });
     };
     SingleView.prototype.parseEssentials = function (data) {
@@ -52,10 +96,10 @@ var SingleView = (function () {
             columnManager.addToColumn(1, new ColumnRow('Record name', new InputText(FIELD_RECORD_NAME, function (id, value) {
                 that.submitCallback('text', id, value);
             }, { placeholder: 'Record name' }, data.record_name)));
-            columnManager.addToColumn(1, new ColumnRow('Record start date', new InputDate(FIELD_START_DATE, function (id, value) {
+            columnManager.addToColumn(1, new ColumnRow('Start date', new InputDate(FIELD_START_DATE, function (id, value) {
                 that.submitCallback('date', id, value);
             }, { placeholder: 'Start date' }, Util.formatNumberDate(Util.parseSQLDate(data.start_date)))));
-            columnManager.addToColumn(1, new ColumnRow('Record end date', new InputDate(FIELD_END_DATE, function (id, value) {
+            columnManager.addToColumn(1, new ColumnRow('End date', new InputDate(FIELD_END_DATE, function (id, value) {
                 that.submitCallback('date', id, value);
             }, { placeholder: 'End date' }, Util.formatNumberDate(Util.parseSQLDate(data.end_date)))));
             columnManager.addToColumn(2, new ColumnRow('Address', new InputTextMultiple(FIELD_ADDRESS, function (id, value) {
@@ -66,10 +110,26 @@ var SingleView = (function () {
                 LoaderManager.destroyLoader(loader);
             });
         });
-    };
-    SingleView.prototype.submitCallback = function (type, id, value) {
-        console.log('ID: ' + type + ' ' + id + '. Values:');
-        console.log(value);
+        var loader2 = LoaderManager.createLoader($('#additional-panel'));
+        LoaderManager.showLoader(loader2, function () {
+            var awards = new InputTextMultiple(FIELD_AWARDS, function (id, value) {
+                that.submitCallback('text-multiple', id, value);
+            }, { placeholder: 'Award' }, data.awards);
+            var awardsContainer = $('#awards');
+            awardsContainer.html('');
+            awards.render(awardsContainer);
+            var publications = new InputTextMultiple(FIELD_PUBLICATIONS, function (id, value) {
+                that.submitCallback('text-multiple', id, value);
+            }, { placeholder: 'Publication' }, data.publications);
+            var publicationsContainer = $('#publications');
+            publicationsContainer.html('');
+            publications.render(publicationsContainer);
+            var activitiesContainer = $('#activities');
+            activitiesContainer.html('<div class="apollo-data-text-multiple"><span class="undefined">None</span></div>');
+            LoaderManager.hideLoader(loader2, function () {
+                LoaderManager.destroyLoader(loader2);
+            });
+        });
     };
     SingleView.prototype.parseFields = function (data) {
         var that = this;
@@ -77,29 +137,19 @@ var SingleView = (function () {
         LoaderManager.showLoader(loader, function () {
             var count = data.length;
             var columnManager = new ColumnManager('#fields', 3, count);
-            /**
-             * interface FieldEditData {
-    id:number,
-    name:string,
-    type:number,
-    has_default:boolean,
-    allow_other:boolean,
-    is_multiple:boolean,
-    defaults:string[],
-    value:number|number[]|string|string[]
-}
-             */
             for (var i = 0; i < count; i++) {
                 var field = data[i];
                 var renderable;
                 switch (field.type) {
                     case 1:
-                        renderable = new InputNumber(field.id, function (id, value) { that.submitCallback('number', id, value); }, { placeholder: field.name }, field.value);
+                        renderable = new InputNumber(field.id, function (id, value) {
+                            that.submitCallback('number', id, value);
+                        }, { placeholder: field.name }, field.value);
                         break;
                     case 2:
                         var value = '';
                         var selected = field.value;
-                        if (typeof selected === 'string' || selected instanceof String) {
+                        if (Util.isString(selected)) {
                             value = selected;
                             selected = field.defaults.length;
                         }
@@ -109,17 +159,25 @@ var SingleView = (function () {
                             }, field.defaults, selected, field.allow_other, value, field.is_multiple);
                         }
                         else if (field.is_multiple) {
-                            renderable = new InputTextMultiple(field.id, function (id, value) { that.submitCallback('text-multiple', id, value); }, { placeholder: field.name }, field.value);
+                            renderable = new InputTextMultiple(field.id, function (id, value) {
+                                that.submitCallback('text-multiple', id, value);
+                            }, { placeholder: field.name }, field.value);
                         }
                         else {
-                            renderable = new InputText(field.id, function (id, value) { that.submitCallback('text', id, value); }, { placeholder: field.name }, field.value);
+                            renderable = new InputText(field.id, function (id, value) {
+                                that.submitCallback('text', id, value);
+                            }, { placeholder: field.name }, field.value);
                         }
                         break;
                     case 3:
-                        renderable = new InputDate(field.id, function (id, value) { that.submitCallback('date', id, value); }, { placeholder: field.name }, field.value.toString());
+                        renderable = new InputDate(field.id, function (id, value) {
+                            that.submitCallback('date', id, value);
+                        }, { placeholder: field.name }, Util.formatNumberDate(Util.parseSQLDate(field.value)));
                         break;
                     case 4:
-                        renderable = new InputLongText(field.id, function (id, value) { that.submitCallback('long-text', id, value); }, { placeholder: field.name }, field.value);
+                        renderable = new InputLongText(field.id, function (id, value) {
+                            that.submitCallback('long-text', id, value);
+                        }, { placeholder: field.name }, field.value);
                         break;
                 }
                 columnManager.add(new ColumnRow(field.name, renderable));
@@ -132,6 +190,7 @@ var SingleView = (function () {
     };
     SingleView.prototype.setupButtons = function (data) {
         var dropdownCurrent = $('#current-record');
+        dropdownCurrent.removeClass('disabled');
         var dropdownOther = $('#other-records');
         dropdownCurrent.html(data.record_name + ' <span class="caret"></span>');
         if (data.record_ids.length > 0) {
@@ -144,6 +203,11 @@ var SingleView = (function () {
         }
         var viewButton = $('#record-view');
         viewButton.attr('href', Util.url('record/view/' + data.record_id));
+        viewButton.removeClass('disabled');
+        this.saveButton = $('#record-save');
+        this.saveButton.removeClass('btn-warning');
+        this.saveButton.addClass('btn-success');
+        this.saveButton.html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>No changes.');
     };
     return SingleView;
 }());

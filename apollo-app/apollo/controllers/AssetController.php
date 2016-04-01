@@ -20,7 +20,7 @@ use finfo;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  */
 class AssetController extends GenericController
 {
@@ -73,6 +73,15 @@ class AssetController extends GenericController
     }
 
     /**
+     * Calls serveFrom() on directory "fonts"
+     *
+     * @since 0.0.3
+     */
+    public function actionFonts() {
+        $this->serveFrom('fonts', ['eot', 'svg', 'ttf', 'woff', 'woff2']);
+    }
+
+    /**
      * Serves a file in request parameters from a certain directory relative to the "assets" folder.
      * If $allowed_extensions is an empty array then allow all extensions.
      *
@@ -104,7 +113,12 @@ class AssetController extends GenericController
                         $mime_type = $file_info->file($path, FILEINFO_MIME_TYPE);
                         break;
                 }
-                //TODO Tim: Add headers for caching and other stuff
+                if(isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
+                    if(strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) < filemtime($path)) {
+                        header('HTTP/1.1 304 Not Modified');
+                        exit;
+                    }
+                }
                 header('Content-Type: ' . $mime_type);
                 readfile($path);
             } else {

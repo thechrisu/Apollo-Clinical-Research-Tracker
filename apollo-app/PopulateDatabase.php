@@ -10,6 +10,7 @@ require_once 'vendor/autoload.php';
 
 use Apollo\Apollo;
 use Apollo\Components\DB;
+use Apollo\Components\User;
 use Apollo\Entities\OrganisationEntity;
 use Apollo\Entities\PersonEntity;
 use Apollo\Entities\RecordEntity;
@@ -23,7 +24,7 @@ $organisationRepo = $entity_manager->getRepository('Apollo\\Entities\\Organisati
  * @var OrganisationEntity $organisation
  */
 $organisation = $organisationRepo->find(1);
-$userRepo = $entity_manager->getRepository('Apollo\\Entities\\UserEntity');
+$userRepo = User::getRepository();
 /**
  * @var UserEntity $user
  */
@@ -31,7 +32,7 @@ $user = $userRepo->find(1);
 date_default_timezone_set('Europe/London');
 $date = new DateTime();
 
-for($i = 0; $i < 5; $i++) {
+for($i = 0; $i < 0; $i++) {
 
     $faker = Factory::create();
     $person = new PersonEntity();
@@ -57,6 +58,5 @@ for($i = 0; $i < 5; $i++) {
     $record->setDateTime(FIELD_END_DATE, new DateTime());
 
     $entity_manager->flush();
-
 
 }

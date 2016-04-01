@@ -6,7 +6,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.7
+ * @version 0.0.8
  */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -16,6 +16,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 /**
  * Skeleton for input objects
  *
+ * @since 0.0.8 Now uses AJAX_LAZY_DELAY instead of AJAX_DELAY
  * @since 0.0.1
  */
 var InputField = (function () {
@@ -31,7 +32,7 @@ var InputField = (function () {
         clearTimeout(this.timeout);
         this.timeout = setTimeout(function () {
             callback();
-        }, AJAX_DELAY);
+        }, AJAX_LAZY_DELAY);
     };
     return InputField;
 }());
@@ -63,6 +64,9 @@ var InputNumber = (function (_super) {
         var that = this;
         this.input.on({
             keyup: function () {
+                that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
+            },
+            change: function () {
                 that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
             }
         });
@@ -152,7 +156,8 @@ var InputTextMultiple = (function (_super) {
         }
         else {
             for (var value in values) {
-                this.createInputPair(values[value]);
+                if (values.hasOwnProperty(value))
+                    this.createInputPair(values[value]);
             }
         }
     };
@@ -187,6 +192,21 @@ var InputTextMultiple = (function (_super) {
                 that.parseCallback();
             }
         });
+        input.input.on({
+            keyup: function (e) {
+                var key = e.keyCode || e.charCode;
+                if (key == 13) {
+                    that.createInputPair().input.input.focus();
+                }
+                else if (key == 8) {
+                    if (that.inputPairs.length > 1 && inputPair.input.input.val().length == 0) {
+                        that.inputPairs[that.inputPairs.indexOf(inputPair) - 1].input.input.focus();
+                        that.removeInputPair(inputPair);
+                    }
+                }
+                that.parseCallback();
+            }
+        });
         this.inputPairs.push(inputPair);
         this.parentNode.append(node);
         return inputPair;
@@ -200,9 +220,7 @@ var InputTextMultiple = (function (_super) {
             this.inputPairs[0].input.input.val('');
         }
     };
-    InputTextMultiple.prototype.parseCallback = function (id, value) {
-        if (id === void 0) { id = 0; }
-        if (value === void 0) { value = null; }
+    InputTextMultiple.prototype.parseCallback = function () {
         var values = [];
         for (var i = 0; i < this.inputPairs.length; i++) {
             var inputPair = this.inputPairs[i];
@@ -297,13 +315,13 @@ var InputDropdown = (function (_super) {
                 'style': 'display:none;',
                 'data-id': this.id.toString(),
                 'id': 'input-dropdown-other-' + this.id,
-                'class': 'form-control input-sm',
+                'class': 'form-control input-sm input-dropdown-other',
                 'placeholder': 'Type here...',
                 'type': 'text',
                 'value': (this.value == null ? '' : this.value)
             }, null, true);
             this.parentNode.append(this.input);
-            if (this.selected == this.options.length)
+            if (this.selected[0] == this.options.length)
                 this.input.show();
         }
     };

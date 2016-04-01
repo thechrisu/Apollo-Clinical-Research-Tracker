@@ -19,6 +19,7 @@ use Apollo\Components\Person;
 use Apollo\Entities\RecordEntity;
 use Apollo\Components\Activity;
 use Apollo\Entities\ActivityEntity;
+use Doctrine\ORM\QueryBuilder;
 
 
 /**
@@ -69,7 +70,7 @@ class GetController extends GenericController
 
         $peopleQB = $this->createQueryForRecordsRequest($data);
         $peopleQuery = $peopleQB->getQuery();
-        $people =  $peopleQuery->getResult();
+        $people = $peopleQuery->getResult();
         $response = $this->getFormattedRecordsOfPeople($people, $page);
         echo json_encode($response);
     }
@@ -95,8 +96,8 @@ class GetController extends GenericController
 
     /**
      * Given a query bulider for records and an ordering, set up the ordering depending on how it is requested
-     * @param $queryBuilder
-     * @param $ordering
+     * @param QueryBuilder $queryBuilder
+     * @param int $ordering
      * @return mixed
      */
     private function orderRecords($queryBuilder, $ordering)
@@ -123,7 +124,7 @@ class GetController extends GenericController
     /**
      * TODO: Add description for function
      *
-     * @param $queryBuilder
+     * @param QueryBuilder $queryBuilder
      * @param $search
      */
     private function addPersonSearch($queryBuilder, $search)
@@ -139,12 +140,13 @@ class GetController extends GenericController
     /**
      * Given a person (retrieved from the data base), returns an object containing all the data of the person
      * TODO: Put this function somewhere else, this is a controller
-     * @param $person
+     * @param PersonEntity $person
      * @return mixed
      */
     private function getFormattedPersonData($person)
     {
         $responsePerson = [];
+        /** @var RecordEntity $recentRecord */
         $recentRecord = Person::getMostRecentRecord($person->getId());
         $responsePerson['id'] = $recentRecord->getId();
         $responsePerson['given_name'] = $person->getGivenName();
@@ -187,15 +189,16 @@ class GetController extends GenericController
      * @return array
      * @since 0.0.9
      */
-    private function getEssentialInformation($record) {
+    private function getEssentialInformation($record)
+    {
         /**
          * @var RecordEntity[] $other_records
          */
         $other_records = Record::getRepository()->findBy(['person' => $record->getPerson()->getId(), 'is_hidden' => 0]);
         $id_array = [];
         $name_array = [];
-        foreach($other_records as $other_record) {
-            if($other_record->getId() != intval($_GET['id'])) {
+        foreach ($other_records as $other_record) {
+            if ($other_record->getId() != intval($_GET['id'])) {
                 $id_array[] = $other_record->getId();
                 $name_array[] = $other_record->findVarchar(FIELD_RECORD_NAME);
             }
@@ -207,6 +210,8 @@ class GetController extends GenericController
             "email" => $record->findVarchar(FIELD_EMAIL),
             "address" => $record->findMultiple(FIELD_ADDRESS),
             "phone" => $record->findVarchar(FIELD_PHONE),
+            "awards" => $record->findMultiple(FIELD_AWARDS),
+            "publications" => $record->findMultiple(FIELD_PUBLICATIONS),
             "start_date" => $record->findDateTime(FIELD_START_DATE)->format('Y-m-d H:i:s'),
             "end_date" => $record->findDateTime(FIELD_END_DATE)->format('Y-m-d H:i:s'),
             "person_id" => $record->getPerson()->getId(),
@@ -218,69 +223,80 @@ class GetController extends GenericController
     }
 
     /**
-     * Returns dummy record data
+     * Returns record data for viewing
      *
      * @since 0.0.3
      */
-    public function actionRecord() {
-        //TODO: refactor this to use actual data
-
+    public function actionRecordView()
+    {
+        $data = $this->parseRequest(['id' => 0]);
+        $response['error'] = null;
         /**
          * @var RecordEntity $record
          */
-        $record = Record::getRepository()->find(intval($_GET['id']));
-        Record::prepare($record);
-
-        $data['error'] = null;
-        $data['essential'] = $this->getEssentialInformation($record);
-        $data['data'] = [
-            [
-                "name" => "Supervisor",
-                "type" => 2,
-                "value" => "M&Ms"
-            ],
-            [
-                "name" => "Car",
-                "type" => 2,
-                "value" => "Aston Martin DB5"
-            ],
-            [
-                "name" => "Work experience",
-                "type" => 2,
-                "value" => ['D-Wave Systems, Junior Research Scientist and Software Engineer', 'EXI Wireless, Bluetooth Group Software and Hardware Engineer', 'Nortel Networks, OPTera Solutions, Photonic Group']
-            ],
-            [
-                "name" => "Intentionally left blank",
-                "type" => 2,
-                "value" => null
-            ],
-            [
-                "name" => "Subjects",
-                "type" => 2,
-                "value" => ['Software Engineering', 'Compiling Techniques', 'Cryptography']
-            ],
-            [
-                "name" => "References",
-                "type" => 4,
-                "value" => "Mister Bond is one of our nicest employees. He even developed new applications in conjunction with Q."
-            ],
-            [
-                "name" => "Birthday",
-                "type" => 3,
-                "value" => "1974-02-22 02:00:00"
-            ],
-            [
-                "name" => "Some other date",
-                "type" => 3,
-                "value" => "2067-11-12 02:00:00"
-            ],
-            [
-            "name" => "Lab skills",
-            "type" => 2,
-            "value" => ['Digital/Analog Scopes', 'Spectrum Analyzer', 'Function Generators']
-        ]
-        ];
-        echo json_encode($data);
+        if ($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
+            Record::prepare($record);
+            $response['essential'] = $this->getEssentialInformation($record);
+            $fieldsViewData = [];
+            $fieldRepo = Field::getRepository();
+            /**
+             * @var FieldEntity[] $fields
+             */
+            $fields = $fieldRepo->findBy(['is_essential' => false, 'is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
+            foreach ($fields as $field) {
+                $fieldViewData['name'] = $field->getName();
+                $fieldViewData['type'] = $field->getType();
+                $defaults = $field->getDefaults();
+                $defaultArray = [];
+                foreach ($defaults as $default) {
+                    $defaultArray[] = $default->getValue();
+                }
+                $fieldData = $record->findOrCreateData($field->getId());
+                $value = [];
+                if ($field->hasDefault()) {
+                    if (!$field->isMultiple()) {
+                        if ($fieldData->isDefault() || !$field->isAllowOther()) {
+                            $value = $defaultArray[$fieldData->getInt()];
+                        } else {
+                            $value = $fieldData->getVarchar();
+                        }
+                    } else {
+                        $selected = unserialize($fieldData->getLongText());
+                        $fieldViewData['type'] = 2;
+                        if (count($selected) > 0) {
+                            for ($i = 0; $i < count($selected); $i++) {
+                                $value[] = $defaultArray[intval($selected[$i])];
+                            }
+                        } else {
+                            $value = '';
+                        }
+                    }
+                } else if ($field->isMultiple()) {
+                    $value = unserialize($fieldData->getLongText());
+                } else {
+                    switch ($field->getType()) {
+                        case 1:
+                            $value = $fieldData->getInt();
+                            break;
+                        case 2:
+                            $value = $fieldData->getVarchar();
+                            break;
+                        case 3:
+                            $value = $fieldData->getDateTime()->format('Y-m-d H:i:s');
+                            break;
+                        case 4:
+                            $value = $fieldData->getLongText();
+                            break;
+                    }
+                }
+                $fieldViewData['value'] = $value;
+                $fieldsViewData[] = $fieldViewData;
+            }
+            $response['data'] = $fieldsViewData;
+        } else {
+            $response['error'] = ['id' => 1, 'description' => 'The supplied ID is invalid!'];
+        }
+        echo json_encode($response);
     }
 
     /**
@@ -288,13 +304,15 @@ class GetController extends GenericController
      *
      * @since 0.0.9
      */
-    public function actionRecordEdit() {
+    public function actionRecordEdit()
+    {
         $data = $this->parseRequest(['id' => 0]);
         $response['error'] = null;
         /**
          * @var RecordEntity $record
          */
-        if($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
+        if ($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
+            Record::prepare($record);
             $response['essential'] = $this->getEssentialInformation($record);
             $fieldsEditData = [];
             $fieldRepo = Field::getRepository();
@@ -302,7 +320,7 @@ class GetController extends GenericController
              * @var FieldEntity[] $fields
              */
             $fields = $fieldRepo->findBy(['is_essential' => false, 'is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
-            foreach($fields as $field) {
+            foreach ($fields as $field) {
                 $fieldEditData['id'] = $field->getId();
                 $fieldEditData['name'] = $field->getName();
                 $fieldEditData['type'] = $field->getType();
@@ -311,26 +329,26 @@ class GetController extends GenericController
                 $fieldEditData['is_multiple'] = $field->isMultiple();
                 $defaults = $field->getDefaults();
                 $defaultArray = [];
-                foreach($defaults as $default) {
+                foreach ($defaults as $default) {
                     $defaultArray[] = $default->getValue();
                 }
                 $fieldEditData['defaults'] = $defaultArray;
                 $fieldData = $record->findOrCreateData($field->getId());
                 $value = [];
-                if($field->hasDefault()) {
+                if ($field->hasDefault()) {
                     if($field->isMultiple()) {
+                        $value = unserialize($fieldData->getLongText());
+                    } else {
                         if ($fieldData->isDefault() || !$field->isAllowOther()) {
-                            $value = $defaultArray[$fieldData->getInt()];
+                            $value = $fieldData->getInt();
                         } else {
                             $value = $fieldData->getVarchar();
                         }
-                    } else {
-                        $value = unserialize($fieldData->getLongText());
                     }
-                } else if($field->isMultiple()) {
+                } else if ($field->isMultiple()) {
                     $value = unserialize($fieldData->getLongText());
                 } else {
-                    switch($field->getType()) {
+                    switch ($field->getType()) {
                         case 1:
                             $value = $fieldData->getInt();
                             break;
@@ -367,10 +385,10 @@ class GetController extends GenericController
 
         $data = $this->parseRequest(['page' => 1, 'sort' => 1, 'search' => null]);
         $page = $data['page'] > 0 ? $data['page'] : 1;
-       /* $activityQB = $this->createQueryForActivitiesRequest($data);
-        $activityQuery = $activityQB->getQuery();
-        $activities =  $activityQuery->getResult();
-        $response = $this->getFormattedActivities($activities, $page);*/
+        /* $activityQB = $this->createQueryForActivitiesRequest($data);
+         $activityQuery = $activityQB->getQuery();
+         $activities =  $activityQuery->getResult();
+         $response = $this->getFormattedActivities($activities, $page);*/
         $response['error'] = null;
         $response['count'] = 12;
         $response['activities'] = [
@@ -476,10 +494,11 @@ class GetController extends GenericController
     }
 
     /**
-     * @param $queryBuilder
+     * @param QueryBuilder $queryBuilder
      * @param $search
      */
-    private function addActivitySearch($queryBuilder, $search){
+    private function addActivitySearch($queryBuilder, $search)
+    {
         $queryBuilder->andWhere($queryBuilder->expr()->orX(
             $queryBuilder->expr()->like('a.name', ':search'),
             $queryBuilder->expr()->like('a.target_group_comment', ':search')
@@ -487,7 +506,8 @@ class GetController extends GenericController
         $queryBuilder->setParameter('search', '%' . $search . '%');
     }
 
-    private function getFormattedActivities($activities, $page){
+    private function getFormattedActivities($activities, $page)
+    {
         $response['error'] = null;
         $response['count'] = count($activities);
         for ($i = 10 * ($page - 1); $i < min($response['count'], $page * 10); $i++) {
@@ -497,7 +517,8 @@ class GetController extends GenericController
         return $response;
     }
 
-    private function getFormattedShortActivityData($activity){
+    private function getFormattedShortActivityData($activity)
+    {
         $responseActivity = [];
         $responseActivity['id'] = $activity->getId();
         $responseActivity['name'] = $activity->getName();
