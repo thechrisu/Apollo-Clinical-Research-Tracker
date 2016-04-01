@@ -13,6 +13,7 @@ use Apollo\Components\DB;
 use Apollo\Components\Field;
 use Apollo\Components\Person;
 use Apollo\Components\Record;
+use Apollo\Entities\ActivityEntity;
 use Apollo\Entities\DataEntity;
 use Apollo\Entities\FieldEntity;
 use Apollo\Entities\PersonEntity;
@@ -28,7 +29,8 @@ use Doctrine\ORM\EntityRepository;
  *
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.4
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @version 0.0.5
  */
 class PostController extends GenericController
 {
@@ -54,7 +56,7 @@ class PostController extends GenericController
 
     /**
      * Action parsing operations on records, such as hiding, adding, duplicating
-     *
+     * TODO: Extract!!!!!
      * @since 0.0.2 Parses
      * @since 0.0.1
      */
@@ -232,7 +234,7 @@ class PostController extends GenericController
     /**
      * Parses the data/field info and saves it into database
      *
-     * TODO Tim: Fix dates
+     * TODO Tim: Fix dates, Extract!!!!!!!!!
      *
      * @since 0.0.4
      */
@@ -317,6 +319,54 @@ class PostController extends GenericController
                 'description' => 'Supplied record ID is invalid.'
             ];
         }
+        echo json_encode($response);
+    }
+
+    public function actionActivity()
+    {
+        $em = DB::getEntityManager();
+        $data = $this->parseRequest(['action' => null]);
+        $action = strtolower($data['action']);
+        if (!in_array($action, ['create', 'hide', 'update'])) {
+            Apollo::getInstance()->getRequest()->error(400, 'Invalid action.');
+        };
+        $response['error'] = null;
+        if ($action == 'create') {
+            $data = $this->parseRequest(['activity_name' => null, 'start_date' => null, 'end_date' => null]);
+            $empty = false;
+            foreach ($data as $key => $value) {
+                if (empty($value)) $empty = true;
+            }
+            if (!$empty) {
+                $user = Apollo::getInstance()->getUser();
+                $start_date = new DateTime($data['start_date']);
+                $end_date = new DateTime($data['end_date']);
+                $activity = new ActivityEntity();
+                $activity->setOrganisation($user->getOrganisation());
+                $activity->setName($data['activity_name']);
+                $activity->setStartDate($start_date);
+                $activity->setEndDate($end_date);
+                $em->persist($activity);
+                try {
+                    $em->flush();
+                    $response['activity_id'] = $activity->getId();
+                } catch (Exception $e) {
+                    $response['errror'] = [
+                        'id' => 2,
+                        'description' => $e->getMessage()
+                    ];
+                }
+            } else {
+                $response['error'] = [
+                    'id' => 1,
+                    'description' => 'Some of the fields are empty!'
+                ];
+            }
+        }
+        $dummy = [
+            'error' => null,
+            'activity_id' => 1
+        ];
         echo json_encode($response);
     }
 }

@@ -30,7 +30,7 @@ class ActivityController extends GenericController
     public function index()
     {
         $breadcrumbs = [
-            ['Activities', URLHelper::url('activity/view/'), true]
+            ['Activities', URLHelper::url('activity/view/1'), true]
         ];
         View::render('activity.activity', 'Activities', $breadcrumbs);
     }

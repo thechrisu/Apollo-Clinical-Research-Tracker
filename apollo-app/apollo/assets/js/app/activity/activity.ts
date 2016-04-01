@@ -1,12 +1,15 @@
 ///<reference path="../ajax.ts"/>
 ///<reference path="../scripts.ts"/>
 ///<reference path="../jquery.d.ts"/>
+///<reference path="../inputs.ts"/>
+///<reference path="../bootbox.d.ts"/>
+
 /**
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  *
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.8
+ * @version 0.1.0
  *
  */
 
@@ -42,7 +45,7 @@ interface DetailActivityData {
 
 /**
  * Class to store the token field (the field to add/remove users from a activity)
- * @version 0.0.3
+ * @version 0.0.4
  * TODO get people's names (--> or display more information?) from the database who are not yet in the activity
  */
 class ValidatorTokenField {
@@ -114,40 +117,43 @@ class ActivityTable {
     private table:JQuery;
     private search:string;
     private page:number;
-    private loader:number;
+    private loader;
+    private activeId:number;
 
     /**
      * Loads up all of the information and sets up the instance variables
      */
-    public load() {
-        this.pagination = $('#pagination');
-        this.table = $('#table-body');
-        this.search = '';
-        this.page = 1;
-        this.loader = LoaderManager.createLoader(this.table);
-        this.updateTable();
-        this.setUp();
+    public load(activeId:number) {
+        this.loader = LoaderManager.createLoader($('#table-body'));
+        var that = this;
+        LoaderManager.showLoader((this.loader), function() {
+            that.pagination = $('#pagination');
+            that.table = $('#table-body');
+            that.search = '';
+            that.page = 1;
+            that.activeId = activeId;
+            that.updateTable();
+            that.setUp();
+        });
+        LoaderManager.hideLoader(this.loader, function () {
+            LoaderManager.destroyLoader(that.loader);
+        });
     }
 
     /**
      * Creates the basic structure of the table
      */
     private setUp() {
-        var that = this;
-        LoaderManager.showLoader((that.loader), function() {
-            that.makeAddButton();
-            that.setUpPagination();
+        this.makeAddButton();
+        this.setUpPagination();
         var timer = null;
-            $('#activities-search').keyup(function () {
-                clearTimeout(timer);
-                that.search = encodeURIComponent($(this).val());
-                timer = setTimeout(function () {
-                    that.updateTable();
-                }, AJAX_DELAY);
-            });
-        });
-        LoaderManager.hideLoader(that.loader, function () {
-            LoaderManager.destroyLoader(that.loader);
+        var that = this
+        $('#activities-search').keyup(function () {
+            clearTimeout(timer);
+            that.search = encodeURIComponent($(this).val());
+            timer = setTimeout(function () {
+                that.updateTable();
+            }, AJAX_DELAY);
         });
     }
 
@@ -177,8 +183,52 @@ class ActivityTable {
     /**
      * Creates a new activity specified by the user. Pops up a modal to get name/start/end date and then goes to the view
      */
-    private addActivity() {
-        //console.log("adding activity...");
+    private addActivity(e) {
+        console.log("adding activity...");
+        e.preventDefault();
+        bootbox.dialog({
+                title: 'Adding a new activity',
+                message: $('#add-modal').html(),
+                buttons: {
+                    main: {
+                        label: "Cancel",
+                        className: "btn-primary",
+                        callback: function () {
+                        }
+                    },
+                    success: {
+                        label: "Add",
+                        className: "btn-success",
+                        callback: function () {
+                            var modal = $('.modal');
+                            var name = modal.find('#add-name').val();
+                            var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
+                            var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
+                            newActivity(name, startDate, endDate);
+                        }
+                    }
+                }
+            }
+        );
+
+        function newActivity(name:string, startDate:string, endDate:string) {
+            var that = this;
+            console.log('performing json post for adding a new activity');
+            console.log('name: ' + name);
+            console.log('start date: ' + startDate);
+            console.log('end date: ' + endDate);
+            //TODO
+            AJAX.post(Util.url('post/activity'), {
+                action: 'create',
+                activity_name: name,
+                start_date: startDate,
+                end_date: endDate
+            }, function (response:any) {
+                Util.to('activity/view/' + response.activity_id);
+            }, function (message:string) {
+                Util.error('An error has occurred during the process of creation of the activity. Error message: ' + message);
+            });
+        }
     }
 
     /**
@@ -229,6 +279,9 @@ class ActivityTable {
         startD = Util.formatShortDate(Util.parseSQLDate(<string> data.start_date));
         endD = Util.formatShortDate(Util.parseSQLDate(<string> data.end_date));
         row = $('<tr></tr>');
+        if(parseInt(data.id) == this.activeId){
+            row.addClass('active');
+        }
         row.append('<td>' + data.name + '</td>');
         row.append('<td>' + startD + ' - ' + endD + '</td>');
         row.click(function() {
@@ -238,7 +291,7 @@ class ActivityTable {
     }
 
     private displayActivity(activityId:string) {
-        window.location.href = window.location.origin + '/activity/view/' + activityId;
+        Util.to('/activity/view/' + activityId);
     }
 }
 
@@ -252,14 +305,24 @@ class ActivityInformation {
 
     private peopleTable:JQuery;
     private id:number;
+    private activeTargetGroup:number;
 
     /**
      * Loads up all of the information and sets up the instance variables
      */
-    public load(){
-        this.peopleTable = $('#existingPeople');
-        this.id = 1;
-        this.setUp();
+    public load(id:number){
+        var loader = LoaderManager.createLoader($('#activityContent'));
+        var that = this;
+        LoaderManager.showLoader((loader), function() {
+            that.peopleTable = $('#existingPeople');
+            that.id = isNaN(id) ? 1 : id;
+            that.activeTargetGroup = NaN;
+            that.setUp();
+            //that.resetTimer();
+        });
+        LoaderManager.hideLoader(loader, function () {
+            LoaderManager.destroyLoader(loader);
+        });
     }
 
     /**
@@ -267,21 +330,16 @@ class ActivityInformation {
      */
     private setUp(){
         var that = this;
-        var loader = LoaderManager.createLoader($('#activityContent'));
-        LoaderManager.showLoader((loader), function() {
-            AJAX.get(Util.url('get/activity/?id=' + that.id, false), function(data:DetailActivityData) {
-                that.displayTitle(data.name);
-                that.displayPeople(data.participants);
-                that.displayTargetGroup(data.target_group, data.current_target_group);
-                that.displayComment(data.target_group_comment);
-                that.displayStartDate(data.start_date);
-                that.displayEndDate(data.end_date);
-            }, function (message:string) {
-                Util.error('An error has occurred while loading the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
-            });
-        });
-        LoaderManager.hideLoader(loader, function () {
-            LoaderManager.destroyLoader(loader);
+        AJAX.get(Util.url('get/activity/?id=' + that.id, false), function(data:DetailActivityData) {
+            that.activeTargetGroup = data.current_target_group;
+            that.displayTitle(data.name);
+            that.displayPeople(data.participants);
+            that.displayTargetGroup(data.target_group);
+            that.displayComment(data.target_group_comment);
+            that.displayStartDate(data.start_date);
+            that.displayEndDate(data.end_date);
+        }, function (message:string) {
+            Util.error('An error has occurred while loading the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
         });
     }
 
@@ -298,14 +356,41 @@ class ActivityInformation {
      * @param options
      * @param active
      */
-    private displayTargetGroup(options:string[], active:number){
+    private displayTargetGroup(options:string[]){
         var dropD = $('#target-dropdown');
         dropD.append('<li class="dropdown-header">Choose a target group:</li>');
-        $('#target-button').append(options[active]);
+        var bt = $('#target-button');
+        bt.append(options[this.activeTargetGroup] + ' <span class="caret"></span>');
         for(var i = 0; i < options.length; i++) {
-                dropD.append('<li><a>' + options[i] + '</a></li>');
+            var option = $('<li optionNameUnique="' + i + '"><a>' + options[i] + '</a></li>');
+            var that = this;
+            if(i == this.activeTargetGroup) {
+                option.addClass('disabled');
+            } else {
+                option.click(function() {
+                    that.activeTargetGroup = parseInt($(this).attr('optionNameUnique'));
+                    dropD.empty();
+                    bt.empty();
+                    that.displayTargetGroup(options);
+                });
+                option.addClass('noselect');
+            }
+            dropD.append(option);
         }
     }
+
+    /*private resetTimer(){
+        $.idleTimer(600);
+        var that = this;
+        $(document).bind("idle.idleTimer", that.save);
+        $(document).bind("active.idleTimer", that.resetTimer);
+    }
+
+    private save(){
+        console.log("saving...");
+        $.idleTimer('destroy');
+        this.resetTimer();
+    }*/
 
     /**
      * Displays the comment for the target group
@@ -322,7 +407,7 @@ class ActivityInformation {
      */
     private displayStartDate(sqlDate:string){
         var startD:string = Util.formatNumberDate(Util.parseSQLDate(<string> sqlDate));
-        var startDate = Util.getDatePicker(startD, "add-start-date");
+        var startDate = Util.getDatePicker(startD, "start-date-picker");
         $('#start-date').append(startDate);
     }
 
@@ -332,7 +417,7 @@ class ActivityInformation {
      */
     private displayEndDate(sqldate:string){
         var endD:string = Util.formatNumberDate(Util.parseSQLDate(<string> sqldate));
-        var endDate = Util.getDatePicker(endD, "add-start-date");
+        var endDate = Util.getDatePicker(endD, "start-date-picker");
         $('#end-date').append(endDate);
     }
 
@@ -342,14 +427,31 @@ class ActivityInformation {
      */
     private displayPeople(people:ParticipantData[]){
         for(var i = 0; i < people.length; i++) {
-            var row = $('<td></td>');
-            row.append(people[i].given_name + ' ' + people[i].last_name);
-            var fullRow = $('<tr></tr>');
+            var person:ParticipantData = people[i];
+            var row = $('<td class="col-md-11"></td>');
+            var that = this;
+            row.append(person.given_name + ' ' + person.last_name);
+            var removeButton = $('<td class="col-md-1"><button type="button" class="btn btn-xs btn-default" style="display:block; text-align:center"><small><span class="glyphicon glyphicon-remove" aria-hidden="false"></span></small></button></td>');
+            removeButton.click(function(e) {
+                e.preventDefault();
+                that.removePerson.call(null, person.id);
+            });
+            var fullRow = $('<tr class="row"></tr>');
             fullRow.append(row);
-            this.addOnClickToRow(fullRow, people[i].id);
+            fullRow.append(removeButton);
+            this.addOnClickToRow(row, people[i].id);
             this.peopleTable.append(fullRow);
         }
     }
+
+    /**
+     * TODO: Really remove the person
+     * @param id
+     */
+    private removePerson(id){
+        console.log('removing person with id... ' + id);
+    }
+
 
     /**
      * Adds an on-click event to a row in the table in which all the people going to an activity are displayed
@@ -365,7 +467,10 @@ class ActivityInformation {
 
 $(document).ready(function () {
     new ValidatorTokenField().load();
-    new ActivityInformation().load();
-    new ActivityTable().load();
+    var id = Util.extractId(window.location.toString());
+    var activity:ActivityInformation = new ActivityInformation();
+    activity.load(id);
+
+    new ActivityTable().load(id);
 });
 

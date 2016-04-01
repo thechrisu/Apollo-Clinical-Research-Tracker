@@ -542,7 +542,7 @@ class GetController extends GenericController
                 'given_name' => $person->getGivenName(),
                 'last_name' => $person->getLastName()
             ];
-            $people[] = $person_obj;
+            $people_obj[] = $person_obj;
         }
         return $people_obj;
     }
