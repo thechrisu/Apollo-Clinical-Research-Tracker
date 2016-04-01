@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping\OrderBy;
  * @package Apollo\Entities
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.5
+ * @version 0.0.6
  * @Entity @Table("people")
  */
 class PersonEntity

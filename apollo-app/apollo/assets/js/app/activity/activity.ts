@@ -6,7 +6,7 @@
  *
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.7
+ * @version 0.0.8
  *
  */
 
@@ -42,7 +42,7 @@ interface DetailActivityData {
 
 /**
  * Class to store the token field (the field to add/remove users from a activity)
- * @version 0.0.2
+ * @version 0.0.3
  * TODO get people's names (--> or display more information?) from the database who are not yet in the activity
  */
 class ValidatorTokenField {
@@ -170,7 +170,7 @@ class ActivityTable {
                     that.table.append('<tr><td colspan="4" class="text-center"><b>Nothing to display . . .</b></td></tr>');
                 }
         }, function (message:string) {
-            Util.error('An error has occurred during the loading of the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
+            Util.error('An error has occurred while loading the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
         });
     }
 
@@ -269,15 +269,15 @@ class ActivityInformation {
         var that = this;
         var loader = LoaderManager.createLoader($('#activityContent'));
         LoaderManager.showLoader((loader), function() {
-            AJAX.get(Util.url('get/activity/' + that.id, false), function(data:DetailActivityData) {
-                that.displayTitle("Second year placements");
+            AJAX.get(Util.url('get/activity/?id=' + that.id, false), function(data:DetailActivityData) {
+                that.displayTitle(data.name);
                 that.displayPeople(data.participants);
                 that.displayTargetGroup(data.target_group, data.current_target_group);
                 that.displayComment(data.target_group_comment);
                 that.displayStartDate(data.start_date);
                 that.displayEndDate(data.end_date);
             }, function (message:string) {
-                Util.error('An error has occurred during the loading of the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
+                Util.error('An error has occurred while loading the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
             });
         });
         LoaderManager.hideLoader(loader, function () {

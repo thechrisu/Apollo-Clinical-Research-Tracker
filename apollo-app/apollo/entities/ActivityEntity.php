@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping\OneToMany;
  * Class ActivityEntity
  * @package Apollo\Entities
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
-  * @version 0.0.1
+  * @version 0.0.2
  * @Entity @Table("activities")
  */
 class ActivityEntity

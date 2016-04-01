@@ -20,6 +20,7 @@ use Apollo\Entities\RecordEntity;
 use Apollo\Components\Activity;
 use Apollo\Entities\ActivityEntity;
 use Doctrine\ORM\QueryBuilder;
+use Exception;
 
 
 /**
@@ -30,7 +31,7 @@ use Doctrine\ORM\QueryBuilder;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.9
+ * @version 0.1.0
  */
 class GetController extends GenericController
 {
@@ -189,7 +190,7 @@ class GetController extends GenericController
      * @return array
      * @since 0.0.9
      */
-    private function getEssentialInformation($record)
+    private function getInfoRecord($record)
     {
         /**
          * @var RecordEntity[] $other_records
@@ -236,7 +237,7 @@ class GetController extends GenericController
          */
         if ($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
             Record::prepare($record);
-            $response['essential'] = $this->getEssentialInformation($record);
+            $response['essential'] = $this->getInfoRecord($record);
             $fieldsViewData = [];
             $fieldRepo = Field::getRepository();
             /**
@@ -313,7 +314,7 @@ class GetController extends GenericController
          */
         if ($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
             Record::prepare($record);
-            $response['essential'] = $this->getEssentialInformation($record);
+            $response['essential'] = $this->getInfoRecord($record);
             $fieldsEditData = [];
             $fieldRepo = Field::getRepository();
             /**
@@ -385,87 +386,24 @@ class GetController extends GenericController
 
         $data = $this->parseRequest(['page' => 1, 'sort' => 1, 'search' => null]);
         $page = $data['page'] > 0 ? $data['page'] : 1;
-        $activityQB = $this->createQueryForActivitiesRequest($data);
-        $activityQuery = $activityQB->getQuery();
-        $activities =  $activityQuery->getResult();
-        $response = $this->getFormattedActivities($activities, $page);
-        /*$response['error'] = null;
-        $response['count'] = 12;
-        $response['activities'] = [
-            [
-                "name" => "Programme 1",
-                "start_date" => "1834-02-22 02:00:00",
-                "end_date" => "1834-02-22 02:00:00",
-                "id" => "1"
-            ],
-            [
-                "name" => "Programme 2",
-                "start_date" => "1834-02-22 02:00:00",
-                "end_date" => "1834-02-22 02:00:00",
-                "id" => "2"
-            ],
-            [
-                "name" => "Programme 3",
-                "start_date" => "1834-02-22 02:00:00",
-                "end_date" => "1834-02-22 02:00:00",
-                "id" => "3"
-            ],
-            [
-                "name" => "Programme 1",
-                "start_date" => "1834-02-22 02:00:00",
-                "end_date" => "1834-02-22 02:00:00",
-                "id" => "1"
-            ],
-            [
-                "name" => "Programme 2",
-                "start_date" => "1834-02-22 02:00:00",
-                "end_date" => "1834-02-22 02:00:00",
-                "id" => "2"
-            ],
-            [
-                "name" => "Programme 3",
-                "start_date" => "1834-02-22 02:00:00",
-                "end_date" => "1834-02-22 02:00:00",
-                "id" => "3"
-            ],
-            [
-                "name" => "Programme 1",
-                "start_date" => "1834-02-22 02:00:00",
-                "end_date" => "1834-02-22 02:00:00",
-                "id" => "1"
-            ],
-            [
-                "name" => "Programme 2",
-                "start_date" => "1834-02-22 02:00:00",
-                "end_date" => "1834-02-22 02:00:00",
-                "id" => "2"
-            ],
-            [
-                "name" => "Programme 3",
-                "start_date" => "1834-02-22 02:00:00",
-                "end_date" => "1834-02-22 02:00:00",
-                "id" => "3"
-            ],
-            [
-                "name" => "Programme 1",
-                "start_date" => "1834-02-22 02:00:00",
-                "end_date" => "1834-02-22 02:00:00",
-                "id" => "1"
-            ],
-            [
-                "name" => "Programme 2",
-                "start_date" => "1834-02-22 02:00:00",
-                "end_date" => "1834-02-22 02:00:00",
-                "id" => "2"
-            ],
-            [
-                "name" => "Programme 3",
-                "start_date" => "1834-02-22 02:00:00",
-                "end_date" => "1834-02-22 02:00:00",
-                "id" => "3"
-            ]
-        ];*/
-        echo json_encode($response);
+        $activities = null;
+        try{
+            $activityQB = $this->createQueryForActivitiesRequest($data);
+            $activityQuery = $activityQB->getQuery();
+            $activities =  $activityQuery->getResult();
+        } catch (Exception $e) {
+
+            $response['error'] = ['id' => 3, 'description' => "Unable to get data from database, server issue? (error in query): " . $e->getMessage()];
+            echo json_encode($response);
+        } finally {
+            if (!empty($activities)) {
+                $response = $this->getFormattedActivities($activities, $page);
+                echo json_encode($response);
+            } else {
+                $response['error'] = ['id' => 4, 'description' => "Unable to get data from database, server issue? (error in fetching)"];
+            }
+        }
+
     }
 
     /**
@@ -517,11 +455,12 @@ class GetController extends GenericController
 
     private function getFormattedShortActivityData($activity)
     {
-        $responseActivity = [];
-        $responseActivity['id'] = $activity->getId();
-        $responseActivity['name'] = $activity->getName();
-        $responseActivity['start_date'] = $activity->getStartDate()->format('Y-m-d H:i:s');
-        $responseActivity['end_date'] = $activity->getEndDate()->format('Y-m-d H:i:s');
+        $responseActivity = [
+            'id' => $activity->getId(),
+            'name' => $activity->getName(),
+            'start_date' => $activity->getStartDate()->format('Y-m-d H:i:s'),
+            'end_date' => $activity->getEndDate()->format('Y-m-d H:i:s')
+        ];
         return $responseActivity;
     }
 
@@ -531,33 +470,81 @@ class GetController extends GenericController
      */
     public function actionActivity()
     {
-        $data['error'] = null;
-        $data['name'] = "Some activity";
-        $data['target_group'] = ["Young people", "Old people", "Twentysomething people"];
-        $data['current_target_group'] = 0;
-        $data['target_group_comment'] = "This is an exceptional activity";
-        $data['start_date'] = "1834-01-22 02:00:00";
-        $data['end_date'] = "1834-02-22 02:00:00";
-        $data['participants'] = [
+        $data = $this->parseRequest(['id' => 1]);
+        if ($data['id'] > 0 && ($activity = Activity::getRepository()->find($data['id'])) != null)
+        {
+            $activityInfo = $this->getInfoActivity($activity);
+            //TODO: Check if there is more than one activity. If so, then report that as invalid
+            /*$dummy[
+            'error'] => null,
+            'name' => "Some activity",
+            'target_group' => ["Young people", "Old people", "Twentysomething people"],
+            'current_target_group' => 0,
+            'target_group_comment' => "This is an exceptional activity",
+            'start_date' => "1834-01-22 02:00:00",
+            'end_date' => "1834-02-22 02:00:00",
+            'participants', => [
 
-            [
-                "given_name" => "Peter",
-                "last_name" => "Parker",
-                "id" => "13"
-            ],
-            [
-                "given_name" => "Michael",
-                "last_name" => "Jackdaughter",
-                "id" => "12"
-            ],
-            [
-                "given_name" => "Rowan",
-                "last_name" => "@kinson",
-                "id" => "1"
-            ]
+                [
+                    "given_name" => "Peter",
+                    "last_name" => "Parker",
+                    "id" => "13"
+                ],
+                [
+                    "given_name" => "Michael",
+                    "last_name" => "Jackdaughter",
+                    "id" => "12"
+                ],
+                [
+                    "given_name" => "Rowan",
+                    "last_name" => "@kinson",
+                    "id" => "1"
+                ]
+            ];*/
+            $response = $activityInfo;
+        } else {
+            $response['error'] = ['id' => 1, 'description' => 'The supplied id is invalid! (' . $data['id'] . ')'];
+        }
+        echo json_encode($response);
+    }
+
+    /**
+     * @param ActivityEntity $activity
+     * @return array
+     */
+    private function getInfoActivity(ActivityEntity $activity)
+    {
+        $people = $this->formatPeopleShort($activity->getPeople());
+        $activityInfo = [
+            'error' => null,
+            'id' => $activity->getId(),
+            'name' => $activity->getName(),
+            'target_group' => ['to_implement!!!', 'still missing', 'lazy programmers'],
+            'current_target_group' => 0,
+            'target_group_comment' => $activity->getTargetGroupComment(),
+            'start_date' => $activity->getStartDate()->format('Y-m-d H:i:s'),
+            'end_date' => $activity->getEndDate()->format('Y-m-d H:i:s'),
+            'participants' => $people
         ];
+        return $activityInfo;
+    }
 
-        echo json_encode($data);
+    /**
+     * @param $people
+     * @return array
+     */
+    private function formatPeopleShort($people)
+    {
+        $people_obj = [];
+        foreach($people as $person) {
+            $person_obj = [
+                'id' => $person->getId(),
+                'given_name' => $person->getGivenName(),
+                'last_name' => $person->getLastName()
+            ];
+            $people[] = $person_obj;
+        }
+        return $people_obj;
     }
 
     /**
