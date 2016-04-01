@@ -64,6 +64,14 @@ class PersonEntity
      * @var bool
      */
     protected $is_hidden = false;
+
+    /**
+     * Array with all the activities of one person
+     * @ManyToMany(targetEntity="ActivityEntity", inversedBy="people")
+     * @var ActivityEntity[]
+     */
+    protected $activities;
+
     public function __construct()
     {
         $this->is_hidden = false;
@@ -158,5 +166,21 @@ class PersonEntity
     public function setIsHidden($is_hidden)
     {
         $this->is_hidden = $is_hidden;
+    }
+
+    /**
+     * @return ActivityEntity[]
+     */
+    public function getActivities()
+    {
+        return $this->activities;
+    }
+
+    /**
+     * @param $activity
+     */
+    public function addActivity($activity)
+    {
+        $this->activities = $activity;
     }
 }

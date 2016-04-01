@@ -385,11 +385,11 @@ class GetController extends GenericController
 
         $data = $this->parseRequest(['page' => 1, 'sort' => 1, 'search' => null]);
         $page = $data['page'] > 0 ? $data['page'] : 1;
-        /* $activityQB = $this->createQueryForActivitiesRequest($data);
-         $activityQuery = $activityQB->getQuery();
-         $activities =  $activityQuery->getResult();
-         $response = $this->getFormattedActivities($activities, $page);*/
-        $response['error'] = null;
+        $activityQB = $this->createQueryForActivitiesRequest($data);
+        $activityQuery = $activityQB->getQuery();
+        $activities =  $activityQuery->getResult();
+        $response = $this->getFormattedActivities($activities, $page);
+        /*$response['error'] = null;
         $response['count'] = 12;
         $response['activities'] = [
             [
@@ -464,7 +464,7 @@ class GetController extends GenericController
                 "end_date" => "1834-02-22 02:00:00",
                 "id" => "3"
             ]
-        ];
+        ];*/
         echo json_encode($response);
     }
 
@@ -476,14 +476,12 @@ class GetController extends GenericController
     {
         $em = DB::getEntityManager();
         $activityRepo = $em->getRepository(Activity::getEntityNamespace());
-        $activityQB = $activityRepo->createQueryBuilder('activities');
-        $activityQB->select('activities');
-        $activityQB->from('activities', 'a');
+        $activityQB = $activityRepo->createQueryBuilder('a');
         $organisation_id = Apollo::getInstance()->getUser()->getOrganisationId();
         $activityQB->where(
             $activityQB->expr()->andX(
                 $activityQB->expr()->eq('a.is_hidden', '0'),
-                $activityQB->expr()->eq('a.organisation_id', $organisation_id)
+                $activityQB->expr()->eq('a.organisation', $organisation_id)
             )
         );
         if (!empty($data['search'])) {
@@ -522,8 +520,8 @@ class GetController extends GenericController
         $responseActivity = [];
         $responseActivity['id'] = $activity->getId();
         $responseActivity['name'] = $activity->getName();
-        $responseActivity['start_date'] = $activity->getStartDate();
-        $responseActivity['end_date'] = $activity->getEndDate();
+        $responseActivity['start_date'] = $activity->getStartDate()->format('Y-m-d H:i:s');
+        $responseActivity['end_date'] = $activity->getEndDate()->format('Y-m-d H:i:s');
         return $responseActivity;
     }
 

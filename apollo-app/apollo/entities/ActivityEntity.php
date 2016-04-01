@@ -52,7 +52,7 @@ class ActivityEntity
 
     /**
      * Array with all of the people in the activity
-     * @OneToMany(targetEntity="PersonEntity", mappedBy="person")
+     * @ManyToMany(targetEntity="PersonEntity", mappedBy="activities")
      * @var PersonEntity[]
      */
     protected $people;
@@ -222,6 +222,5 @@ class ActivityEntity
     {
         $this->is_hidden = $is_hidden;
     }
-
 
 }
