@@ -347,7 +347,6 @@ class PostController extends GenericController
         }
     }
 
-
     /**
      * @param $data
      * @return ActivityEntity
@@ -374,6 +373,43 @@ class PostController extends GenericController
         $em = DB::getEntityManager();
         $em->persist($activity);
         $em->flush();
+    }
+
+    /**
+     * Just accepts new people, adds them/deletes them from the activity
+     * @return mixed
+     */
+    public function actionActivitySavePeople()
+    {
+        $response['error'] = null;
+        $data = $this->parseRequest(['activity_id' => null, 'toAdd' => null, 'toDelete' => null]);
+        if (!$this->areFieldsEmpty($data)) {
+            $activity = Activity::getRepository()->find($data['activity_id']);
+            if($activity) {
+                foreach($data['toAdd'] as $person_id){
+                    $person = Person::getRepository()->find($person_id);
+                    if($person) {
+                        $activity->addPerson($person);
+                    }
+                }
+                foreach($data['toDelete'] as $person_id){
+                    $person = Person::getRepository()->find($person_id);
+                    if($person) {
+                        $activity->removePerson($person);
+                    }
+                }
+                try {
+                    $this->writeActivityToDB($activity);
+                } catch (Exception $e) {
+                    $response['error'] = $this->getJSONError(4, 'Unexpected exception when saving the new data. Message: ' . $e->getMessage());
+                }
+            } else {
+                $response['error'] = $this->getJSONError(3, 'Could not find activity with given id while saving people');
+            }
+        } else {
+            $response['error'] = $this->getJSONError(1, 'Some of the fields are empty');
+        }
+        return $response;
     }
 
     /**

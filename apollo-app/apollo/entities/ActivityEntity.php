@@ -177,7 +177,36 @@ class ActivityEntity
      */
     public function addPerson($person)
     {
-        $this->people[] = $person;
+        if(!$this->hasPerson($person))
+            $this->people[] = $person;
+    }
+
+    public function removePerson($person)
+    {
+        if(($key = array_search($person, $this->getPeople())) !== false)
+        {
+           unset($this->people[$key]);
+        }
+    }
+
+    /**
+     * @param $people
+     */
+    public function addPeople($people)
+    {
+        foreach($people as $person)
+        if(!$this->hasPerson($person)){
+            $this->addPerson($person);
+        }
+    }
+
+    /**
+     * @param $people
+     */
+    public function removePeople($people)
+    {
+        foreach($people as $person)
+            $this->removePerson($person);
     }
 
     /**
@@ -215,6 +244,11 @@ class ActivityEntity
     public function isHidden()
     {
         return $this->is_hidden;
+    }
+
+    public function hasPerson($person)
+    {
+        return in_array($person, $this->getPeople());
     }
 
     /**

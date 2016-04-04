@@ -1,5 +1,5 @@
 /*
- Apollo stylesheet v0.0.3
+ Apollo stylesheet v0.0.4
  Copyright 2016 Timur Kuzhagaliyev
  https://opensource.org/licenses/mit-license.php MIT License
 
@@ -111,3 +111,40 @@
   -webkit-user-select: none
   -ms-user-select: none
   user-select: none
+
+.tt-menu
+  width: 100%
+  display: block
+  white-space: nowrap
+  text-decoration: none
+  clear: both
+  -webkit-box-sizing: border-box
+  -moz-box-sizing: border-box
+  box-sizing: border-box
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2)
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2)
+  -webkit-background-clip: padding-box
+  -moz-background-clip: padding
+  background-clip: padding-box
+
+.tt-suggestion
+  width: 100%
+  padding: 3px 20px
+
+.twitter-typeahead
+  width: 100%
+  position: relative
+  vertical-align: top
+
+.twitter-typeahead.tt-hint
+  border: 1px solid transparent
+
+.tt-suggestion.tt-selectable
+  &:hover
+    background-color: $apollo-link-colour
+    border-color: $apollo-link-colour
+    color: $apollo-background-colour
+  &:active
+    background-color: $apollo-link-colour
+    border-color: $apollo-link-colour
+  width: 100%

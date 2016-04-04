@@ -5,66 +5,138 @@
 ///<reference path="../bootbox.d.ts"/>
 /**
  * Class to store the token field (the field to add/remove users from a activity)
- * @version 0.0.5
- * TODO get people's names (--> or display more information?) from the database who are not yet in the activity
+ * @version 0.0.6
+ * TODO Dynamically update the table when new entries were added. Add "autosave"
  */
-var ValidatorTokenField = (function () {
-    function ValidatorTokenField() {
+var PeopleField = (function () {
+    function PeopleField() {
     }
-    ValidatorTokenField.prototype.load = function () {
+    PeopleField.prototype.load = function (activity_id) {
+        this.activity_id = activity_id;
+        this.search = '';
+        this.temporarily_added = [];
         this.setUp();
     };
-    ValidatorTokenField.prototype.setUp = function () {
-        this.setSuggestionEngine();
-        this.displayTokenField();
-        this.preventDuplicates();
-    };
-    /**
-     * Initially sets up the engine of suggestions, stores the state in this.engine
-     * @since 0.0.1
-     */
-    ValidatorTokenField.prototype.setSuggestionEngine = function () {
-        //   docs for bloodhound suggestion engine https://github.com/twitter/typeahead.js/blob/master/doc/bloodhound.md
-        this.engine = new Bloodhound({
-            local: [{ value: 'red' }, { value: 'Tim' }, { value: 'Peter' }, { value: 'Christoph' }],
-            datumTokenizer: function (d) {
-                return Bloodhound.tokenizers.whitespace(d.value);
-            },
-            queryTokenizer: Bloodhound.tokenizers.whitespace
+    PeopleField.prototype.setUp = function () {
+        var that = this;
+        this.activateBloodHound();
+        $('#person-input').keyup(function () {
+            that.search = encodeURIComponent($(this).val());
         });
-        this.engine.initialize();
+        /*$('#person-input').keydown(function(e) {
+            that.search = encodeURIComponent($(this).val());
+        }*/
     };
-    /**
-     * Checks if one of the tokens entered is a duplicate of an existing one.
-     * @since 0.0.4
-     */
-    ValidatorTokenField.prototype.preventDuplicates = function () {
-        $('#person-input').on('tokenfield:createToken', function (e) {
-            console.log('...checking if too many tokens');
-            var existingTokens = this.tf('getTokens');
-            $.each(existingTokens, function (i, tok) {
-                if (tok.value === e.attrs.value) {
-                    e.preventDefault();
+    PeopleField.prototype.activateBloodHound = function () {
+        var that = this;
+        this.setBloodhound(that);
+        var promise = this.bh.initialize();
+        promise.fail(function () { Util.error('failed to load the suggestion engine'); });
+        this.resetTypeahead();
+    };
+    PeopleField.prototype.resetTypeahead = function () {
+        var that = this;
+        $('#person-input').typeahead('destroy');
+        $('#person-input').typeahead({
+            highlight: true
+        }, {
+            name: 'data',
+            displayKey: 'name',
+            source: that.bh.ttAdapter(),
+            templates: {
+                suggestion: function (data) {
+                    var str = '';
+                    str += '<div class="noselect">' + data.name + '</div>';
+                    return str;
                 }
-            });
+            }
         });
     };
-    /**
-     * Displays the token field in the DOM and sets a reference to the object in instance variable tf
-     * @since 0.0.1
-     */
-    ValidatorTokenField.prototype.displayTokenField = function () {
-        this.tf = $('#person-input').tokenfield({
-            typeahead: [null, { source: this.engine.ttAdapter() }]
+    PeopleField.prototype.setBloodhound = function () {
+        var that = this;
+        this.bh = new Bloodhound({
+            datumTokenizer: function (a) {
+                return Bloodhound.tokenizers.whitespace(a.name);
+            },
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            remote: {
+                url: Util.url('get/activitypeople') + '?activity_id=' + that.activity_id + that.formatTemporarily_added(that.temporarily_added) + '&search=' + that.search,
+                filter: function (data) {
+                    console.log(Util.url('get/activitypeople') + '?activity_id=' + that.activity_id + that.formatTemporarily_added(that.temporarily_added) + '&search=' + that.search);
+                    return $.map(data.data, function (item) {
+                        return {
+                            id: item.id,
+                            name: item.name
+                        };
+                    });
+                }
+            }
         });
     };
-    return ValidatorTokenField;
+    //$('#person-input').typeahead({source: cNames});/*{
+    /*hint: true,
+    highlight: true,
+    minLength: 1
+    {
+       source: cNames
+   });
+   /*AJAX.get(Util.url('get/activitypeople?activity_id=' + that.activity_id + that.formatTemporarily_added(that.temporarily_added) + '&search=' + that.search),
+       function(data:ParticipantData[]) {
+          /* var cNames = concatNames(data);*/
+    /*      var cNames = ['bla', 'blahahaha'];
+          /*that.bh = new Bloodhound({
+              initialize: false,
+              datumTokenizer: Bloodhound.tokenizers.whitespace,
+              queryTokenizer: Bloodhound.tokenizers.whitespace,
+              local: cNames
+          });
+
+          var promise = that.bh.initialize();
+
+          promise
+              .done(function() { console.log('ready to go!');})
+              .fail(function() { console.log('something went wrong');});
+*/
+    /*    $('#person-input').typeahead(/*{
+            hint: true,
+            highlight: true,
+            minLength: 1
+        },{
+      /*      source: cNames
+        });
+        function concatNames (items:ParticipantData[]) {
+            var names:string[] = [];
+            for(var item in items) {
+                names.concat(item.given_name + ' ' + item.last_name);
+            }
+            return names;
+        }
+
+        function concatIds (items:ParticipantData[]) {
+            var ids:number[] = [];
+            for(var item in items) {
+                ids.concat(item.id);
+            }
+            return ids;
+        }
+    },
+    function(message:string) {
+        Util.error('An error has occurred while people not in the programme. Please contact the system administrator. Error message: ' + message);
+    });*/
+    PeopleField.prototype.formatTemporarily_added = function (tA) {
+        var query = '';
+        for (var id in tA) {
+            query += '&temporarily_added[]=' + id;
+        }
+        return query;
+    };
+    PeopleField.prototype.setId = function (id) {
+        this.activity_id = id;
+    };
+    return PeopleField;
 })();
 /**
  * Defines the menu/table on the left of the view.
- * TODO hook up to API (display first activity)
- * TODO do quick search
- * TODO do the animation of displaying the activity on the right if the user clicks on it
  * @version 0.0.6
  */
 var ActivityTable = (function () {
@@ -73,17 +145,20 @@ var ActivityTable = (function () {
     /**
      * Loads up all of the information and sets up the instance variables
      */
-    ActivityTable.prototype.load = function (content) {
+    ActivityTable.prototype.load = function (content, existingPeople) {
         this.loader = LoaderManager.createLoader($('#table-body'));
         var that = this;
         LoaderManager.showLoader((this.loader), function () {
             that.content = content;
+            that.existingPeople = existingPeople;
             that.pagination = $('#pagination');
             that.table = $('#table-body');
             that.search = '';
             that.page = 1;
             that.updateTable();
             that.setUp();
+            that.existingPeople.setId(that.content.getId());
+            that.existingPeople.load(that.content.getId());
         });
         LoaderManager.hideLoader(this.loader, function () {
             LoaderManager.destroyLoader(that.loader);
@@ -257,6 +332,7 @@ var ActivityTable = (function () {
         row.click(function () {
             that.displayActivity.call(null, data.id);
         });
+        row.addClass('noselect');
         this.table.append(row);
     };
     ActivityTable.prototype.displayActivity = function (activityId) {
@@ -299,6 +375,8 @@ var ActivityInformation = (function () {
     ActivityInformation.prototype.setUp = function () {
         var that = this;
         AJAX.get(Util.url('get/activity/?id=' + that.id, false), function (data) {
+            var breadcrumbs = $('#nav-breadcrumbs');
+            breadcrumbs.find('li:nth-child(3)').text('Activity #' + that.id + ': ' + data.name);
             that.activeTargetGroup = data.current_target_group;
             that.displayTitle(data.name);
             that.displayPeople(data.participants);
@@ -424,9 +502,10 @@ var ActivityInformation = (function () {
     return ActivityInformation;
 })();
 $(document).ready(function () {
-    new ValidatorTokenField().load();
     var id = Util.extractId(window.location.toString());
     var activity = new ActivityInformation();
+    var existingPeopleField = new PeopleField();
     activity.load(id);
-    var menu = new ActivityTable().load(activity);
+    existingPeopleField.load(id);
+    var menu = new ActivityTable().load(activity, existingPeopleField);
 });

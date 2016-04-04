@@ -538,7 +538,7 @@ class GetController extends GenericController
                 $response['error'] = null;
                 $query = $pqb->getQuery();
                 $result = $query->getResult();
-                $response['data'] = $this->formatPeopleShort($result);
+                $response['data'] = $this->formatPeopleShortConcatName($result);
             } catch (Exception $e) {
                 $response['error'] = $this->getJSONError(1, "Query failed with exception " . $e->getMessage());
             }
@@ -546,6 +546,22 @@ class GetController extends GenericController
         echo json_encode($response);
     }
 
+    /**
+     * @param $people
+     * @return array
+     */
+    private function formatPeopleShortConcatName($people)
+    {
+        $people_obj = [];
+        foreach($people as $person) {
+                $person_obj = [
+                    'id' => $person->getId(),
+                    'name' => implode(' ', [$person->getGivenName(), $person->getMiddleName(),$person->getLastName()])
+                ];
+            $people_obj[] = $person_obj;
+        }
+        return $people_obj;
+    }
 
     /**
      * @param $queryBuilder

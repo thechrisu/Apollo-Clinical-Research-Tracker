@@ -21,8 +21,6 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
     <link rel="stylesheet" href="{{ AssetHelper::css('bootstrap.cosmo.min') }}" />
     <link rel="stylesheet" href="{{ AssetHelper::css('stylesheet') }}" />
     <link rel="stylesheet" href="{{ AssetHelper::css('datepicker3.min') }}" />
-    <link rel="stylesheet" href="{{ AssetHelper::css('bootstrap-tokenfield') }}" />
-    <link rel="stylesheet" href="{{ AssetHelper::css('tokenfield-typeahead-custom') }}" />
     <link rel="icon" type="image/png" href="{{ AssetHelper::img('favicon.png') }}" />
     <title>{{ !empty($title) ? $title . ' | ' . APP_NAME : APP_NAME }}</title>
 @stop
@@ -84,7 +82,7 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
     <script src="{{ AssetHelper::js('app/ajax') }}"></script>
     <script src="{{ AssetHelper::js('plugins/affix') }}"></script>
     <script src="{{ AssetHelper::js('plugins/scrollspy') }}"></script>
-    <script src="{{ AssetHelper::js('plugins/typeahead.bundle.min') }}"></script>
+    <script src="{{ AssetHelper::js('plugins/typeahead.bundle') }}"></script>
     <script src="{{ AssetHelper::js('plugins/bootbox.min') }}"></script>
     <script src="{{ AssetHelper::js('plugins/bootstrap-datepicker') }}"></script>
     <script>

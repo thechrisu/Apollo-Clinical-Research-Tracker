@@ -3,7 +3,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/gpl-license.php MIT License
- * @version 0.0.2
+ * @version 0.0.3
  */
 
 use Apollo\Helpers\AssetHelper;
@@ -104,12 +104,10 @@ use Apollo\Helpers\URLHelper;
                                 <tbody id="existingPeople">
                                 </tbody>
                             </table>
-                            <form  onSubmit="return false;">
-                                <fieldset class="form-group">
-                                    <input type="text" class="form-control input-sm" id="person-input"
-                                           placeholder="Add more people..." />
-                                </fieldset>
-                            </form>
+                            <div>
+                                <input type="text" class="form-control input-sm" id="person-input"
+                                       placeholder="Add more people..." data-provide="typeahead" autocomplete="off"/>
+                            </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
                             <div class="form-group">
@@ -134,7 +132,7 @@ use Apollo\Helpers\URLHelper;
 
 @stop
 @section('scripts')
-    @parent
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-idletimer/1.0.0/idle-timer.min.js"></script>
+@parent
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-idletimer/1.0.0/idle-timer.min.js"></script>-->
     <script src="{{ AssetHelper::js('app/activity/activity') }}"></script>
 @stop
