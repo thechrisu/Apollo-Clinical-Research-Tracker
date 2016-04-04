@@ -1,6 +1,7 @@
 <?php
 /**
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
  */
@@ -10,6 +11,8 @@ namespace Apollo\Controllers;
 
 use Apollo\Apollo;
 use Apollo\Components\DB;
+use Doctrine\ORM\EntityRepository;
+use Apollo\Components\Activity;
 use Apollo\Components\Field;
 use Apollo\Components\Person;
 use Apollo\Components\Record;
@@ -19,7 +22,6 @@ use Apollo\Entities\FieldEntity;
 use Apollo\Entities\PersonEntity;
 use Apollo\Entities\RecordEntity;
 use DateTime;
-use Doctrine\ORM\EntityRepository;
 use Exception;
 
 
@@ -31,7 +33,7 @@ use Exception;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.6
+ * @version 0.0.7
  */
 class PostController extends GenericController
 {
@@ -72,10 +74,7 @@ class PostController extends GenericController
         $response['error'] = null;
         if ($action == 'create') {
             $data = $this->parseRequest(['given_name' => null, 'middle_name' => null, 'last_name' => null, 'record_name' => null, 'start_date' => null, 'end_date' => null]);
-            $empty = false;
-            foreach ($data as $key => $value) {
-                if (empty($value) && $key != 'middle_name') $empty = true;
-            }
+            $empty = $this->areFieldsEmpty($data);
             if (!$empty) {
                 $user = Apollo::getInstance()->getUser();
                 $person = new PersonEntity();
@@ -98,10 +97,7 @@ class PostController extends GenericController
 
                 $response['record_id'] = $record->getId();
             } else {
-                $response['error'] = [
-                    'id' => 1,
-                    'description' => 'Some of the fields are empty!'
-                ];
+                $response['error'] = $this->getJSONError(1, 'Some of the fields are empty!');
             }
         }
         if ($action == 'add') {
@@ -140,25 +136,16 @@ class PostController extends GenericController
                                     }
                                 }
                             } else {
-                                $response['error'] = [
-                                    'id' => 1,
-                                    'description' => 'Source record ID is invalid.'
-                                ];
+                                $response['error'] = $this->getJSONError(1, 'Source record ID is invalid.');
                             }
                         }
                         $em->flush();
                         $response['record_id'] = $record->getId();
                 } else {
-                    $response['error'] = [
-                        'id' => 1,
-                        'description' => 'Invalid person ID.'
-                    ];
+                    $response['error'] = $this->getJSONError(1, 'Invalid person ID.');
                 }
             } else {
-                $response['error'] = [
-                    'id' => 1,
-                    'description' => 'You must specify a name for the new record.'
-                ];
+                $response['error'] = $this->getJSONError(1, 'You must specify a name for the new record.');
             }
         }
         if ($action == 'hide') {
@@ -207,29 +194,6 @@ class PostController extends GenericController
             }
         }
         echo json_encode($response);
-    }
-
-    /**
-     * Parses the request searching for specified keys. If a key is not defined in the POST request,
-     * use the default value specified in the array.
-     *
-     * @param array $data
-     * @return array
-     * @since 0.0.1
-     */
-    public function parseRequest($data)
-    {
-        $parsedData = [];
-        foreach ($data as $key => $default) {
-            if (isset($_POST[$key])) {
-                $value = $_POST[$key];
-                if (is_int($default)) $value = intval($value);
-                $parsedData[$key] = $value;
-            } else {
-                $parsedData[$key] = $default;
-            }
-        }
-        return $parsedData;
     }
 
     /**
@@ -303,22 +267,13 @@ class PostController extends GenericController
                     }
                     $em->flush();
                 } else {
-                    $response['error'] = [
-                        'id' => 1,
-                        'description' => 'Value cannot be equal to null.'
-                    ];
+                    $response['error'] = $this->getJSONError(1, 'Value cannot be equal to null.');
                 }
             } else {
-                $response['error'] = [
-                    'id' => 1,
-                    'description' => 'Supplied field ID is invalid.'
-                ];
+                $response['error'] = $this->getJSONError(1, 'Supplied field ID is invalid.');
             }
         } else {
-            $response['error'] = [
-                'id' => 1,
-                'description' => 'Supplied record ID is invalid.'
-            ];
+            $response['error'] = $this->getJSONError(1, 'Supplied record ID is invalid.');
         }
         echo json_encode($response);
     }
@@ -330,15 +285,68 @@ class PostController extends GenericController
     {
         $data = $this->parseRequest(['action' => null]);
         $action = strtolower($data['action']);
-        if (!in_array($action, ['create', 'hide', 'update'])) {
-            Apollo::getInstance()->getRequest()->error(400, 'Invalid action.');
-        };
         $response = [];
-        if ($action == 'create') {
-            $response = $this->activityCreate();
+        switch($action){
+            case 'create':
+                $response = $this->activityCreate();
+                break;
+            case 'hide':
+                $response = $this->activityHide();
+                break;
+            default:
+                Apollo::getInstance()->getRequest()->error(400, 'Invalid action.');
+                break;
         }
         echo json_encode($response);
     }
+
+    /**
+     * Handles the post request for adding a new activity
+     * @return mixed
+     * @since 0.0.6
+     */
+    private function activityCreate()
+    {
+        $response['error'] = null;
+        $data = $this->parseRequest(['activity_name' => null, 'start_date' => null, 'end_date' => null]);
+        if (!$this->areFieldsEmpty($data)) {
+            $activity = $this->createActivityFromData($data);
+            try {
+                $this->writeActivityToDB($activity);
+                $response['activity_id'] = $activity->getId();
+            } catch (Exception $e) {
+                $response['error'] = $this->getJSONError(2, $e->getMessage());
+            }
+        } else {
+            $response['error'] = $this->getJSONError(1, 'Some of the fields are empty');
+        }
+        return $response;
+    }
+
+    private function activityHide()
+    {
+        $response['error'] = null;
+        $data = $this->parseRequest(['activity_id' => null]);
+        $activity = null;
+        try {
+            $activity = Activity::getRepository()->find($data['activity_id']);
+        } catch (Exception $e) {
+            $response['error'] = $this->getJSONError(2, 'Error while querying database for activity, message: ' . $e->getMessage());
+        } finally {
+            if ($data['activity_id'] > 0 & $activity != null) {
+                try {
+                    $activity->setIsHidden(true);
+                    $this->writeActivityToDB($activity);
+                } catch (Exception $e) {
+                    $response['error'] = $this->getJSONError(3, 'Error while writing to database for activity, message: ' . $e->getMessage());
+                }
+            } else {
+                $response['error'] = $this->getJSONError(1, 'Error in activity id, could not hide');
+            }
+            return $response;
+        }
+    }
+
 
     /**
      * @param $data
@@ -359,37 +367,56 @@ class PostController extends GenericController
     }
 
     /**
-     * @return mixed
-     * @since 0.0.6
+     * @param $activity
      */
-    private function activityCreate()
+    private function writeActivityToDB($activity)
     {
-        $response['error'] = null;
-        $data = $this->parseRequest(['activity_name' => null, 'start_date' => null, 'end_date' => null]);
-        $empty = false;
-        foreach ($data as $key => $value) {
-            if (empty($value)) $empty = true;
-        }
-        if (!$empty) {
-            $activity = $this->createActivityFromData($data);
-            try {
-                $em = DB::getEntityManager();
-                $em->persist($activity);
-                $em->flush();
-                $response['activity_id'] = $activity->getId();
-            } catch (Exception $e) {
-                $response['error'] = [
-                    'id' => 2,
-                    'description' => $e->getMessage()
-                ];
-            }
-        } else {
-            $response['error'] = [
-                'id' => 1,
-                'description' => 'Some of the fields are empty!'
-            ];
-        }
-        return $response;
+        $em = DB::getEntityManager();
+        $em->persist($activity);
+        $em->flush();
     }
 
+    /**
+     * Parses the request searching for specified keys. If a key is not defined in the POST request,
+     * use the default value specified in the array.
+     *
+     * @param array $data
+     * @return array
+     * @since 0.0.1
+     */
+    public function parseRequest($data)
+    {
+        $parsedData = [];
+        foreach ($data as $key => $default) {
+            if (isset($_POST[$key])) {
+                $value = $_POST[$key];
+                if (is_int($default)) $value = intval($value);
+                $parsedData[$key] = $value;
+            } else {
+                $parsedData[$key] = $default;
+            }
+        }
+        return $parsedData;
+    }
+
+    private function getJSONError($id, $description) {
+        return  [
+            'id' => $id,
+            'description' => $description
+        ];
+    }
+
+    /**
+     * For a bunch of fields, checks if any of them is empty. Returns true if at least one is empty
+     * @param $data
+     * @return bool
+     */
+    private function areFieldsEmpty($data)
+    {
+        foreach ($data as $key => $value) {
+            if (empty($value))
+                return true;
+        }
+        return false;
+    }
 }

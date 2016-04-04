@@ -41,21 +41,30 @@ use Apollo\Helpers\URLHelper;
                             </div>
                         </div>
                     </div>
-                    <span class="help-block">Time period covered by this record.</span>
+                    <span class="help-block">Time period covered by this activity.</span>
                 </div>
             </div>
         </form>
     </div>
 
-    <div class="panel panel-default">
+    <div id="essential-panel" class="panel panel-default loader-ready">
         <div class="panel-heading">
             <div class="row">
                 <div class="input-group-sm col-lg-4">
                     <input type="text" class="form-control input-small" id="activities-search"
                            placeholder="Search activities...">
                 </div>
-                <div class="col-sm-2 btn-group-sm">
-                    <a href="#" id="add-activity" class="btn btn-default btn-block">Add an activity</a>
+                <div class="btn-group-sm col-lg-8">
+                    <span class="pull-right"><!--
+             --><a href="#" id="add-activity" class="btn btn-sm btn-success disabled"><span
+                                    class="glyphicon glyphicon-plus"
+                                    aria-hidden="true"></span>Add an activity</a><!--
+             --><a href="#" id="duplicate-activity" class="btn btn-sm btn-primary disabled"><span
+                                    class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>Duplicate activity</a><!--
+             --><a href="#" id="hide-activity" class="btn btn-sm btn-danger disabled"><span
+                                    class="glyphicon glyphicon-remove"
+                                    aria-hidden="true"></span>Hide</a>
+                    </span>
                 </div>
             </div>
         </div>
@@ -81,7 +90,7 @@ use Apollo\Helpers\URLHelper;
                         </div>
                         <div class="col-lg-4 col-md-6 col-sm-12 col-sx-12 top-buffer top-buffer">
                             <div class="btn-group btn-block">
-                                <button class="btn btn-block btn-primary dropdown-toggle" type="button"
+                                <button class="btn btn-block btn-primary dropdown-toggle disabled" type="button"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                                         id="target-button">
                                 </button>

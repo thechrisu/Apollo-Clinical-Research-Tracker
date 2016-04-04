@@ -5,7 +5,7 @@
 ///<reference path="../bootbox.d.ts"/>
 /**
  * Class to store the token field (the field to add/remove users from a activity)
- * @version 0.0.4
+ * @version 0.0.5
  * TODO get people's names (--> or display more information?) from the database who are not yet in the activity
  */
 var ValidatorTokenField = (function () {
@@ -73,15 +73,15 @@ var ActivityTable = (function () {
     /**
      * Loads up all of the information and sets up the instance variables
      */
-    ActivityTable.prototype.load = function (activeId) {
+    ActivityTable.prototype.load = function (content) {
         this.loader = LoaderManager.createLoader($('#table-body'));
         var that = this;
         LoaderManager.showLoader((this.loader), function () {
+            that.content = content;
             that.pagination = $('#pagination');
             that.table = $('#table-body');
             that.search = '';
             that.page = 1;
-            that.activeId = activeId;
             that.updateTable();
             that.setUp();
         });
@@ -93,7 +93,7 @@ var ActivityTable = (function () {
      * Creates the basic structure of the table
      */
     ActivityTable.prototype.setUp = function () {
-        this.makeAddButton();
+        this.setUpButtons();
         this.setUpPagination();
         var timer = null;
         var that = this;
@@ -104,6 +104,7 @@ var ActivityTable = (function () {
                 that.updateTable();
             }, AJAX_DELAY);
         });
+        this.activateButtons();
     };
     /**
      * Adding the content to the table.
@@ -158,12 +159,6 @@ var ActivityTable = (function () {
             }
         });
         function newActivity(name, startDate, endDate) {
-            var that = this;
-            console.log('performing json post for adding a new activity');
-            console.log('name: ' + name);
-            console.log('start date: ' + startDate);
-            console.log('end date: ' + endDate);
-            //TODO
             AJAX.post(Util.url('post/activity'), {
                 action: 'create',
                 activity_name: name,
@@ -175,6 +170,20 @@ var ActivityTable = (function () {
                 Util.error('An error has occurred during the process of creation of the activity. Error message: ' + message);
             });
         }
+    };
+    ActivityTable.prototype.hideActivity = function (id) {
+        bootbox.confirm('Are you sure you want to hide this activity? The data won\'t be deleted and can be restored later.', function (result) {
+            if (result) {
+                AJAX.post(Util.url('post/activity'), {
+                    action: 'hide',
+                    activity_id: id
+                }, function (response) {
+                    Util.to('activity/');
+                }, function (message) {
+                    Util.error('An error has occurred while hiding activity. Error message: ' + message);
+                });
+            }
+        });
     };
     /**
      * Sets up the pagination
@@ -196,24 +205,43 @@ var ActivityTable = (function () {
     /**
      * Links up the button for adding activities with the JS
      */
-    ActivityTable.prototype.makeAddButton = function () {
+    ActivityTable.prototype.setUpButtons = function () {
+        var that = this;
+        var active = this.content.getId();
         $('#add-activity').click(this.addActivity);
+        $('#hide-activity').click(function () {
+            that.hideActivity.call(null, active);
+        });
+    };
+    ActivityTable.prototype.activateButtons = function () {
+        var addButton = $("#add-activity");
+        addButton.removeClass('disabled');
+        var duplicateButton = $("#duplicate-activity");
+        duplicateButton.removeClass('disabled');
+        var hideButton = $("#hide-activity");
+        hideButton.removeClass('disabled');
+        var targetGroupButton = $("#target-button");
+        targetGroupButton.removeClass('disabled');
     };
     /**
      * With the data of all the activities, it successively creates the rows for each activity
      * @param data
      */
     ActivityTable.prototype.addDataToTable = function (data) {
+        var activeId = this.content.getId();
+        if (isNaN(activeId)) {
+            activeId = parseInt(data.activities[0].id);
+        }
         for (var i = 0; i < data.activities.length; i++) {
             var item = data.activities[i];
-            this.addRowToTable(item);
+            this.addRowToTable(item, parseInt(item.id) == activeId);
         }
     };
     /**
      * Successively adds the parameters to one row and adds it to the DOM
      * @param data
      */
-    ActivityTable.prototype.addRowToTable = function (data) {
+    ActivityTable.prototype.addRowToTable = function (data, active) {
         var row;
         var startD;
         var endD;
@@ -221,7 +249,7 @@ var ActivityTable = (function () {
         startD = Util.formatShortDate(Util.parseSQLDate(data.start_date));
         endD = Util.formatShortDate(Util.parseSQLDate(data.end_date));
         row = $('<tr></tr>');
-        if (parseInt(data.id) == this.activeId) {
+        if (active) {
             row.addClass('active');
         }
         row.append('<td>' + data.name + '</td>');
@@ -245,6 +273,9 @@ var ActivityTable = (function () {
 var ActivityInformation = (function () {
     function ActivityInformation() {
     }
+    ActivityInformation.prototype.getId = function () {
+        return this.id;
+    };
     /**
      * Loads up all of the information and sets up the instance variables
      */
@@ -397,5 +428,5 @@ $(document).ready(function () {
     var id = Util.extractId(window.location.toString());
     var activity = new ActivityInformation();
     activity.load(id);
-    new ActivityTable().load(id);
+    var menu = new ActivityTable().load(activity);
 });
