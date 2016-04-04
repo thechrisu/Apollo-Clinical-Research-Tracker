@@ -10,16 +10,17 @@
 namespace Apollo\Controllers;
 
 use Apollo\Apollo;
+use Apollo\Components\Activity;
+use Apollo\Components\DB;
 use Apollo\Components\Field;
+use Apollo\Components\Person;
 use Apollo\Components\Record;
+use Apollo\Entities\ActivityEntity;
 use Apollo\Entities\FieldEntity;
 use Apollo\Entities\PersonEntity;
-use Apollo\Components\DB;
-use Apollo\Components\Person;
 use Apollo\Entities\RecordEntity;
-use Apollo\Components\Activity;
-use Apollo\Entities\ActivityEntity;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine;
 use Exception;
 
 
@@ -31,7 +32,7 @@ use Exception;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.1.0
+ * @version 0.1.1
  */
 class GetController extends GenericController
 {
@@ -412,16 +413,7 @@ class GetController extends GenericController
      */
     private function createQueryForActivitiesRequest($data)
     {
-        $em = DB::getEntityManager();
-        $activityRepo = $em->getRepository(Activity::getEntityNamespace());
-        $activityQB = $activityRepo->createQueryBuilder('a');
-        $organisation_id = Apollo::getInstance()->getUser()->getOrganisationId();
-        $activityQB->where(
-            $activityQB->expr()->andX(
-                $activityQB->expr()->eq('a.is_hidden', '0'),
-                $activityQB->expr()->eq('a.organisation', $organisation_id)
-            )
-        );
+        $activityQB = $this->getQueryValidActivities('a');
         if (!empty($data['search'])) {
             $this->addActivitySearch($activityQB, $data['search']);
             return $activityQB;
@@ -509,6 +501,7 @@ class GetController extends GenericController
     }
 
     /**
+     * Formats an activity as a valid JSON object
      * @param ActivityEntity $activity
      * @return array
      */
@@ -530,21 +523,86 @@ class GetController extends GenericController
     }
 
     /**
-     * @param $people
-     * @return array
+     * Gets all the people not in the specified activity, who meet the search criteria and who are not already temporarily added
      */
-    private function formatPeopleShort($people)
+    public function actionActivityPeople()
     {
-        $people_obj = [];
-        foreach($people as $person) {
-            $person_obj = [
-                'id' => $person->getId(),
-                'given_name' => $person->getGivenName(),
-                'last_name' => $person->getLastName()
-            ];
-            $people_obj[] = $person_obj;
+        $data = $this->parseRequest(['activity_id' => null, 'temporarily_added' => null, 'search' => null]);
+        $people = null;
+        $pqb = $this->getQueryForPeopleNotInProgramme($data);
+        $activity = Activity::getRepository()->findBy(['id' => $data['activity_id'], 'is_hidden' => 0, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
+        if((empty($activity[0])) || $activity[0]->isHidden()){
+            $response['error'] = $this->getJSONError(2, "Activity hidden.");
+        } else {
+            try {
+                $response['error'] = null;
+                $query = $pqb->getQuery();
+                $result = $query->getResult();
+                $response['data'] = $this->formatPeopleShort($result);
+            } catch (Exception $e) {
+                $response['error'] = $this->getJSONError(1, "Query failed with exception " . $e->getMessage());
+            }
         }
-        return $people_obj;
+        echo json_encode($response);
+    }
+
+
+    /**
+     * @param $queryBuilder
+     * @param $search
+     */
+    private function addShortPersonSearch($queryBuilder, $search)
+    {
+        $queryBuilder->andWhere($queryBuilder->expr()->orX(
+            $queryBuilder->expr()->like('p.given_name', ':search'),
+            $queryBuilder->expr()->like('p.last_name', ':search')
+        ));
+        $queryBuilder->setParameter('search', '%' . $search . '%');
+    }
+
+    /**
+     * @param $queryBuilder
+     * @param $array
+     */
+    private function removePeopleInArray($queryBuilder, $array)
+    {
+        foreach ($array as $id) {
+
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->notIn('p.id', $id)
+            );
+        }
+    }
+
+    /**
+     * @param $pqb
+     * @param $aqb
+     */
+    private function getPeopleNotInTable($pqb, $aqb)
+    {
+        $pqb->andWhere(
+            $pqb->expr()->notIn('p.id', $aqb->getDQL())
+        );
+    }
+
+    /**
+     * TODO: Fix bug: When activity is hidden, no people should be returned
+     * @param $data
+     * @return QueryBuilder
+     */
+    private function getQueryForPeopleNotInProgramme($data)
+    {
+        $aqb = $this->getQueryPeopleIdWithValidActivityId($data);
+        $pqb = $this->getQueryValidPeople();
+        if (!empty($data['temporarily_added'])) {
+            $this->removePeopleInArray($pqb, $data['temporarily_added']);
+        }
+        if (!empty($data['search'])) {
+            $this->addShortPersonSearch($pqb, $data['search']);
+        }
+
+        $this->getPeopleNotInTable($pqb, $aqb);
+        return $pqb;
     }
 
     /**
@@ -566,5 +624,86 @@ class GetController extends GenericController
             }
         }
         return $parsedData;
+    }
+
+    /**
+     * @param $people
+     * @return array
+     */
+    private function formatPeopleShort($people)
+    {
+        $people_obj = [];
+        foreach($people as $person) {
+            $person_obj = [
+                'id' => $person->getId(),
+                'given_name' => $person->getGivenName(),
+                'last_name' => $person->getLastName()
+            ];
+            $people_obj[] = $person_obj;
+        }
+        return $people_obj;
+    }
+
+    /**
+     * Given an activity id, returns a query bulider that contains the ids of the people in the activity, as long as the activity is valid
+     * @param $data
+     * @return QueryBuilder
+     */
+    private function getQueryPeopleIdWithValidActivityId($data)
+    {
+        $em = DB::getEntityManager();
+        $activityRepo = $em->getRepository(Activity::getEntityNamespace());
+        $activityQB = $activityRepo->createQueryBuilder('a');
+        $activityQB->select('ppl.id');
+        $organisation_id = Apollo::getInstance()->getUser()->getOrganisationId();
+        $notHidden = $activityQB->expr()->eq(strtolower('a' . '.is_hidden'), '0');
+        $sameOrgId = $activityQB->expr()->eq('a' . '.organisation', $organisation_id);
+        $valid = $activityQB->expr()->andX($notHidden, $sameOrgId);
+        $matchesId = $activityQB->expr()->eq('a.id', $data['activity_id']);
+        $cond = $activityQB->expr()->andX($valid, $matchesId);
+
+        $activityQB->join('a.' . 'people', 'ppl', 'WHERE', $cond);
+        return $activityQB;
+    }
+
+    /**
+     * @param $alias
+     * @return QueryBuilder
+     */
+    private function getQueryValidActivities($alias)
+    {
+
+        $em = DB::getEntityManager();
+        $activityRepo = $em->getRepository(Activity::getEntityNamespace());
+        $activityQB = $activityRepo->createQueryBuilder($alias);
+        $organisation_id = Apollo::getInstance()->getUser()->getOrganisationId();
+        $notHidden = $activityQB->expr()->eq($alias . '.is_hidden', '0');
+        $sameOrgId = $activityQB->expr()->eq($alias . '.organisation', $organisation_id);
+        $cond = $activityQB->expr()->andX($notHidden, $sameOrgId);
+        $activityQB->where($cond);
+        return $activityQB;
+    }
+
+    private function getQueryValidPeople()
+    {
+        $em = DB::getEntityManager();
+        $peopleRepo = $em->getRepository(Person::getEntityNamespace());
+        $organisation_id = Apollo::getInstance()->getUser()->getOrganisationId();
+        $pqb = $peopleRepo->createQueryBuilder('p');
+        $pqb->where(
+            $pqb->expr()->andX(
+                $pqb->expr()->eq('p.organisation', $organisation_id),
+                $pqb->expr()->eq('p.is_hidden', '0')
+            )
+        );
+        return $pqb;
+    }
+
+
+    private function getJSONError($id, $description) {
+        return  [
+            'id' => $id,
+            'description' => $description
+        ];
     }
 }
