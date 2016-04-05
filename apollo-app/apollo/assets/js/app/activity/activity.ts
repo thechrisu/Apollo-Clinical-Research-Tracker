@@ -107,16 +107,28 @@ class PeopleField {
                 return Bloodhound.tokenizers.whitespace(a.name);
             },
             queryTokenizer: Bloodhound.tokenizers.whitespace,
+            identify: function(item) {return item.id;},
+            sort: function (a, b) {
+                if (a.name < b.name)
+                    return -1;
+                if (b.name < a.name)
+                    return 1;
+                return 0;
+            },
             remote: {
                 url: Util.url('get/activitypeople') + '?activity_id=' + that.activity_id + that.formatTemporarily_added(that.temporarily_added) + '&search=' + that.search,
                 filter: function (data) {
-                    console.log(Util.url('get/activitypeople') + '?activity_id=' + that.activity_id + that.formatTemporarily_added(that.temporarily_added) + '&search=' + that.search);
+                    if (!data) {
+                        return {};
+                    } else {
+                        console.log(Util.url('get/activitypeople') + '?activity_id=' + that.activity_id + that.formatTemporarily_added(that.temporarily_added) + '&search=' + that.search);
                     return $.map(data.data, function (item) {
                         return {
                             id: item.id,
                             name: item.name
                         }
                     })
+                    }
                 }
             }
         });
@@ -433,7 +445,7 @@ class ActivityInformation {
         var that = this;
         LoaderManager.showLoader((loader), function() {
             that.peopleTable = $('#existingPeople');
-            that.id = isNaN(id) ? 1 : id;
+            that.id = id;
             that.activeTargetGroup = NaN;
             that.setUp();
             //that.resetTimer();
@@ -587,6 +599,12 @@ class ActivityInformation {
 
 $(document).ready(function () {
     var id = Util.extractId(window.location.toString());
+    if(isNaN(id)){
+        var breadcrumbs = $('#nav-breadcrumbs');
+        var fullLink = breadcrumbs.find('li:nth-child(2)').find("a").attr("href");
+        var newId = Util.extractId(fullLink);
+        id = newId;
+    }
     var activity:ActivityInformation = new ActivityInformation();
     var existingPeopleField:PeopleField = new PeopleField();
     activity.load(id);

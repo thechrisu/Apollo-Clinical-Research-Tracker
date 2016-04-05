@@ -462,40 +462,16 @@ class GetController extends GenericController
      */
     public function actionActivity()
     {
-        $data = $this->parseRequest(['id' => 1]);
-        if ($data['id'] > 0 && ($activity = Activity::getRepository()->find($data['id'])) != null)
+        $data = $this->parseRequest(['id' => 0]);
+        $activity = Activity::getRepository()->findOneBy(['id' => $data['id'], 'is_hidden' => 0, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
+
+        if ($data['id'] > 0 && $activity != null)
         {
             $activityInfo = $this->getInfoActivity($activity);
             //TODO: Check if there is more than one activity. If so, then report that as invalid
-            /*$dummy[
-            'error'] => null,
-            'name' => "Some activity",
-            'target_group' => ["Young people", "Old people", "Twentysomething people"],
-            'current_target_group' => 0,
-            'target_group_comment' => "This is an exceptional activity",
-            'start_date' => "1834-01-22 02:00:00",
-            'end_date' => "1834-02-22 02:00:00",
-            'participants', => [
-
-                [
-                    "given_name" => "Peter",
-                    "last_name" => "Parker",
-                    "id" => "13"
-                ],
-                [
-                    "given_name" => "Michael",
-                    "last_name" => "Jackdaughter",
-                    "id" => "12"
-                ],
-                [
-                    "given_name" => "Rowan",
-                    "last_name" => "@kinson",
-                    "id" => "1"
-                ]
-            ];*/
             $response = $activityInfo;
         } else {
-            $response['error'] = ['id' => 1, 'description' => 'The supplied id is invalid! (' . $data['id'] . ')'];
+            $response['error'] = $this->getJSONError(1, 'The supplied id is invalid!');
         }
         echo json_encode($response);
     }

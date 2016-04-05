@@ -9,6 +9,7 @@ namespace Apollo\Controllers;
 
 
 use Apollo\Apollo;
+use Apollo\Components\Activity;
 use Apollo\Components\View;
 use Apollo\Helpers\URLHelper;
 
@@ -29,8 +30,10 @@ class ActivityController extends GenericController
      */
     public function index()
     {
+        $id = Activity::getMinId();
         $breadcrumbs = [
-            ['Activities', URLHelper::url('activity/view/1'), true]
+            ['Activities', URLHelper::url('activity/view/' . $id), true],
+            ['Activity name (Activity ID)', null, true]
         ];
         View::render('activity.activity', 'Activities', $breadcrumbs);
     }
