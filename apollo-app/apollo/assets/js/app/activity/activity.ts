@@ -64,10 +64,10 @@ class PeopleField {
 
     private setUp() {
         var that = this;
-        this.resetBloodhound();
         $('#person-input').keyup(function () {
             that.search = encodeURIComponent($(this).val());
         });
+        this.resetBloodhound();
         /*$('#person-input').keydown(function(e) {
             that.search = encodeURIComponent($(this).val());
         }*/
@@ -75,8 +75,7 @@ class PeopleField {
     }
 
     private resetBloodhound() {
-        var that = this;
-        this.setBloodhound(that);
+        this.setBloodhound();
         var promise = this.bh.initialize();
         promise.fail(function() { Util.error('failed to load the suggestion engine');});
         this.resetTypeahead();
@@ -92,6 +91,7 @@ class PeopleField {
         }, {
             name: 'data',
             displayKey: 'name',
+            allowDuplicates: false,
             source: that.bh.ttAdapter(),
             templates: {
                 suggestion: function (data) {
@@ -122,6 +122,7 @@ class PeopleField {
                         return {};
                     } else {
                         function destringify(data) {
+                            console.log(data);
                             $.map(data, function (item:ParticipantData) {
                                 return {
                                     id: item.id,
@@ -132,8 +133,9 @@ class PeopleField {
 
                         function carryout(data) {
                             var objects = destringify(data);
+                            console.log(objects);
                             var output = [];
-                            $.each(objects, function(k,v){
+                            $.each(data, function(k,v){
                                 if (!Util.isIn(v, that.temporarily_added) && !Util.isIn(v, that.temporarily_removed)){
                                     output.push(v);
                                 }
@@ -148,7 +150,6 @@ class PeopleField {
                     }
 
                 },
-                rateLimitWait: 300
             }
         });
     }
@@ -637,6 +638,5 @@ $(document).ready(function () {
     var existingPeopleField:PeopleField = new PeopleField();
     activity.load(id, existingPeopleField);
     var menu:ActivityTable = new ActivityTable().load(activity);
-
 });
 
