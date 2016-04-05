@@ -33,7 +33,7 @@ use Exception;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.7
+ * @version 0.0.8
  */
 class PostController extends GenericController
 {
@@ -297,9 +297,7 @@ class PostController extends GenericController
                 Apollo::getInstance()->getRequest()->error(400, 'Invalid action.');
                 break;
         }
-        json_decode(json_encode($response));
-        if(json_last_error() != JSON_ERROR_NONE)
-            $response = $this->getJSONError('5', 'made invalid JSON: ' . json_encode($response));
+        //$this->derail($response);
         echo json_encode($response);
     }
 
@@ -313,18 +311,17 @@ class PostController extends GenericController
         $response['error'] = null;
         $data = $this->parseRequest(['id' => -1, 'activity_name' => null, 'start_date' => null, 'end_date' => null]);
         $organisation = Apollo::getInstance()->getUser()->getOrganisation();
-        $bonus = null;
         if ($data['id'] > 0) {
             try{
                 $sourceActivity = Activity::find($data['id']);
                 if ($sourceActivity != null && !$sourceActivity->isHidden() && $sourceActivity->getOrganisation() == $organisation) {
                     $bonus['target_group_comment'] = $sourceActivity->getTargetGroupComment();
-                    $bonus['people'] = count($sourceActivity->getPeople());
+                    $bonus['people'] = $sourceActivity->getPeople();
                 } else {
                     $response['error'] = $this->getJSONError(2, 'Source activity ID is invalid.');
                 }
             } catch (Exception $e) {
-                $response['error'] = $this->getJSONError(3, 'Error whlie duplicating. Message: ' . $e->getMessage());
+                $response['error'] = $this->getJSONError(3, 'Error while duplicating. Message: ' . $e->getMessage());
             }
         }
         if (!$this->areFieldsEmpty($data)) {
@@ -333,6 +330,7 @@ class PostController extends GenericController
         } else {
             $response['error'] = $this->getJSONError(1, 'Some of the fields are empty');
         }
+        //$response['bonus'] = $bonus;
         return $response;
     }
 
@@ -489,5 +487,15 @@ class PostController extends GenericController
             $response['error'] = $this->getJSONError(2, $e->getMessage());
         }
         return $response;
+    }
+
+    /**
+     * Function meant to be used for debugging: Deliberately stops the active post request by creating an error
+     * @param $data
+     */
+    private function derail($data)
+    {
+        echo json_encode($this->getJSONError(0, json_encode($data)));
+        return;
     }
 }

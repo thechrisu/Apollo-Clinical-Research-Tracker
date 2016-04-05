@@ -8,23 +8,30 @@
 namespace Apollo\Entities;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\JoinColumns;
+use Doctrine\ORM\Mapping\JoinTable;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\OrderBy;
+use Doctrine\Common\Collections\ArrayCollection;
+use Illuminate\Support\Arr;
+
 /**
  * Class PersonEntity
  * @package Apollo\Entities
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.6
+ * @version 0.0.7
  * @Entity @Table("people")
  */
 class PersonEntity
 {
     /**
      * Unique Person id
-     * @Id @Column(type="integer") @GeneratedValue
+     * @Id @Column(type="integer", name="id")
+     * @GeneratedValue(strategy="AUTO")
      * @var int
      */
     protected $id;
@@ -59,21 +66,28 @@ class PersonEntity
      */
     protected $records;
     /**
+     * Array with all the activities of one person
+     * @ManyToMany(targetEntity="ActivityEntity",  inversedBy="person")
+     * @JoinTable(
+     *     name="personentity_activityentity",
+     *     joinColumns={
+     *     @JoinColumn(name="personentity_id", referencedColumnName="id")
+     * },
+     * inverseJoinColumns={@JoinColumn(name="activityentity_id", referencedColumnName="id")}
+     * )
+     * @var \Doctrine\Common\Collections\ArrayCollection|ActivityEntity[]
+     */
+    protected $activities;
+    /**
      * Determines if person is shown or not
      * @Column(type="boolean")
      * @var bool
      */
     protected $is_hidden = false;
 
-    /**
-     * Array with all the activities of one person
-     * @ManyToMany(targetEntity="ActivityEntity", inversedBy="people")
-     * @var ActivityEntity[]
-     */
-    protected $activities;
-
     public function __construct()
     {
+        $this->activities = new ArrayCollection();
         $this->is_hidden = false;
     }
     /**
@@ -169,6 +183,28 @@ class PersonEntity
     }
 
     /**
+     * @param ActivityEntity $activity
+     */
+    public function addActivity(ActivityEntity $activity)
+    {
+        if(!$this->hasActivity($activity)) {
+            $this->activities->add($activity);
+            $activity->addPerson($this);
+        }
+    }
+
+    /**
+     * @param ActivityEntity $activity
+     */
+    public function removeActivity(ActivityEntity $activity)
+    {
+        if($this->hasActivity($activity)) {
+            $this->activities->removeElement($activity);
+            $activity->removePerson($this);
+        }
+    }
+
+    /**
      * @return ActivityEntity[]
      */
     public function getActivities()
@@ -176,11 +212,11 @@ class PersonEntity
         return $this->activities;
     }
 
-    /**
-     * @param $activity
-     */
-    public function addActivity($activity)
+    private function hasActivity($activity)
     {
-        $this->activities = $activity;
+        if(!$this->getActivities() || empty($this->getActivities()))
+            return false;
+        else
+            return $this->activities->contains($activity);
     }
 }

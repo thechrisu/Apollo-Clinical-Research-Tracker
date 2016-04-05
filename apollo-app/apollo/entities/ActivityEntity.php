@@ -8,24 +8,29 @@
 namespace Apollo\Entities;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
-use DateTime;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\JoinColumns;
+use Doctrine\ORM\Mapping\JoinTable;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Doctrine\ORM\Mapping\ManyToMany;
+use Doctrine\Common\Collections\ArrayCollection;
+use DateTime;
 
 /**
  * Class ActivityEntity
  * @package Apollo\Entities
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  * @Entity @Table("activities")
  */
 class ActivityEntity
 {
     /**
      * Unique activity id
-     * @Id @Column(type="integer") @GeneratedValue
+     * @Id @Column(type="integer", name="id")
+     * @GeneratedValue(strategy="AUTO")
      * @var int
      */
     protected $id;
@@ -53,8 +58,8 @@ class ActivityEntity
 
     /**
      * Array with all of the people in the activity
+     * @var \Doctrine\Common\Collections\ArrayCollection|PersonEntity[]
      * @ManyToMany(targetEntity="PersonEntity", mappedBy="activities")
-     * @var PersonEntity[]
      */
     protected $people;
 
@@ -88,6 +93,7 @@ class ActivityEntity
 
     public function __construct()
     {
+        $this->people = new ArrayCollection();
         $this->is_hidden = false;
         $this->target_group_comment = '';
     }
@@ -169,34 +175,44 @@ class ActivityEntity
      */
     public function getPeople()
     {
-        return $this->people;
+        $ret = [];
+        foreach($this->people as $person){
+            $ret[] = $person;
+        }
+        return $ret;
     }
 
     /**
      * @param PersonEntity $person
      */
-    public function addPerson($person)
+    public function addPerson(PersonEntity $person)
     {
-        if(!$this->hasPerson($person))
-            $this->people[] = $person;
-    }
-
-    public function removePerson($person)
-    {
-        if(($key = array_search($person, $this->getPeople())) !== false)
-        {
-           unset($this->people[$key]);
+        if(!$this->hasPerson($person)) {
+            $this->people->add($person);
+            $person->addActivity($this);
         }
     }
 
     /**
-     * @param $people
+     * @param PersonEntity $person
+     */
+    public function removePerson(PersonEntity $person)
+    {
+        if($this->hasPerson($person))
+        {
+           $this->people->removeElement($person);
+            $person->removeActivity($this);
+        }
+    }
+
+    /**
+     * @param PersonEntity[] $people
      */
     public function addPeople($people)
     {
         if($people && !empty($people) && (is_array($people) || is_object($people))) {
-            foreach ($people as $p)
-                    $this->addPerson($p);
+            foreach($people as $person)
+                    $this->addPerson($person);
         }
     }
 
@@ -246,12 +262,16 @@ class ActivityEntity
         return $this->is_hidden;
     }
 
-    public function hasPerson($person)
+    /**
+     * @param $person
+     * @return bool
+     */
+    public function hasPerson(PersonEntity $person)
     {
         if(!$this->getPeople() || empty($this->getPeople()))
             return false;
         else
-            return in_array($person, $this->getPeople());
+            return $this->people->contains($person);
     }
 
     /**
