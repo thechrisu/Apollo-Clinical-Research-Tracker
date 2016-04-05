@@ -10,16 +10,19 @@
  */
 var PeopleField = (function () {
     function PeopleField() {
+        this.temporarily_added = []; //people that are temporarily added to the activity (-> not saved). These should not be suggested.
+        this.temporarily_removed = []; //people that are temporarily added to the suggestions. These items were removed from the activity
     }
     PeopleField.prototype.load = function (activity_id) {
         this.activity_id = activity_id;
         this.search = '';
         this.temporarily_added = [];
+        this.temporarily_removed = [];
         this.setUp();
     };
     PeopleField.prototype.setUp = function () {
         var that = this;
-        this.activateBloodHound();
+        this.resetBloodhound();
         $('#person-input').keyup(function () {
             that.search = encodeURIComponent($(this).val());
         });
@@ -27,7 +30,7 @@ var PeopleField = (function () {
             that.search = encodeURIComponent($(this).val());
         }*/
     };
-    PeopleField.prototype.activateBloodHound = function () {
+    PeopleField.prototype.resetBloodhound = function () {
         var that = this;
         this.setBloodhound(that);
         var promise = this.bh.initialize();
@@ -36,9 +39,11 @@ var PeopleField = (function () {
     };
     PeopleField.prototype.resetTypeahead = function () {
         var that = this;
+        $('#person-input').val("");
         $('#person-input').typeahead('destroy');
         $('#person-input').typeahead({
-            highlight: true
+            highlight: true,
+            skipCache: true
         }, {
             name: 'data',
             displayKey: 'name',
@@ -46,12 +51,14 @@ var PeopleField = (function () {
             templates: {
                 suggestion: function (data) {
                     var str = '';
-                    str += '<div class="noselect">' + data.name + '</div>';
+                    if (!Util.isIn(data, that.temporarily_added))
+                        str += '<div class="noselect">' + data.name + '</div>';
                     return str;
                 }
             }
         });
     };
+    //http://stackoverflow.com/questions/25419972/twitter-typeahead-add-custom-data-to-dataset
     PeopleField.prototype.setBloodhound = function () {
         var that = this;
         this.bh = new Bloodhound({
@@ -60,13 +67,7 @@ var PeopleField = (function () {
             },
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             identify: function (item) { return item.id; },
-            sort: function (a, b) {
-                if (a.name < b.name)
-                    return -1;
-                if (b.name < a.name)
-                    return 1;
-                return 0;
-            },
+            sorter: sortParticipants,
             remote: {
                 url: Util.url('get/activitypeople') + '?activity_id=' + that.activity_id + that.formatTemporarily_added(that.temporarily_added) + '&search=' + that.search,
                 filter: function (data) {
@@ -74,68 +75,50 @@ var PeopleField = (function () {
                         return {};
                     }
                     else {
-                        console.log(Util.url('get/activitypeople') + '?activity_id=' + that.activity_id + that.formatTemporarily_added(that.temporarily_added) + '&search=' + that.search);
-                        return $.map(data.data, function (item) {
-                            return {
-                                id: item.id,
-                                name: item.name
-                            };
-                        });
+                        function destringify(data) {
+                            $.map(data, function (item) {
+                                return {
+                                    id: item.id,
+                                    name: item.name
+                                };
+                            });
+                        }
+                        function carryout(data) {
+                            var objects = destringify(data);
+                            var output = [];
+                            $.each(objects, function (k, v) {
+                                if (!Util.isIn(v, that.temporarily_added) && !Util.isIn(v, that.temporarily_removed)) {
+                                    output.push(v);
+                                }
+                            });
+                            $.each(that.temporarily_removed, function (k, v) {
+                                output.push(v);
+                            });
+                            return output;
+                        }
+                        return carryout(data.data);
                     }
-                }
+                },
+                rateLimitWait: 300
             }
         });
     };
-    //$('#person-input').typeahead({source: cNames});/*{
-    /*hint: true,
-    highlight: true,
-    minLength: 1
-    {
-       source: cNames
-   });
-   /*AJAX.get(Util.url('get/activitypeople?activity_id=' + that.activity_id + that.formatTemporarily_added(that.temporarily_added) + '&search=' + that.search),
-       function(data:ParticipantData[]) {
-          /* var cNames = concatNames(data);*/
-    /*      var cNames = ['bla', 'blahahaha'];
-          /*that.bh = new Bloodhound({
-              initialize: false,
-              datumTokenizer: Bloodhound.tokenizers.whitespace,
-              queryTokenizer: Bloodhound.tokenizers.whitespace,
-              local: cNames
-          });
-
-          var promise = that.bh.initialize();
-
-          promise
-              .done(function() { console.log('ready to go!');})
-              .fail(function() { console.log('something went wrong');});
-*/
-    /*    $('#person-input').typeahead(/*{
-            hint: true,
-            highlight: true,
-            minLength: 1
-        },{
-      /*      source: cNames
+    PeopleField.prototype.removeItemFromSuggestions = function (data) {
+        this.temporarily_added.push(data);
+        if (Util.isIn(data, this.temporarily_removed))
+            Util.removeFromArray(data, this.temporarily_removed);
+    };
+    PeopleField.prototype.addItemToSuggestions = function (data) {
+        this.temporarily_removed.push(data);
+        if (Util.isIn(data, this.temporarily_added))
+            Util.removeFromArray(data, this.temporarily_added);
+        this.bh.add(data);
+    };
+    PeopleField.prototype.addDataToSuggestions = function (data) {
+        $.each(data, function (key, obj) {
+            this.addItemToSuggestions(obj);
         });
-        function concatNames (items:ParticipantData[]) {
-            var names:string[] = [];
-            for(var item in items) {
-                names.concat(item.given_name + ' ' + item.last_name);
-            }
-            return names;
-        }
-
-        function concatIds (items:ParticipantData[]) {
-            var ids:number[] = [];
-            for(var item in items) {
-                ids.concat(item.id);
-            }
-            return ids;
-        }
-    },
-    function(message:string) {
-        Util.error('An error has occurred while people not in the programme. Please contact the system administrator. Error message: ' + message);
-    });*/
+    };
     PeopleField.prototype.formatTemporarily_added = function (tA) {
         var query = '';
         for (var id in tA) {
@@ -158,20 +141,17 @@ var ActivityTable = (function () {
     /**
      * Loads up all of the information and sets up the instance variables
      */
-    ActivityTable.prototype.load = function (content, existingPeople) {
+    ActivityTable.prototype.load = function (content) {
         this.loader = LoaderManager.createLoader($('#table-body'));
         var that = this;
         LoaderManager.showLoader((this.loader), function () {
             that.content = content;
-            that.existingPeople = existingPeople;
             that.pagination = $('#pagination');
             that.table = $('#table-body');
             that.search = '';
             that.page = 1;
             that.updateTable();
             that.setUp();
-            that.existingPeople.setId(that.content.getId());
-            that.existingPeople.load(that.content.getId());
         });
         LoaderManager.hideLoader(this.loader, function () {
             LoaderManager.destroyLoader(that.loader);
@@ -221,7 +201,6 @@ var ActivityTable = (function () {
      * Creates a new activity specified by the user. Pops up a modal to get name/start/end date and then goes to the view
      */
     ActivityTable.prototype.addActivity = function (e) {
-        console.log("adding activity...");
         e.preventDefault();
         bootbox.dialog({
             title: 'Adding a new activity',
@@ -361,6 +340,8 @@ var ActivityTable = (function () {
  */
 var ActivityInformation = (function () {
     function ActivityInformation() {
+        this.addedPeople = [];
+        this.removedPeople = [];
     }
     ActivityInformation.prototype.getId = function () {
         return this.id;
@@ -368,15 +349,18 @@ var ActivityInformation = (function () {
     /**
      * Loads up all of the information and sets up the instance variables
      */
-    ActivityInformation.prototype.load = function (id) {
+    ActivityInformation.prototype.load = function (id, existingPeople) {
         var loader = LoaderManager.createLoader($('#activityContent'));
         var that = this;
         LoaderManager.showLoader((loader), function () {
+            that.existingPeople = existingPeople;
             that.peopleTable = $('#existingPeople');
             that.id = id;
             that.activeTargetGroup = NaN;
             that.setUp();
-            //that.resetTimer();
+            that.existingPeople.setId(id);
+            that.existingPeople.load(id);
+            that.makeLinkWithSuggestions();
         });
         LoaderManager.hideLoader(loader, function () {
             LoaderManager.destroyLoader(loader);
@@ -387,12 +371,14 @@ var ActivityInformation = (function () {
      */
     ActivityInformation.prototype.setUp = function () {
         var that = this;
+        this.removedPeople = [];
         AJAX.get(Util.url('get/activity/?id=' + that.id, false), function (data) {
             var breadcrumbs = $('#nav-breadcrumbs');
             breadcrumbs.find('li:nth-child(3)').text('Activity #' + that.id + ': ' + data.name);
             that.activeTargetGroup = data.current_target_group;
+            that.people = data.participants;
             that.displayTitle(data.name);
-            that.displayPeople(data.participants);
+            that.displayPeople();
             that.displayTargetGroup(data.target_group);
             that.displayComment(data.target_group_comment);
             that.displayStartDate(data.start_date);
@@ -407,6 +393,9 @@ var ActivityInformation = (function () {
      */
     ActivityInformation.prototype.displayTitle = function (title) {
         $('#activity-title').val(title);
+    };
+    ActivityInformation.prototype.makeLinkWithSuggestions = function () {
+        $('.twitter-typeahead').on('typeahead:selected', { that: this }, addItemFromSuggestion);
     };
     /**
      * Shows the target group as dropdown
@@ -477,30 +466,41 @@ var ActivityInformation = (function () {
      * Creates the table with all the people in a activity
      * @param people
      */
-    ActivityInformation.prototype.displayPeople = function (people) {
+    ActivityInformation.prototype.displayPeople = function () {
+        var people = this.people.concat(this.addedPeople);
+        this.peopleTable.empty();
+        var that = this;
+        people.sort(sortParticipants);
         for (var i = 0; i < people.length; i++) {
             var person = people[i];
+            this.displayPerson(person);
+        }
+    };
+    ActivityInformation.prototype.displayPerson = function (person) {
+        var that = this;
+        if (!Util.isIn(person, this.removedPeople)) {
             var row = $('<td class="col-md-11"></td>');
-            var that = this;
-            row.append(person.given_name + ' ' + person.last_name);
+            row.append(person.name);
             var removeButton = $('<td class="col-md-1"><button type="button" class="btn btn-xs btn-default" style="display:block; text-align:center"><small><span class="glyphicon glyphicon-remove" aria-hidden="false"></span></small></button></td>');
-            removeButton.click(function (e) {
-                e.preventDefault();
-                that.removePerson.call(null, person.id);
-            });
+            that.addRemoveClick(removeButton, person);
             var fullRow = $('<tr class="row"></tr>');
             fullRow.append(row);
             fullRow.append(removeButton);
-            this.addOnClickToRow(row, people[i].id);
-            this.peopleTable.append(fullRow);
+            that.addOnClickToRow(row, person.id);
+            that.peopleTable.append(fullRow);
         }
     };
-    /**
-     * TODO: Really remove the person
-     * @param id
-     */
-    ActivityInformation.prototype.removePerson = function (id) {
-        console.log('removing person with id... ' + id);
+    ActivityInformation.prototype.addRemoveClick = function (button, person) {
+        var that = this;
+        function removePerson(e) {
+            var c = e.data; //context
+            Util.removeFromArray(c.person, c.that.addedPeople);
+            c.that.removedPeople.push(c.person);
+            c.that.existingPeople.addItemToSuggestions(c.person);
+            //that.removePerson.call(null, person.id);
+            c.that.displayPeople();
+        }
+        button.click({ person: person, that: that }, removePerson);
     };
     /**
      * Adds an on-click event to a row in the table in which all the people going to an activity are displayed
@@ -514,6 +514,26 @@ var ActivityInformation = (function () {
     };
     return ActivityInformation;
 })();
+function sortParticipants(a, b) {
+    if (a.name > b.name)
+        return 1;
+    if (b.name > a.name)
+        return -1;
+    return 0;
+}
+function addItemFromSuggestion(e, item) {
+    var c = e.data;
+    if (Util.isIn(item, c.that.removedPeople)) {
+        Util.removeFromArray(item, c.that.removedPeople);
+    }
+    else {
+        c.that.addedPeople.push(item);
+    }
+    c.that.existingPeople.removeItemFromSuggestions(item);
+    c.that.displayPeople();
+    c.that.existingPeople.resetBloodhound();
+    c.that.makeLinkWithSuggestions();
+}
 $(document).ready(function () {
     var id = Util.extractId(window.location.toString());
     if (isNaN(id)) {
@@ -524,7 +544,6 @@ $(document).ready(function () {
     }
     var activity = new ActivityInformation();
     var existingPeopleField = new PeopleField();
-    activity.load(id);
-    existingPeopleField.load(id);
-    var menu = new ActivityTable().load(activity, existingPeopleField);
+    activity.load(id, existingPeopleField);
+    var menu = new ActivityTable().load(activity);
 });

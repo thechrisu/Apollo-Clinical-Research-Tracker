@@ -83,7 +83,7 @@ interface Attributes {
 
 /**
  * Util class
- * @since 0.0.4
+ * @since 0.0.5
  */
 class Util {
 
@@ -127,6 +127,16 @@ class Util {
             messageContainer.html(message);
         });
         modal.modal('show');
+    }
+
+    public static removeFromArray(needle:any, haystack:any[]) {
+        var index = haystack.indexOf(needle);
+        if(index > -1)
+            haystack.splice(index, 1);
+    }
+
+    public static isIn(needle:any, haystack:any[]) {
+        return haystack.indexOf(needle) > -1;
     }
 
     /**

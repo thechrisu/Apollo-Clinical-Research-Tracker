@@ -483,7 +483,7 @@ class GetController extends GenericController
      */
     private function getInfoActivity(ActivityEntity $activity)
     {
-        $people = $this->formatPeopleShort($activity->getPeople());
+        $people = $this->formatPeopleShortConcatName($activity->getPeople());
         $activityInfo = [
             'error' => null,
             'id' => $activity->getId(),

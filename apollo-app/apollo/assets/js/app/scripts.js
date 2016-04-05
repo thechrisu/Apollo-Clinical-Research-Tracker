@@ -34,7 +34,7 @@ var FIELD_AWARDS = 7;
 var FIELD_PUBLICATIONS = 8;
 /**
  * Util class
- * @since 0.0.4
+ * @since 0.0.5
  */
 var Util = (function () {
     function Util() {
@@ -80,6 +80,14 @@ var Util = (function () {
             messageContainer.html(message);
         });
         modal.modal('show');
+    };
+    Util.removeFromArray = function (needle, haystack) {
+        var index = haystack.indexOf(needle);
+        if (index > -1)
+            haystack.splice(index, 1);
+    };
+    Util.isIn = function (needle, haystack) {
+        return haystack.indexOf(needle) > -1;
     };
     /**
      * Converts MySQL date time string into JS' Date object
