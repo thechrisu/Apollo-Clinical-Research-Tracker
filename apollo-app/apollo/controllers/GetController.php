@@ -547,6 +547,7 @@ class GetController extends GenericController
     {
         $queryBuilder->andWhere($queryBuilder->expr()->orX(
             $queryBuilder->expr()->like('p.given_name', ':search'),
+            $queryBuilder->expr()->like('p.middle_name', ':search'),
             $queryBuilder->expr()->like('p.last_name', ':search')
         ));
         $queryBuilder->setParameter('search', '%' . $search . '%');

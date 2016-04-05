@@ -89,6 +89,15 @@ var Util = (function () {
     Util.isIn = function (needle, haystack) {
         return haystack.indexOf(needle) > -1;
     };
+    Util.shortify = function (str, maxLength) {
+        var res = str;
+        if (str.length > maxLength) {
+            var spliceLocation = maxLength - 3;
+            res = str.substring(0, spliceLocation);
+            res = res.slice(0, spliceLocation) + '...';
+        }
+        return res;
+    };
     /**
      * Converts MySQL date time string into JS' Date object
      *

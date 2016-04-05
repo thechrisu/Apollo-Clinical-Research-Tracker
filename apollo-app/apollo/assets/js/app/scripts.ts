@@ -139,6 +139,16 @@ class Util {
         return haystack.indexOf(needle) > -1;
     }
 
+    public static shortify(str:string, maxLength:number) {
+        var res:string = str;
+        if(str.length > maxLength) {
+            var spliceLocation = maxLength - 3;
+            res = str.substring(0, spliceLocation);
+            res = res.slice(0, spliceLocation) + '...' ;
+        }
+        return res;
+    }
+
     /**
      * Converts MySQL date time string into JS' Date object
      *

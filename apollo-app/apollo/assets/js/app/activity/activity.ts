@@ -51,8 +51,8 @@ class PeopleField {
     private activity_id:number;
     private search:string;
     private bh:BloodHound;
-    private temporarily_added = []; //people that are temporarily added to the activity (-> not saved). These should not be suggested.
-    private temporarily_removed = []; //people that are temporarily added to the suggestions. These items were removed from the activity
+    private temporarily_added:ParticipantData[] = []; //people that are temporarily added to the activity (-> not saved). These should not be suggested.
+    private temporarily_removed:ParticipantData[] = []; //people that are temporarily added to the suggestions. These items were removed from the activity
 
     public load(activity_id:number){
         this.activity_id = activity_id;
@@ -64,9 +64,6 @@ class PeopleField {
 
     private setUp() {
         var that = this;
-        $('#person-input').keyup(function () {
-            that.search = encodeURIComponent($(this).val());
-        });
         this.resetBloodhound();
         /*$('#person-input').keydown(function(e) {
             that.search = encodeURIComponent($(this).val());
@@ -74,7 +71,7 @@ class PeopleField {
 
     }
 
-    private resetBloodhound() {
+    public resetBloodhound() {
         this.setBloodhound();
         var promise = this.bh.initialize();
         promise.fail(function() { Util.error('failed to load the suggestion engine');});
@@ -82,12 +79,12 @@ class PeopleField {
     }
 
     public resetTypeahead() {
+        //console.log('resetting typehead');
         var that = this;
         $('#person-input').val("");
         $('#person-input').typeahead('destroy');
         $('#person-input').typeahead({
-            highlight: true,
-            skipCache: true
+            highlight: true
         }, {
             name: 'data',
             displayKey: 'name',
@@ -113,58 +110,78 @@ class PeopleField {
                 return Bloodhound.tokenizers.whitespace(a.name);
             },
             queryTokenizer: Bloodhound.tokenizers.whitespace,
+            initialize: true,
             identify: function(item) {return item.id;},
             sorter: sortParticipants,
             remote: {
-                url: Util.url('get/activitypeople') + '?activity_id=' + that.activity_id + that.formatTemporarily_added(that.temporarily_added) + '&search=' + that.search,
+                url: Util.url('get/activitypeople') + '?activity_id=' + that.activity_id + that.formatTemporarily_added() + '&search=' + that.search,
                 filter: function (data) {
                     if (!data) {
                         return {};
                     } else {
+
                         function destringify(data) {
-                            console.log(data);
-                            $.map(data, function (item:ParticipantData) {
+                            ////console.log(data);
+                            $.map(data, function (item) {
                                 return {
-                                    id: item.id,
-                                    name: item.name
+                                    'id': item.id,
+                                    'name': item.name
                                 }
-                            })
+                            });
                         }
 
                         function carryout(data) {
-                            var objects = destringify(data);
-                            console.log(objects);
+                            //console.log(data);
+                            var objs = destringify(data);
                             var output = [];
                             $.each(data, function(k,v){
                                 if (!Util.isIn(v, that.temporarily_added) && !Util.isIn(v, that.temporarily_removed)){
                                     output.push(v);
                                 }
                             });
+                            //console.log('added all normal people:');
+                            //console.log(output);
                             $.each(that.temporarily_removed, function(k,v){
                                output.push(v);
                             });
+                            //console.log('after adding temporarily_removed:');
+                            //console.log(output);
                             return output;
                         }
-                        return carryout(data.data);
+                        var co = carryout(data.data);
+                        //console.log('temp added (carryout): ');
+                        //console.log(that.temporarily_added);
+                        //console.log('temp removed (carryout): ');
+                        //console.log(that.temporarily_removed);
+                        //console.log('after adding:');
+                        //console.log(co);
+                        return co;
 
                     }
 
                 },
-            }
+            },
+            rateLimitWait: 100
         });
     }
 
     public removeItemFromSuggestions(data:ParticipantData) {
         this.temporarily_added.push(data);
-        if(Util.isIn(data, this.temporarily_removed))
+        //console.log('removing item from suggestions, adding to temporarily_added ' + data.name + data.id);
+        if (Util.isIn(data, this.temporarily_removed)) {
             Util.removeFromArray(data, this.temporarily_removed);
+            //console.log('removing item from suggestions, removing from temporarily removed ' + data.name + data.id);
+        }
     }
 
     public addItemToSuggestions(data:ParticipantData) {
         this.temporarily_removed.push(data);
-        if(Util.isIn(data, this.temporarily_added))
+        //console.log('adding item to suggestions, adding to temporarily removed ' + data.name + data.id);
+        if(Util.isIn(data, this.temporarily_added)) {
             Util.removeFromArray(data, this.temporarily_added);
-        this.bh.add(data);
+            //console.log('adding item to suggestions, removing from temporarily_added ' + data.name + data.id);
+
+        }
     }
 
     public addDataToSuggestions(data:ParticipantData[]) {
@@ -173,12 +190,18 @@ class PeopleField {
         });
     }
 
-    private formatTemporarily_added (tA)
+    private formatTemporarily_added ()
     {
+        var tA = this.temporarily_added;
+        //console.log('formatting:');
+        //console.log(tA);
         var query = '';
-        for(var id in tA) {
-            query += '&temporarily_added[]=' + id;
+        for(var i = 0; i < tA.length; i++) {
+            var pa = tA[i];
+            //console.log(pa);
+            query += '&temporarily_added[]=' + pa.id;
         }
+        //console.log(query);
         return query;
     }
 
@@ -392,8 +415,8 @@ class ActivityTable {
         if(active){
             row.addClass('active');
         }
-        row.append('<td>' + data.name + '</td>');
-        row.append('<td>' + startD + ' - ' + endD + '</td>');
+        row.append('<td>' + Util.shortify(data.name) + '</td>');
+        row.append('<td>' + startD + '-' + endD + '</td>');
         row.click(function() {
             that.displayActivity.call(null, data.id);
         });
@@ -437,8 +460,9 @@ class ActivityInformation {
             that.id = id;
             that.activeTargetGroup = NaN;
             that.setUp();
-            that.existingPeople.setId(id);
             that.existingPeople.load(id);
+            that.makeLinkWithSuggestions();
+            that.existingPeople.resetBloodhound();
             that.makeLinkWithSuggestions();
         });
         LoaderManager.hideLoader(loader, function () {
@@ -477,7 +501,13 @@ class ActivityInformation {
     }
 
     private makeLinkWithSuggestions(){
-        $('.twitter-typeahead').on('typeahead:selected', {that: this}, addItemFromSuggestion);
+        var ta = $('.twitter-typeahead');
+        ta.keyup(function(e){
+            if(e.which == 13) {
+                $('.tt-suggestion:first-child', this).trigger('click');
+            }
+        });
+        ta.on('typeahead:selected', {that: this}, addItemFromSuggestion);
     }
 
     /**
@@ -516,7 +546,7 @@ class ActivityInformation {
     }
 
     private save(){
-        console.log("saving...");
+        //console.log("saving...");
         $.idleTimer('destroy');
         this.resetTimer();
     }*/
@@ -557,7 +587,6 @@ class ActivityInformation {
     private displayPeople(){
         var people = this.people.concat(this.addedPeople);
         this.peopleTable.empty();
-        var that = this;
         people.sort(sortParticipants);
         for(var i = 0; i < people.length; i++) {
             var person:ParticipantData = people[i];
@@ -584,11 +613,14 @@ class ActivityInformation {
         var that = this;
         function removePerson(e) {
             var c = e.data; //context
+            //console.log('removing from activityinfo array added people name ' + c.person.name);
             Util.removeFromArray(c.person, c.that.addedPeople);
             c.that.removedPeople.push(c.person);
             c.that.existingPeople.addItemToSuggestions(c.person);
             //that.removePerson.call(null, person.id);
             c.that.displayPeople();
+            c.that.existingPeople.resetBloodhound();
+            c.that.makeLinkWithSuggestions();
         }
         button.click({person: person, that: that}, removePerson);
     }
@@ -613,8 +645,14 @@ function sortParticipants(a, b) {
     return 0;
 }
 
+/**
+ * Function for handling the event of adding a new person
+ * @param e
+ * @param item
+ */
 function addItemFromSuggestion(e, item){
     var c = e.data;
+    //console.log('adding activityinfo array added people name ' + item.name);
     if(Util.isIn(item, c.that.removedPeople)){
         Util.removeFromArray(item, c.that.removedPeople);
     } else {
