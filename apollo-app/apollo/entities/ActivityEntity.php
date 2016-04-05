@@ -194,9 +194,9 @@ class ActivityEntity
      */
     public function addPeople($people)
     {
-        foreach($people as $person)
-        if(!$this->hasPerson($person)){
-            $this->addPerson($person);
+        if($people && !empty($people) && (is_array($people) || is_object($people))) {
+            foreach ($people as $p)
+                    $this->addPerson($p);
         }
     }
 
@@ -248,7 +248,10 @@ class ActivityEntity
 
     public function hasPerson($person)
     {
-        return in_array($person, $this->getPeople());
+        if(!$this->getPeople() || empty($this->getPeople()))
+            return false;
+        else
+            return in_array($person, $this->getPeople());
     }
 
     /**

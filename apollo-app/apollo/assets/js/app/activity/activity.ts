@@ -33,6 +33,7 @@ interface ParticipantData {
 
 interface DetailActivityData {
     error:Error,
+    page:number,
     name:string,
     target_group:string[],
     current_target_group:number,
@@ -222,11 +223,10 @@ class ActivityTable {
     private page:number;
     private loader;
     private content:ActivityInformation;
-
     /**
      * Loads up all of the information and sets up the instance variables
      */
-    public load(content:ActivityInformation) {
+    public load(content:ActivityInformation, page) {
         this.loader = LoaderManager.createLoader($('#table-body'));
         var that = this;
         LoaderManager.showLoader((this.loader), function() {
@@ -234,7 +234,7 @@ class ActivityTable {
             that.pagination = $('#pagination');
             that.table = $('#table-body');
             that.search = '';
-            that.page = 1;
+            that.page = isNaN(page)? 1 : page;
             that.updateTable();
             that.setUp();
         });
@@ -284,6 +284,24 @@ class ActivityTable {
         });
     }
 
+    static newActivity(name:string, startDate:string, endDate:string, id:number) {
+        var args = {
+            action: 'create',
+            activity_name: name,
+            start_date: startDate,
+            end_date: endDate
+        };
+        if(id > 0) {
+            args['id'] = id;
+        }
+        AJAX.post(Util.url('post/activity'), args,
+            function (response:any) {
+            Util.to('activity/view/' + response.activity_id);
+        }, function (message:string) {
+            Util.error('An error has occurred during the process of creating the activity. Error message: ' + message);
+        });
+    }
+
     /**
      * Creates a new activity specified by the user. Pops up a modal to get name/start/end date and then goes to the view
      */
@@ -307,26 +325,43 @@ class ActivityTable {
                             var name = modal.find('#add-name').val();
                             var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
                             var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
-                            newActivity(name, startDate, endDate);
+                            ActivityTable.newActivity(name, startDate, endDate, -1);
                         }
                     }
                 }
             }
         );
-
-        function newActivity(name:string, startDate:string, endDate:string) {
-            AJAX.post(Util.url('post/activity'), {
-                action: 'create',
-                activity_name: name,
-                start_date: startDate,
-                end_date: endDate
-            }, function (response:any) {
-                Util.to('activity/view/' + response.activity_id);
-            }, function (message:string) {
-                Util.error('An error has occurred during the process of creation of the activity. Error message: ' + message);
-            });
-        }
     }
+
+
+    private duplicateActivity (e) {
+        e.preventDefault();
+        bootbox.dialog({
+                title: 'Duplicating activity',
+                message: $('#add-modal').html(),
+                buttons: {
+                    main: {
+                        label: "Cancel",
+                        className: "btn-primary",
+                        callback: function () {
+                        }
+                    },
+                    success: {
+                        label: "Add",
+                        className: "btn-success",
+                        callback: function () {
+                            var modal = $('.modal');
+                            var name = modal.find('#add-name').val();
+                            var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
+                            var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
+                            ActivityTable.newActivity(name, startDate, endDate, e.data.id);
+                        }
+                    }
+                }
+            }
+        );
+    }
+
 
     private hideActivity(id) {
         bootbox.confirm('Are you sure you want to hide this activity? The data won\'t be deleted and can be restored later.', function (result) {
@@ -351,11 +386,13 @@ class ActivityTable {
         this.pagination.pagination({
             items: 0,
             itemsOnPage: 10,
+            currentPage: that.page,
             onPageClick: function (page, event) {
                 if(event != null) {
                     event.preventDefault();
                 }
                 that.page = page;
+                that.updateTable();
             }
         });
     }
@@ -368,6 +405,7 @@ class ActivityTable {
         var that = this;
         var active = this.content.getId();
         $('#add-activity').click(this.addActivity);
+        $('#duplicate-activity').click({id: active}, this.duplicateActivity);
         $('#hide-activity').click(function() {
             that.hideActivity.call(null, active)
         });
@@ -415,7 +453,7 @@ class ActivityTable {
         if(active){
             row.addClass('active');
         }
-        row.append('<td>' + Util.shortify(data.name) + '</td>');
+        row.append('<td>' + Util.shortify(data.name, 20) + '</td>');
         row.append('<td>' + startD + '-' + endD + '</td>');
         row.click(function() {
             that.displayActivity.call(null, data.id);
@@ -438,6 +476,7 @@ class ActivityTable {
 class ActivityInformation {
 
     private peopleTable:JQuery;
+    private onPage:number;
     private id:number;
     private activeTargetGroup:number;
     private people:ParticipantData[];
@@ -448,6 +487,11 @@ class ActivityInformation {
     public getId() {
         return this.id;
     }
+
+    public getPage() {
+        return this.onPage;
+    }
+
     /**
      * Loads up all of the information and sets up the instance variables
      */
@@ -481,6 +525,7 @@ class ActivityInformation {
             breadcrumbs.find('li:nth-child(3)').text('Activity #' + that.id + ': ' + data.name);
             that.activeTargetGroup = data.current_target_group;
             that.people = data.participants;
+            that.onPage = data.page;
             that.displayTitle(data.name);
             that.displayPeople();
             that.displayTargetGroup(data.target_group);
@@ -666,6 +711,9 @@ function addItemFromSuggestion(e, item){
 
 $(document).ready(function () {
     var id = Util.extractId(window.location.toString());
+    var hidden = $('input[name="hiddenField"]');
+    var page = hidden.val();
+    console.log(page);
     if(isNaN(id)){
         var breadcrumbs = $('#nav-breadcrumbs');
         var fullLink = breadcrumbs.find('li:nth-child(2)').find("a").attr("href");
@@ -675,6 +723,6 @@ $(document).ready(function () {
     var activity:ActivityInformation = new ActivityInformation();
     var existingPeopleField:PeopleField = new PeopleField();
     activity.load(id, existingPeopleField);
-    var menu:ActivityTable = new ActivityTable().load(activity);
+    var menu:ActivityTable = new ActivityTable().load(activity, page);
 });
 

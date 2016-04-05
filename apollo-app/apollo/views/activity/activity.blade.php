@@ -6,13 +6,19 @@
  * @version 0.0.3
  */
 
+use Apollo\Apollo;
 use Apollo\Helpers\AssetHelper;
+use Apollo\Components\Activity;
 use Apollo\Helpers\URLHelper;
 
+$pattern = '/[^\/]+$/';
+preg_match($pattern, rtrim($breadcrumbs[0][1], '/'), $result);
+$id = $result[0];
+$page = Activity::getNumSmallerIds($id)/10 + 1;
 ?>
 @extends('layouts.extended')
 @section('content')
-
+    <input type="hidden" name="hiddenField" value="{{$page}}"/>
     <div id="add-modal" style="display: none;">
         <form class="form-horizontal">
             <div class="form-group">

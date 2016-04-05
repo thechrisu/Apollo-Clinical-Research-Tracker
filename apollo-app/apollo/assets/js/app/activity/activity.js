@@ -161,7 +161,7 @@ var ActivityTable = (function () {
     /**
      * Loads up all of the information and sets up the instance variables
      */
-    ActivityTable.prototype.load = function (content) {
+    ActivityTable.prototype.load = function (content, page) {
         this.loader = LoaderManager.createLoader($('#table-body'));
         var that = this;
         LoaderManager.showLoader((this.loader), function () {
@@ -169,7 +169,7 @@ var ActivityTable = (function () {
             that.pagination = $('#pagination');
             that.table = $('#table-body');
             that.search = '';
-            that.page = 1;
+            that.page = isNaN(page) ? 1 : page;
             that.updateTable();
             that.setUp();
         });
@@ -217,6 +217,22 @@ var ActivityTable = (function () {
             Util.error('An error has occurred while loading the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
         });
     };
+    ActivityTable.newActivity = function (name, startDate, endDate, id) {
+        var args = {
+            action: 'create',
+            activity_name: name,
+            start_date: startDate,
+            end_date: endDate
+        };
+        if (id > 0) {
+            args['id'] = id;
+        }
+        AJAX.post(Util.url('post/activity'), args, function (response) {
+            Util.to('activity/view/' + response.activity_id);
+        }, function (message) {
+            Util.error('An error has occurred during the process of creating the activity. Error message: ' + message);
+        });
+    };
     /**
      * Creates a new activity specified by the user. Pops up a modal to get name/start/end date and then goes to the view
      */
@@ -240,23 +256,37 @@ var ActivityTable = (function () {
                         var name = modal.find('#add-name').val();
                         var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
                         var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
-                        newActivity(name, startDate, endDate);
+                        ActivityTable.newActivity(name, startDate, endDate, -1);
                     }
                 }
             }
         });
-        function newActivity(name, startDate, endDate) {
-            AJAX.post(Util.url('post/activity'), {
-                action: 'create',
-                activity_name: name,
-                start_date: startDate,
-                end_date: endDate
-            }, function (response) {
-                Util.to('activity/view/' + response.activity_id);
-            }, function (message) {
-                Util.error('An error has occurred during the process of creation of the activity. Error message: ' + message);
-            });
-        }
+    };
+    ActivityTable.prototype.duplicateActivity = function (e) {
+        e.preventDefault();
+        bootbox.dialog({
+            title: 'Duplicating activity',
+            message: $('#add-modal').html(),
+            buttons: {
+                main: {
+                    label: "Cancel",
+                    className: "btn-primary",
+                    callback: function () {
+                    }
+                },
+                success: {
+                    label: "Add",
+                    className: "btn-success",
+                    callback: function () {
+                        var modal = $('.modal');
+                        var name = modal.find('#add-name').val();
+                        var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
+                        var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
+                        ActivityTable.newActivity(name, startDate, endDate, e.data.id);
+                    }
+                }
+            }
+        });
     };
     ActivityTable.prototype.hideActivity = function (id) {
         bootbox.confirm('Are you sure you want to hide this activity? The data won\'t be deleted and can be restored later.', function (result) {
@@ -281,11 +311,13 @@ var ActivityTable = (function () {
         this.pagination.pagination({
             items: 0,
             itemsOnPage: 10,
+            currentPage: that.page,
             onPageClick: function (page, event) {
                 if (event != null) {
                     event.preventDefault();
                 }
                 that.page = page;
+                that.updateTable();
             }
         });
     };
@@ -296,6 +328,7 @@ var ActivityTable = (function () {
         var that = this;
         var active = this.content.getId();
         $('#add-activity').click(this.addActivity);
+        $('#duplicate-activity').click({ id: active }, this.duplicateActivity);
         $('#hide-activity').click(function () {
             that.hideActivity.call(null, active);
         });
@@ -339,7 +372,7 @@ var ActivityTable = (function () {
         if (active) {
             row.addClass('active');
         }
-        row.append('<td>' + Util.shortify(data.name) + '</td>');
+        row.append('<td>' + Util.shortify(data.name, 20) + '</td>');
         row.append('<td>' + startD + '-' + endD + '</td>');
         row.click(function () {
             that.displayActivity.call(null, data.id);
@@ -365,6 +398,9 @@ var ActivityInformation = (function () {
     }
     ActivityInformation.prototype.getId = function () {
         return this.id;
+    };
+    ActivityInformation.prototype.getPage = function () {
+        return this.onPage;
     };
     /**
      * Loads up all of the information and sets up the instance variables
@@ -398,6 +434,7 @@ var ActivityInformation = (function () {
             breadcrumbs.find('li:nth-child(3)').text('Activity #' + that.id + ': ' + data.name);
             that.activeTargetGroup = data.current_target_group;
             that.people = data.participants;
+            that.onPage = data.page;
             that.displayTitle(data.name);
             that.displayPeople();
             that.displayTargetGroup(data.target_group);
@@ -571,6 +608,9 @@ function addItemFromSuggestion(e, item) {
 }
 $(document).ready(function () {
     var id = Util.extractId(window.location.toString());
+    var hidden = $('input[name="hiddenField"]');
+    var page = hidden.val();
+    console.log(page);
     if (isNaN(id)) {
         var breadcrumbs = $('#nav-breadcrumbs');
         var fullLink = breadcrumbs.find('li:nth-child(2)').find("a").attr("href");
@@ -580,5 +620,5 @@ $(document).ready(function () {
     var activity = new ActivityInformation();
     var existingPeopleField = new PeopleField();
     activity.load(id, existingPeopleField);
-    var menu = new ActivityTable().load(activity);
+    var menu = new ActivityTable().load(activity, page);
 });

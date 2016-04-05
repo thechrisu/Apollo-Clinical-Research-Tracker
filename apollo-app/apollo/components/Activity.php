@@ -45,4 +45,19 @@ class Activity extends DBComponent
         return $item;
     }
 
+    public static function getNumSmallerIds($id)
+    {
+        $em = DB::getEntityManager();
+        $repo = $em->getRepository(Activity::getEntityNamespace());
+        $qb = $repo->createQueryBuilder('a');
+        $organisation_id = Apollo::getInstance()->getUser()->getOrganisationId();
+        $notHidden = $qb->expr()->eq('a' . '.is_hidden', '0');
+        $sameOrgId = $qb->expr()->eq('a' . '.organisation', $organisation_id);
+        $cond = $qb->expr()->andX($notHidden, $sameOrgId);
+        $qb->where($cond);
+        $qb->andWhere('a.id < ' . $id);
+        $result = $qb->getQuery()->getResult();
+        return count($result);
+    }
+
 }

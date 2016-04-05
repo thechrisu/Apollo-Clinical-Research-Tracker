@@ -47,11 +47,13 @@ class ActivityController extends GenericController
         $activity_id = intval($activity_id);
         if($activity_id < 1) {
             Apollo::getInstance()->getRequest()->error(400, 'Invalid activity ID!');
+        } else {
+            $breadcrumbs = [
+                ['Activities', URLHelper::url('activity/view/' . $activity_id), true],
+                ['Activity name (Activity ID)', null, true],
+
+            ];
+            View::render('activity.activity', 'View Activity', $breadcrumbs);
         }
-        $breadcrumbs = [
-            ['Activities', URLHelper::url('activity/view/' . $activity_id), true],
-            ['Activity name (Activity ID)', null, true]
-        ];
-        View::render('activity.activity', 'View Activity', $breadcrumbs);
     }
 }

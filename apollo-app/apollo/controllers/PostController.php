@@ -297,6 +297,9 @@ class PostController extends GenericController
                 Apollo::getInstance()->getRequest()->error(400, 'Invalid action.');
                 break;
         }
+        json_decode(json_encode($response));
+        if(json_last_error() != JSON_ERROR_NONE)
+            $response = $this->getJSONError('5', 'made invalid JSON: ' . json_encode($response));
         echo json_encode($response);
     }
 
@@ -308,15 +311,25 @@ class PostController extends GenericController
     private function activityCreate()
     {
         $response['error'] = null;
-        $data = $this->parseRequest(['activity_name' => null, 'start_date' => null, 'end_date' => null]);
-        if (!$this->areFieldsEmpty($data)) {
-            $activity = $this->createActivityFromData($data);
-            try {
-                $this->writeActivityToDB($activity);
-                $response['activity_id'] = $activity->getId();
+        $data = $this->parseRequest(['id' => -1, 'activity_name' => null, 'start_date' => null, 'end_date' => null]);
+        $organisation = Apollo::getInstance()->getUser()->getOrganisation();
+        $bonus = null;
+        if ($data['id'] > 0) {
+            try{
+                $sourceActivity = Activity::find($data['id']);
+                if ($sourceActivity != null && !$sourceActivity->isHidden() && $sourceActivity->getOrganisation() == $organisation) {
+                    $bonus['target_group_comment'] = $sourceActivity->getTargetGroupComment();
+                    $bonus['people'] = count($sourceActivity->getPeople());
+                } else {
+                    $response['error'] = $this->getJSONError(2, 'Source activity ID is invalid.');
+                }
             } catch (Exception $e) {
-                $response['error'] = $this->getJSONError(2, $e->getMessage());
+                $response['error'] = $this->getJSONError(3, 'Error whlie duplicating. Message: ' . $e->getMessage());
             }
+        }
+        if (!$this->areFieldsEmpty($data)) {
+            $activity = $this->createActivityFromData($data, $bonus);
+            $response = $this->registerActivity($activity);
         } else {
             $response['error'] = $this->getJSONError(1, 'Some of the fields are empty');
         }
@@ -349,10 +362,11 @@ class PostController extends GenericController
 
     /**
      * @param $data
+     * @param $bonus
      * @return ActivityEntity
      * @since 0.0.6
      */
-    private function createActivityFromData($data)
+    private function createActivityFromData($data, $bonus)
     {
         $user = Apollo::getInstance()->getUser();
         $activity = new ActivityEntity();
@@ -362,6 +376,12 @@ class PostController extends GenericController
         $end_date = new DateTime($data['end_date']);
         $activity->setStartDate($start_date);
         $activity->setEndDate($end_date);
+        if($bonus) {
+            if(!empty($bonus['people']))
+                $activity->addPeople($bonus['people']);
+            if(!empty($bonus['target_group_comment']))
+                $activity->setTargetGroupComment($bonus['target_group_comment']);
+        }
         return $activity;
     }
 
@@ -454,5 +474,20 @@ class PostController extends GenericController
                 return true;
         }
         return false;
+    }
+
+    /**
+     * @param $activity
+     * @return mixed
+     */
+    private function registerActivity($activity)
+    {
+        try {
+            $this->writeActivityToDB($activity);
+            $response['activity_id'] = $activity->getId();
+        } catch (Exception $e) {
+            $response['error'] = $this->getJSONError(2, $e->getMessage());
+        }
+        return $response;
     }
 }
