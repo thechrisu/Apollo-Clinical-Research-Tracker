@@ -16,8 +16,7 @@ var PeopleField = (function () {
     PeopleField.prototype.load = function (activity_id) {
         this.activity_id = activity_id;
         this.search = '';
-        this.temporarily_added = [];
-        this.temporarily_removed = [];
+        this.resetAdded();
         this.setUp();
     };
     PeopleField.prototype.setUp = function () {
@@ -32,6 +31,10 @@ var PeopleField = (function () {
         var promise = this.bh.initialize();
         promise.fail(function () { Util.error('failed to load the suggestion engine'); });
         this.resetTypeahead();
+    };
+    PeopleField.prototype.resetAdded = function () {
+        this.temporarily_added = [];
+        this.temporarily_removed = [];
     };
     PeopleField.prototype.resetTypeahead = function () {
         //console.log('resetting typehead');
@@ -111,22 +114,20 @@ var PeopleField = (function () {
                     }
                 }
             },
-            rateLimitWait: 100
+            rateLimitWait: 500
         });
     };
     PeopleField.prototype.removeItemFromSuggestions = function (data) {
         this.temporarily_added.push(data);
         //console.log('removing item from suggestions, adding to temporarily_added ' + data.name + data.id);
-        if (Util.isIn(data, this.temporarily_removed)) {
-            Util.removeFromArray(data, this.temporarily_removed);
-        }
+        Util.removeFromArray(data, this.temporarily_removed);
+        //console.log('removing item from suggestions, removing from temporarily removed ' + data.name + data.id);
     };
     PeopleField.prototype.addItemToSuggestions = function (data) {
         this.temporarily_removed.push(data);
         //console.log('adding item to suggestions, adding to temporarily removed ' + data.name + data.id);
-        if (Util.isIn(data, this.temporarily_added)) {
-            Util.removeFromArray(data, this.temporarily_added);
-        }
+        Util.removeFromArray(data, this.temporarily_added);
+        //console.log('adding item to suggestions, removing from temporarily_added ' + data.name + data.id);
     };
     PeopleField.prototype.addDataToSuggestions = function (data) {
         $.each(data, function (key, obj) {
@@ -215,51 +216,6 @@ var ActivityTable = (function () {
             }
         }, function (message) {
             Util.error('An error has occurred while loading the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
-        });
-    };
-    ActivityTable.prototype.save = function () {
-        var that = this;
-        var active = this.content.getId();
-        this.saveButton.removeClass('btn-danger');
-        this.saveButton.removeClass('btn-success');
-        this.saveButton.addClass('btn-warning');
-        this.saveButton.html('<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>Saving...');
-        var data = {
-            record_id: active,
-            field_id: id
-        };
-        switch (type) {
-            case 'number':
-                data['value'] = Util.isString(value) ? parseInt(value) : value;
-                break;
-            case 'text':
-                data['value'] = value;
-                break;
-            case 'text-multiple':
-                data['value'] = value;
-                break;
-            case 'dropdown':
-                if (!Util.isString(value)) {
-                    data['is_default'] = true;
-                }
-                data['value'] = value;
-                break;
-            case 'date':
-                data['value'] = Util.toMysqlFormat(Util.parseNumberDate(value));
-                break;
-            case 'long-text':
-                data['value'] = value;
-                break;
-        }
-        AJAX.post(Util.url('post/data'), data, function (response) {
-            that.saveButton.removeClass('btn-warning');
-            that.saveButton.addClass('btn-success');
-            that.saveButton.html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Changes saved.');
-        }, function (message) {
-            that.saveButton.removeClass('btn-warning');
-            that.saveButton.addClass('btn-danger');
-            that.saveButton.html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Saving failed.');
-            Util.error('An error has occurred during the process of updating of the data. Error message: ' + message);
         });
     };
     /**
@@ -442,8 +398,7 @@ var ActivityTable = (function () {
 /**
  * carries out all the tasks related to displaying the actual information of one activity on the right of the view
  * @since 0.0.4
- * TODO: Make the add new person thing work
- * TODO: autosave
+ * TODO: fix autosave
  */
 var ActivityInformation = (function () {
     function ActivityInformation() {
@@ -469,7 +424,6 @@ var ActivityInformation = (function () {
             that.activeTargetGroup = null;
             that.setUp();
             that.existingPeople.load(id);
-            that.makeLinkWithSuggestions();
             that.existingPeople.resetBloodhound();
             that.makeLinkWithSuggestions();
         });
@@ -499,12 +453,69 @@ var ActivityInformation = (function () {
             Util.error('An error has occurred while loading the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
         });
     };
+    ActivityInformation.prototype.save = function () {
+        var that = this;
+        var active = this.getId();
+        var saveButton = $('#save-activity');
+        saveButton.removeClass('btn-danger');
+        saveButton.removeClass('btn-success');
+        saveButton.addClass('btn-warning');
+        saveButton.html('<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>Saving...');
+        var sd = this.startDate.datepicker('getDate');
+        var startDate = Util.toMysqlFormat(sd);
+        var ed = this.endDate.datepicker('getDate');
+        var endDate = Util.toMysqlFormat(ed);
+        var added_ppl = this.addedPeople;
+        console.log(added_ppl);
+        var removed_ppl = this.removedPeople;
+        console.log(removed_ppl);
+        var tg = this.activeTargetGroup == null ? null : this.activeTargetGroup.id;
+        var data = {
+            action: 'update',
+            activity_id: active,
+            activity_name: this.title.val(),
+            target_group: tg,
+            target_group_comment: this.targetComment.val(),
+            start_date: startDate,
+            end_date: endDate,
+            added_people: added_ppl,
+            removed_people: removed_ppl
+        };
+        AJAX.post(Util.url('post/activity'), data, function (response) {
+            saveButton.removeClass('btn-warning');
+            saveButton.addClass('btn-success');
+            saveButton.html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Changes saved.');
+        }, function (message) {
+            saveButton.removeClass('btn-warning');
+            saveButton.addClass('btn-danger');
+            saveButton.html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Saving failed.');
+            Util.error('An error has occurred while saving. Error message: ' + message);
+        });
+        //this.resetPeople();
+    };
+    ActivityInformation.prototype.resetPeople = function () {
+        /*this.addedPeople = [];
+        this.removedPeople = [];
+        this.existingPeople.resetAdded();*/
+        this.existingPeople.resetBloodhound();
+        //this.displayPeople();
+        this.makeLinkWithSuggestions();
+    };
     /**
      * Displays the title of the activity in the dedicated textfield
      * @param title
      */
     ActivityInformation.prototype.displayTitle = function (title) {
-        $('#activity-title').val(title);
+        this.title = $('#activity-title');
+        this.title.val(title);
+        var timer;
+        var that = this;
+        this.title.on('input propertychange change', function () {
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                that.save();
+            }, AJAX_DELAY);
+        });
     };
     ActivityInformation.prototype.makeLinkWithSuggestions = function () {
         var ta = $('.twitter-typeahead');
@@ -513,20 +524,22 @@ var ActivityInformation = (function () {
                 $('.tt-suggestion:first-child', this).trigger('click');
             }
         });
-        ta.on('typeahead:selected', { that: this }, addItemFromSuggestion);
+        var that = this;
+        ta.on('typeahead:selected', { that: that }, addItemFromSuggestion);
     };
     /**
      * Shows the target group as dropdown
      * @param options
      */
     ActivityInformation.prototype.displayTargetGroup = function (options) {
+        var that = this;
         var dropD = $('#target-dropdown');
         dropD.append('<li class="dropdown-header">Choose a target group:</li>');
         var bt = $('#target-button');
         bt.append(this.activeTargetGroup.name + ' <span class="caret"></span>');
         for (var i = 0; i < options.length; i++) {
             var option = $('<li optionNameUnique="' + options[i].name + '" optionIdUnique="' + options[i].id + '"><a>' + options[i].name + '</a></li>');
-            var that = this;
+            var timer;
             if (options[i].id == this.activeTargetGroup.id) {
                 option.addClass('disabled');
             }
@@ -537,6 +550,10 @@ var ActivityInformation = (function () {
                     dropD.empty();
                     bt.empty();
                     that.displayTargetGroup(options);
+                    clearTimeout(timer);
+                    timer = setTimeout(function () {
+                        that.save();
+                    });
                 });
                 option.addClass('noselect');
             }
@@ -560,7 +577,16 @@ var ActivityInformation = (function () {
      * @param initialData
      */
     ActivityInformation.prototype.displayComment = function (initialData) {
-        $('#target-comment').val(initialData);
+        this.targetComment = $('#target-comment');
+        this.targetComment.val(initialData);
+        var timer;
+        var that = this;
+        this.targetComment.on('input propertychange change', function () {
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                that.save();
+            }, AJAX_DELAY);
+        });
     };
     /**
      * Displays the start date of the activity
@@ -568,8 +594,17 @@ var ActivityInformation = (function () {
      */
     ActivityInformation.prototype.displayStartDate = function (sqlDate) {
         var startD = Util.formatNumberDate(Util.parseSQLDate(sqlDate));
-        var startDate = Util.getDatePicker(startD, "start-date-picker");
-        $('#start-date').append(startDate);
+        this.startDate = Util.getDatePicker(startD, "start-date-picker");
+        $('#start-date').append(this.startDate);
+        this.startDate = $('#start-date-picker'); //otherwise it would not work properly
+        var timer;
+        var that = this;
+        this.startDate.on('input propertychange change', function () {
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                that.save();
+            }, AJAX_DELAY);
+        });
     };
     /**
      * Displays the end date of the activity
@@ -577,8 +612,17 @@ var ActivityInformation = (function () {
      */
     ActivityInformation.prototype.displayEndDate = function (sqldate) {
         var endD = Util.formatNumberDate(Util.parseSQLDate(sqldate));
-        var endDate = Util.getDatePicker(endD, "start-date-picker");
-        $('#end-date').append(endDate);
+        this.endDate = Util.getDatePicker(endD, "end-date-picker");
+        $('#end-date').append(this.endDate);
+        this.endDate = $('#end-date-picker'); //otherwise it would not work properly
+        var timer;
+        var that = this;
+        this.endDate.on('input propertychange change', function () {
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                that.save();
+            }, AJAX_DELAY);
+        });
     };
     /**
      * Creates the table with all the people in a activity
@@ -586,8 +630,10 @@ var ActivityInformation = (function () {
      */
     ActivityInformation.prototype.displayPeople = function () {
         var people = this.people.concat(this.addedPeople);
-        this.peopleTable.empty();
+        people = Util.arraySubtract(people, this.removedPeople);
+        acGlobal.peopleTable.empty();
         people.sort(sortParticipants);
+        console.log(people);
         for (var i = 0; i < people.length; i++) {
             var person = people[i];
             this.displayPerson(person);
@@ -609,6 +655,7 @@ var ActivityInformation = (function () {
     };
     ActivityInformation.prototype.addRemoveClick = function (button, person) {
         var that = this;
+        var timer;
         function removePerson(e) {
             var c = e.data; //context
             //console.log('removing from activityinfo array added people name ' + c.person.name);
@@ -619,6 +666,10 @@ var ActivityInformation = (function () {
             c.that.displayPeople();
             c.that.existingPeople.resetBloodhound();
             c.that.makeLinkWithSuggestions();
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                c.that.save();
+            }, AJAX_DELAY);
         }
         button.click({ person: person, that: that }, removePerson);
     };
@@ -664,7 +715,7 @@ $(document).ready(function () {
     var id = Util.extractId(window.location.toString());
     var hidden = $('input[name="hiddenField"]');
     var page = hidden.val();
-    console.log(page);
+    //console.log(page);
     if (isNaN(id)) {
         var breadcrumbs = $('#nav-breadcrumbs');
         var fullLink = breadcrumbs.find('li:nth-child(2)').find("a").attr("href");

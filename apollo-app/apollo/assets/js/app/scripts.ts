@@ -129,6 +129,13 @@ class Util {
         modal.modal('show');
     }
 
+    public static arraySubtract(toSubtractFrom:any[], subtractedBy:any[])
+    {
+        return toSubtractFrom.filter(function(item){
+            return subtractedBy.indexOf(item) === -1;
+        });
+    }
+
     public static removeFromArray(needle:any, haystack:any[]) {
         var index = haystack.indexOf(needle);
         if(index > -1)
@@ -137,6 +144,15 @@ class Util {
 
     public static isIn(needle:any, haystack:any[]) {
         return haystack.indexOf(needle) > -1;
+    }
+
+    public static isValIn(needle, haystack, key) {
+        for(var item in haystack)
+        {
+            if(item[key] == needle[key])
+                return true;
+        }
+        return false;
     }
 
     public static shortify(str:string, maxLength:number) {

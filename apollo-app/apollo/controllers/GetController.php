@@ -34,7 +34,7 @@ use Exception;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.1.1
+ * @version 0.1.2
  */
 class GetController extends GenericController
 {
@@ -509,15 +509,25 @@ class GetController extends GenericController
         $arr = [];
         foreach($targetGroups as $targetGroup)
         {
-            $tg = [
-                'id' => $targetGroup->getId(),
-                'name' => $targetGroup->getName()
-            ];
+            $tg = $this->getFormattedTargetGroup($targetGroup);
             $arr[] = $tg;
         }
         $ret['data'] = $arr;
-        $ret['active'] = $activity_activeTarget;
+        $ret['active'] = $this->getFormattedTargetGroup($activity_activeTarget);
         return $ret;
+    }
+
+    /**
+     * @param $targetGroup
+     * @return array
+     */
+    private function getFormattedTargetGroup($targetGroup)
+    {
+        $tg = [
+            'id' => $targetGroup->getId(),
+            'name' => $targetGroup->getName()
+        ];
+        return $tg;
     }
 
     /**

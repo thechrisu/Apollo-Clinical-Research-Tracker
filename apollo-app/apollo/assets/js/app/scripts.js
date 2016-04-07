@@ -81,6 +81,11 @@ var Util = (function () {
         });
         modal.modal('show');
     };
+    Util.arraySubtract = function (toSubtractFrom, subtractedBy) {
+        return toSubtractFrom.filter(function (item) {
+            return subtractedBy.indexOf(item) === -1;
+        });
+    };
     Util.removeFromArray = function (needle, haystack) {
         var index = haystack.indexOf(needle);
         if (index > -1)
@@ -88,6 +93,13 @@ var Util = (function () {
     };
     Util.isIn = function (needle, haystack) {
         return haystack.indexOf(needle) > -1;
+    };
+    Util.isValIn = function (needle, haystack, key) {
+        for (var item in haystack) {
+            if (item[key] == needle[key])
+                return true;
+        }
+        return false;
     };
     Util.shortify = function (str, maxLength) {
         var res = str;

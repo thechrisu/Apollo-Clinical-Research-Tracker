@@ -239,6 +239,7 @@ body {
 
 .tt-suggestion.tt-selectable {
   width: 100%;
+  background-color: #f2f2f2;
 }
 .tt-suggestion.tt-selectable:hover {
   background-color: #2780e3;

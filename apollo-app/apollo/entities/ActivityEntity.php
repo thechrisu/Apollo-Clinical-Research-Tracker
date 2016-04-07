@@ -22,7 +22,7 @@ use DateTime;
  * Class ActivityEntity
  * @package Apollo\Entities
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.4
+ * @version 0.0.5
  * @Entity @Table("activities")
  */
 class ActivityEntity
@@ -186,7 +186,7 @@ class ActivityEntity
     /**
      * @param PersonEntity $person
      */
-    public function addPerson(PersonEntity $person)
+    public function addPerson($person)
     {
         if(!$this->hasPerson($person)) {
             $this->people->add($person);
@@ -222,8 +222,10 @@ class ActivityEntity
      */
     public function removePeople($people)
     {
-        foreach($people as $person)
-            $this->removePerson($person);
+        if($people && !empty($people) && (is_array($people) || is_object($people))) {
+            foreach ($people as $person)
+                $this->removePerson($person);
+        }
     }
 
     /**

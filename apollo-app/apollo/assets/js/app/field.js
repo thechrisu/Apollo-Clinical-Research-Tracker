@@ -100,7 +100,7 @@ var RecordTable = (function () {
         this.table.append(tr);
     };
     return RecordTable;
-}());
+})();
 $(document).ready(function () {
     new RecordTable().load();
 });
