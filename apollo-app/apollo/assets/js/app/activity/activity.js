@@ -466,7 +466,7 @@ var ActivityInformation = (function () {
             that.existingPeople = existingPeople;
             that.peopleTable = $('#existingPeople');
             that.id = id;
-            that.activeTargetGroup = NaN;
+            that.activeTargetGroup = null;
             that.setUp();
             that.existingPeople.load(id);
             that.makeLinkWithSuggestions();
@@ -486,12 +486,12 @@ var ActivityInformation = (function () {
         AJAX.get(Util.url('get/activity/?id=' + that.id, false), function (data) {
             var breadcrumbs = $('#nav-breadcrumbs');
             breadcrumbs.find('li:nth-child(3)').text('Activity #' + that.id + ': ' + data.name);
-            that.activeTargetGroup = data.current_target_group;
+            that.activeTargetGroup = data.target_groups.active;
             that.people = data.participants;
             that.onPage = data.page;
             that.displayTitle(data.name);
             that.displayPeople();
-            that.displayTargetGroup(data.target_group);
+            that.displayTargetGroup(data.target_groups.data);
             that.displayComment(data.target_group_comment);
             that.displayStartDate(data.start_date);
             that.displayEndDate(data.end_date);
@@ -518,22 +518,22 @@ var ActivityInformation = (function () {
     /**
      * Shows the target group as dropdown
      * @param options
-     * @param active
      */
     ActivityInformation.prototype.displayTargetGroup = function (options) {
         var dropD = $('#target-dropdown');
         dropD.append('<li class="dropdown-header">Choose a target group:</li>');
         var bt = $('#target-button');
-        bt.append(options[this.activeTargetGroup] + ' <span class="caret"></span>');
+        bt.append(this.activeTargetGroup.name + ' <span class="caret"></span>');
         for (var i = 0; i < options.length; i++) {
-            var option = $('<li optionNameUnique="' + i + '"><a>' + options[i] + '</a></li>');
+            var option = $('<li optionNameUnique="' + options[i].name + '" optionIdUnique="' + options[i].id + '"><a>' + options[i].name + '</a></li>');
             var that = this;
-            if (i == this.activeTargetGroup) {
+            if (options[i].id == this.activeTargetGroup.id) {
                 option.addClass('disabled');
             }
             else {
                 option.click(function () {
-                    that.activeTargetGroup = parseInt($(this).attr('optionNameUnique'));
+                    that.activeTargetGroup.id = $(this).attr('optionIdUnique');
+                    that.activeTargetGroup.name = $(this).attr('optionNameUnique');
                     dropD.empty();
                     bt.empty();
                     that.displayTargetGroup(options);

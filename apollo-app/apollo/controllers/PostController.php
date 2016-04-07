@@ -315,6 +315,7 @@ class PostController extends GenericController
             try{
                 $sourceActivity = Activity::find($data['id']);
                 if ($sourceActivity != null && !$sourceActivity->isHidden() && $sourceActivity->getOrganisation() == $organisation) {
+                    $bonus['target_group'] = $sourceActivity->getTargetGroup();
                     $bonus['target_group_comment'] = $sourceActivity->getTargetGroupComment();
                     $bonus['people'] = $sourceActivity->getPeople();
                 } else {
@@ -377,6 +378,8 @@ class PostController extends GenericController
         if($bonus) {
             if(!empty($bonus['people']))
                 $activity->addPeople($bonus['people']);
+            if(!empty($bonus['target_group']))
+                $activity->setTargetGroup($bonus['target_group']);
             if(!empty($bonus['target_group_comment']))
                 $activity->setTargetGroupComment($bonus['target_group_comment']);
         }

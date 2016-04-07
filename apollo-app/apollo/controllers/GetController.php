@@ -12,6 +12,7 @@ namespace Apollo\Controllers;
 use Apollo\Apollo;
 use Apollo\Components\Activity;
 use Apollo\Components\DB;
+use Apollo\Components\TargetGroup;
 use Apollo\Components\Field;
 use Apollo\Components\Person;
 use Apollo\Components\Record;
@@ -19,6 +20,7 @@ use Apollo\Entities\ActivityEntity;
 use Apollo\Entities\FieldEntity;
 use Apollo\Entities\PersonEntity;
 use Apollo\Entities\RecordEntity;
+use Apollo\Entities\TargetGroupEntity;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine;
 use Exception;
@@ -488,14 +490,34 @@ class GetController extends GenericController
             'error' => null,
             'id' => $activity->getId(),
             'name' => $activity->getName(),
-            'target_group' => ['to_implement!!!', 'still missing', 'lazy programmers'],
-            'current_target_group' => 0,
+            'target_groups' => $this->getFormattedTargetGroups($activity->getTargetGroup()),
             'target_group_comment' => $activity->getTargetGroupComment(),
             'start_date' => $activity->getStartDate()->format('Y-m-d H:i:s'),
             'end_date' => $activity->getEndDate()->format('Y-m-d H:i:s'),
             'participants' => $people
         ];
         return $activityInfo;
+    }
+
+    /**
+     * @param $activity_activeTarget
+     * @return array
+     */
+    private function getFormattedTargetGroups($activity_activeTarget)
+    {
+        $targetGroups = $this->getValidTargetGroups();
+        $arr = [];
+        foreach($targetGroups as $targetGroup)
+        {
+            $tg = [
+                'id' => $targetGroup->getId(),
+                'name' => $targetGroup->getName()
+            ];
+            $arr[] = $tg;
+        }
+        $ret['data'] = $arr;
+        $ret['active'] = $activity_activeTarget;
+        return $ret;
     }
 
     /**
@@ -660,6 +682,15 @@ class GetController extends GenericController
     }
 
     /**
+     * @return array
+     */
+    private function getValidTargetGroups()
+    {
+        $org_id = Apollo::getInstance()->getUser()->getOrganisationId();
+        return TargetGroup::getRepository()->findBy(['organisation' => $org_id, 'is_hidden' => 0]);
+    }
+
+    /**
      * @param $alias
      * @return QueryBuilder
      */
@@ -677,6 +708,9 @@ class GetController extends GenericController
         return $activityQB;
     }
 
+    /**
+     * @return QueryBuilder
+     */
     private function getQueryValidPeople()
     {
         $em = DB::getEntityManager();
@@ -691,7 +725,6 @@ class GetController extends GenericController
         );
         return $pqb;
     }
-
 
     private function getJSONError($id, $description) {
         return  [
