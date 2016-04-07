@@ -62,6 +62,9 @@ $page = Activity::getNumSmallerIds($id)/10 + 1;
                 </div>
                 <div class="btn-group-sm col-lg-8">
                     <span class="pull-right"><!--
+             --><a href="#" id="save-activity" class="btn btn-sm btn-warning disabled"><span
+                                    class="glyphicon glyphicon-refresh"
+                                    aria-hidden="true"></span>Loading...</a><!--
              --><a href="#" id="add-activity" class="btn btn-sm btn-success disabled"><span
                                     class="glyphicon glyphicon-plus"
                                     aria-hidden="true"></span>Add an activity</a><!--
@@ -74,6 +77,7 @@ $page = Activity::getNumSmallerIds($id)/10 + 1;
                 </div>
             </div>
         </div>
+
 
         <div class="panel-body">
             <div id="activity-wrapper" class="row">

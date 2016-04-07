@@ -22,7 +22,7 @@ use DateTime;
  * Class ActivityEntity
  * @package Apollo\Entities
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  * @Entity @Table("activities")
  */
 class ActivityEntity
@@ -64,10 +64,11 @@ class ActivityEntity
     protected $people;
 
     /**
-     * Array with all the target groups
-     * TODO: Add definition for type of target group
+     * The target group for the activity
+     * @ManyToOne(targetEntity="TargetGroupEntity", inversedBy="activities")
+     * @var TargetGroupEntity
      */
-    protected $target_groups;
+    protected $target_group;
 
     /**
      * Accompanying text for the target group
@@ -226,16 +227,19 @@ class ActivityEntity
     }
 
     /**
-     * TODO: Add type for target group
+     * @return mixed
      */
-    public function getTargetGroups()
+    public function getTargetGroup()
     {
-        return $this->target_groups;
+        return $this->target_group;
     }
 
-    public function addTargetGroup($target_group)
+    /**
+     * @param $target_group
+     */
+    public function setTargetGroup($target_group)
     {
-        $this->target_groups[] = $target_group;
+        $this->target_group = $target_group;
     }
 
     /**
@@ -263,6 +267,14 @@ class ActivityEntity
     }
 
     /**
+     * @param boolean $is_hidden
+     */
+    public function setIsHidden($is_hidden)
+    {
+        $this->is_hidden = $is_hidden;
+    }
+
+    /**
      * @param $person
      * @return bool
      */
@@ -273,13 +285,4 @@ class ActivityEntity
         else
             return $this->people->contains($person);
     }
-
-    /**
-     * @param boolean $is_hidden
-     */
-    public function setIsHidden($is_hidden)
-    {
-        $this->is_hidden = $is_hidden;
-    }
-
 }

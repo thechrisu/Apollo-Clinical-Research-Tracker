@@ -217,6 +217,58 @@ var ActivityTable = (function () {
             Util.error('An error has occurred while loading the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
         });
     };
+    ActivityTable.prototype.save = function () {
+        var that = this;
+        var active = this.content.getId();
+        this.saveButton.removeClass('btn-danger');
+        this.saveButton.removeClass('btn-success');
+        this.saveButton.addClass('btn-warning');
+        this.saveButton.html('<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>Saving...');
+        var data = {
+            record_id: active,
+            field_id: id
+        };
+        switch (type) {
+            case 'number':
+                data['value'] = Util.isString(value) ? parseInt(value) : value;
+                break;
+            case 'text':
+                data['value'] = value;
+                break;
+            case 'text-multiple':
+                data['value'] = value;
+                break;
+            case 'dropdown':
+                if (!Util.isString(value)) {
+                    data['is_default'] = true;
+                }
+                data['value'] = value;
+                break;
+            case 'date':
+                data['value'] = Util.toMysqlFormat(Util.parseNumberDate(value));
+                break;
+            case 'long-text':
+                data['value'] = value;
+                break;
+        }
+        AJAX.post(Util.url('post/data'), data, function (response) {
+            that.saveButton.removeClass('btn-warning');
+            that.saveButton.addClass('btn-success');
+            that.saveButton.html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Changes saved.');
+        }, function (message) {
+            that.saveButton.removeClass('btn-warning');
+            that.saveButton.addClass('btn-danger');
+            that.saveButton.html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Saving failed.');
+            Util.error('An error has occurred during the process of updating of the data. Error message: ' + message);
+        });
+    };
+    /**
+     * Performs a post request in order to create a new activity based on the information received in the modal
+     * @param name
+     * @param startDate
+     * @param endDate
+     * @param id
+     */
     ActivityTable.newActivity = function (name, startDate, endDate, id) {
         var args = {
             action: 'create',
@@ -327,21 +379,23 @@ var ActivityTable = (function () {
     ActivityTable.prototype.setUpButtons = function () {
         var that = this;
         var active = this.content.getId();
-        $('#add-activity').click(this.addActivity);
-        $('#duplicate-activity').click({ id: active }, this.duplicateActivity);
-        $('#hide-activity').click(function () {
-            that.hideActivity.call(null, active);
-        });
+        this.saveButton = $('#save-activity');
+        this.addButton = $('#add-activity');
+        this.duplicateButton = $('#duplicate-activity');
+        this.hideButton = $('#hide-activity');
+        this.targetGroupButton = $("#target-button");
+        this.addButton.click(this.addActivity);
+        this.duplicateButton.click({ id: active }, this.duplicateActivity);
+        this.hideButton.click(function () { that.hideActivity.call(null, active); });
     };
     ActivityTable.prototype.activateButtons = function () {
-        var addButton = $("#add-activity");
-        addButton.removeClass('disabled');
-        var duplicateButton = $("#duplicate-activity");
-        duplicateButton.removeClass('disabled');
-        var hideButton = $("#hide-activity");
-        hideButton.removeClass('disabled');
-        var targetGroupButton = $("#target-button");
-        targetGroupButton.removeClass('disabled');
+        this.saveButton.removeClass('btn-warning');
+        this.saveButton.addClass('btn-success');
+        this.saveButton.html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>No changes.');
+        this.addButton.removeClass('disabled');
+        this.duplicateButton.removeClass('disabled');
+        this.hideButton.removeClass('disabled');
+        this.targetGroupButton.removeClass('disabled');
     };
     /**
      * With the data of all the activities, it successively creates the rows for each activity
