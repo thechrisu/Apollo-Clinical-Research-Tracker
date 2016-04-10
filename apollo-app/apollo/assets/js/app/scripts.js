@@ -6,7 +6,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.2.1
+ * @version 0.2.2
  */
 /**
  * Constant specifying a delay before the AJAX request after the user
@@ -81,26 +81,83 @@ var Util = (function () {
         });
         modal.modal('show');
     };
+    /**
+     * Removes all instances of an element from another array
+     * @param toSubtractFrom
+     * @param subtractedBy
+     * @returns {any[]}
+     */
     Util.arraySubtract = function (toSubtractFrom, subtractedBy) {
         return toSubtractFrom.filter(function (item) {
             return subtractedBy.indexOf(item) === -1;
         });
     };
+    /**
+     * Removes all instances of an item in an array from another array. Comparison is done with a custom compare function
+     * @param toSubtractFrom
+     * @param subtractedBy
+     * @param compareFunction
+     */
+    Util.arraySubtractCmp = function (toSubtractFrom, subtractedBy, compareFunction) {
+        for (var i = 0; i < subtractedBy.length; i++) {
+            this.removeFromArrayCmp(subtractedBy[i], toSubtractFrom, compareFunction);
+        }
+    };
+    /**
+     * Removes all instances of an item from an array
+     * @param needle
+     * @param haystack
+     */
     Util.removeFromArray = function (needle, haystack) {
         var index = haystack.indexOf(needle);
         if (index > -1)
             haystack.splice(index, 1);
     };
+    /**
+     * Removes all instances of an item from an array using a custom compare function
+     * @param needle
+     * @param haystack
+     * @param compareFunction
+     */
+    Util.removeFromArrayCmp = function (needle, haystack, compareFunction) {
+        for (var i = 0; i < haystack.length; i++) {
+            if (compareFunction(haystack[i], needle) == 0) {
+                haystack.splice(i, 1);
+                i--; //decrement since the array indices will move up
+            }
+        }
+    };
+    /**
+     * Checks if an element is in an array
+     * @param needle
+     * @param haystack
+     * @returns {boolean}
+     */
     Util.isIn = function (needle, haystack) {
         return haystack.indexOf(needle) > -1;
     };
-    Util.isValIn = function (needle, haystack, key) {
-        for (var item in haystack) {
-            if (item[key] == needle[key])
+    /**
+     * Checks if an element is in an array using a custom compare function
+     * @param needle
+     * @param haystack
+     * @param compareFunction
+     * @returns {boolean}
+     */
+    Util.isInCmp = function (needle, haystack, compareFunction) {
+        for (var i = 0; i < haystack.length; i++) {
+            var item = haystack[i];
+            if (compareFunction(needle, item) == 0) {
                 return true;
+            }
         }
         return false;
     };
+    /**
+     * If a string is larger than a given size, it will shorten the string and replace the last three characters with dots
+     * @param str
+     * @param maxLength
+     * @returns {string}
+     */
     Util.shortify = function (str, maxLength) {
         var res = str;
         if (str.length > maxLength) {

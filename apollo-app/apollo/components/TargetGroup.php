@@ -23,4 +23,22 @@ class TargetGroup extends DBComponent
      * @var string
      */
     protected static $entityNamespace = 'Apollo\\Entities\\TargetGroupEntity';
+
+    public static function getMin()
+    {
+        $em = DB::getEntityManager();
+        $repo = $em->getRepository(TargetGroup::getEntityNamespace());
+        $qb = $repo->createQueryBuilder('t');
+        $organisation_id = Apollo::getInstance()->getUser()->getOrganisationId();
+        $notHidden = $qb->expr()->eq('t' . '.is_hidden', '0');
+        $sameOrgId = $qb->expr()->eq('t' . '.organisation', $organisation_id);
+        $cond = $qb->expr()->andX($notHidden, $sameOrgId);
+        $qb->where($cond);
+        $query = $qb->getQuery()
+            ->setFirstResult(0)
+            ->setMaxResults(1);
+        $result = $query->getResult();
+        $item = $result[0];
+        return $item;
+    }
 }

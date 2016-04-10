@@ -250,3 +250,31 @@ body {
   background-color: #2780e3;
   border-color: #2780e3;
 }
+
+.activeItem {
+  background-color: #dddddd;
+  color: #2f2f2f !important;
+}
+.activeItem:hover {
+  background-color: #2780e3 !important;
+  border-color: #2780e3;
+  color: #f2f2f2 !important;
+}
+.activeItem:active {
+  background-color: #2780e3;
+  border-color: #2780e3;
+}
+
+.selectionItem {
+  width: 100%;
+  background-color: #f2f2f2;
+}
+.selectionItem:hover {
+  background-color: #2780e3 !important;
+  border-color: #2780e3;
+  color: #f2f2f2 !important;
+}
+.selectionItem:active {
+  background-color: #2780e3;
+  border-color: #2780e3;
+}

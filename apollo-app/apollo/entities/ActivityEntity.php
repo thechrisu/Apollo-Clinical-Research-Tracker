@@ -6,6 +6,7 @@
  */
 
 namespace Apollo\Entities;
+use Apollo\components\TargetGroup;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\JoinColumn;
@@ -96,6 +97,7 @@ class ActivityEntity
     {
         $this->people = new ArrayCollection();
         $this->is_hidden = false;
+        $this->setTargetGroup(TargetGroup::getMin());
         $this->target_group_comment = '';
     }
 

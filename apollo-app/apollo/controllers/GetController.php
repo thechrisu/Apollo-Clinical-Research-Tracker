@@ -523,10 +523,14 @@ class GetController extends GenericController
      */
     private function getFormattedTargetGroup($targetGroup)
     {
-        $tg = [
-            'id' => $targetGroup->getId(),
-            'name' => $targetGroup->getName()
-        ];
+        if(!empty($targetGroup)) {
+            $tg = [
+                'id' => $targetGroup->getId(),
+                'name' => $targetGroup->getName()
+            ];
+        } else {
+            return null;
+        }
         return $tg;
     }
 
