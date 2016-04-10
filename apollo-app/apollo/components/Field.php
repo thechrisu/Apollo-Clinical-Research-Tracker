@@ -7,6 +7,7 @@
 
 
 namespace Apollo\Components;
+use Apollo\Apollo;
 
 
 /**
@@ -24,13 +25,23 @@ class Field extends DBComponent
      */
     protected static $entityNamespace = 'Apollo\\Entities\\FieldEntity';
 
-
-
-    public static function getString($field)
+    public static function getFieldNames()
     {
-        switch($field->getType())
-        {
-            
+        $organisation = Apollo::getInstance()->getUser()->getOrganisation();
+        $fields = self::getRepository()->findBy(['is_hidden' => '0', 'organisation' => $organisation]);
+        $names = [];
+        foreach($fields as $field)
+            $names[] = $field->getName();
+        return $names;
+    }
+
+    public static function getDefaultsValues($field)
+    {
+        $defaults =  $field->getDefaults();
+        $defaultArray = [];
+        foreach ($defaults as $default) {
+            $defaultArray[] = $default->getValue();
         }
+        return $defaultArray;
     }
 }

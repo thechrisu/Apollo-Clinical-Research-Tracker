@@ -47,4 +47,26 @@ class Record extends DBComponent
             $record->findOrCreateData($field->getId());
         }
     }
+
+    public static function getFormattedFields($record) {
+        $fieldsData = [];
+        $fieldRepo = Field::getRepository();
+        $fields = $fieldRepo->findBy(['is_essential' => false, 'is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
+        foreach ($fields as $field) {
+            $fieldData = self::getFormattedFieldOfRecord($record, $field);
+            $fieldsData[] = $fieldData;
+        }
+        return $fieldsData;
+    }
+
+    /**
+     * @param $record
+     * @param $field
+     * @return mixed
+     */
+    private static function getFormattedFieldOfRecord($record, $field)
+    {
+        $fieldData = $record->findOrCreateData($field->getId());
+        return Data::getFormattedData($fieldData);
+    }
 }

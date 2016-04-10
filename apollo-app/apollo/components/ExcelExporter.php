@@ -32,7 +32,7 @@ class ExcelExporter
         $excel->writer->setData(
             array
             (
-                $this->getFieldNames(),
+                Field::getFieldNames(),
                 array('1',   'Kab. Bogor',       '1'    ),
                 array('2',   'Kab. Cianjur',     '1'    ),
                 array('3',   'Kab. Sukabumi',    '1'    ),
@@ -42,12 +42,4 @@ class ExcelExporter
         $excel->writer->saveFile('people-' . date('Y-m-d'));
     }
 
-    private function getFieldNames()
-    {
-        $fields = Field::getRepository()->findBy(['is_hidden' => '0']);
-        $names = [];
-        foreach($fields as $field)
-            $names[] = $field->getName();
-        return $names;
-    }
 }
