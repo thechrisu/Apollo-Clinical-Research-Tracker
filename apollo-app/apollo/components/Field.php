@@ -23,4 +23,14 @@ class Field extends DBComponent
      * @var string
      */
     protected static $entityNamespace = 'Apollo\\Entities\\FieldEntity';
+
+
+
+    public static function getString($field)
+    {
+        switch($field->getType())
+        {
+            
+        }
+    }
 }

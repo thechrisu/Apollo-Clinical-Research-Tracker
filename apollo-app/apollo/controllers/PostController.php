@@ -318,6 +318,7 @@ class PostController extends GenericController
         $response['error'] = null;
         $data = $this->parseRequest(['id' => -1, 'activity_name' => null, 'start_date' => null, 'end_date' => null]);
         $organisation = Apollo::getInstance()->getUser()->getOrganisation();
+        $bonus = null;
         if ($data['id'] > 0) {
             try{
                 $sourceActivity = Activity::find($data['id']);
