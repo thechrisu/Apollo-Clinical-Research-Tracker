@@ -33,8 +33,8 @@ class FieldController extends GenericController
     public function index()
     {
         $breadcrumbs = [
-            ['Field', URLHelper::url('field'), true]
+            ['Fields', URLHelper::url('field'), true]
         ];
-        View::render('field.index', 'Field', $breadcrumbs);
+        View::render('field.index', 'Fields', $breadcrumbs);
     }
 }

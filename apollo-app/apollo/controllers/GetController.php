@@ -34,7 +34,7 @@ use Exception;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.1.2
+ * @version 0.1.3
  */
 class GetController extends GenericController
 {
@@ -340,7 +340,7 @@ class GetController extends GenericController
                 $fieldData = $record->findOrCreateData($field->getId());
                 $value = [];
                 if ($field->hasDefault()) {
-                    if($field->isMultiple()) {
+                    if ($field->isMultiple()) {
                         $value = unserialize($fieldData->getLongText());
                     } else {
                         if ($fieldData->isDefault() || !$field->isAllowOther()) {
@@ -390,10 +390,10 @@ class GetController extends GenericController
         $data = $this->parseRequest(['page' => 1, 'sort' => 1, 'search' => null]);
         $page = $data['page'] > 0 ? $data['page'] : 1;
         $activities = null;
-        try{
+        try {
             $activityQB = $this->createQueryForActivitiesRequest($data);
             $activityQuery = $activityQB->getQuery();
-            $activities =  $activityQuery->getResult();
+            $activities = $activityQuery->getResult();
         } catch (Exception $e) {
 
             $response['error'] = ['id' => 3, 'description' => "Unable to get data from database, server issue? (error in query): " . $e->getMessage()];
@@ -467,8 +467,7 @@ class GetController extends GenericController
         $data = $this->parseRequest(['id' => 0]);
         $activity = Activity::getRepository()->findOneBy(['id' => $data['id'], 'is_hidden' => 0, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
 
-        if ($data['id'] > 0 && $activity != null)
-        {
+        if ($data['id'] > 0 && $activity != null) {
             $activityInfo = $this->getInfoActivity($activity);
             //TODO: Check if there is more than one activity. If so, then report that as invalid
             $response = $activityInfo;
@@ -507,8 +506,7 @@ class GetController extends GenericController
     {
         $targetGroups = $this->getValidTargetGroups();
         $arr = [];
-        foreach($targetGroups as $targetGroup)
-        {
+        foreach ($targetGroups as $targetGroup) {
             $tg = $this->getFormattedTargetGroup($targetGroup);
             $arr[] = $tg;
         }
@@ -539,7 +537,7 @@ class GetController extends GenericController
         $people = null;
         $pqb = $this->getQueryForPeopleNotInProgramme($data);
         $activity = Activity::getRepository()->findBy(['id' => $data['activity_id'], 'is_hidden' => 0, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
-        if((empty($activity[0])) || $activity[0]->isHidden()){
+        if ((empty($activity[0])) || $activity[0]->isHidden()) {
             $response['error'] = $this->getJSONError(2, "Activity hidden.");
         } else {
             try {
@@ -561,11 +559,11 @@ class GetController extends GenericController
     private function formatPeopleShortConcatName($people)
     {
         $people_obj = [];
-        foreach($people as $person) {
-                $person_obj = [
-                    'id' => $person->getId(),
-                    'name' => implode(' ', [$person->getGivenName(), $person->getMiddleName(),$person->getLastName()])
-                ];
+        foreach ($people as $person) {
+            $person_obj = [
+                'id' => $person->getId(),
+                'name' => implode(' ', [$person->getGivenName(), $person->getMiddleName(), $person->getLastName()])
+            ];
             $people_obj[] = $person_obj;
         }
         return $people_obj;
@@ -658,7 +656,7 @@ class GetController extends GenericController
     private function formatPeopleShort($people)
     {
         $people_obj = [];
-        foreach($people as $person) {
+        foreach ($people as $person) {
             $person_obj = [
                 'id' => $person->getId(),
                 'given_name' => $person->getGivenName(),
@@ -736,10 +734,62 @@ class GetController extends GenericController
         return $pqb;
     }
 
-    private function getJSONError($id, $description) {
-        return  [
+    private function getJSONError($id, $description)
+    {
+        return [
             'id' => $id,
             'description' => $description
         ];
+    }
+
+    /**
+     * Returns a list of all fields belonging to user's organisation
+     *
+     * @since 0.1.3
+     */
+    public function actionFields()
+    {
+        $em = DB::getEntityManager();
+        $fieldRepo = $em->getRepository(Field::getEntityNamespace());
+        /** @var FieldEntity[] $fields */
+        $fields = $fieldRepo->findBy(['organisation' => Apollo::getInstance()->getUser()->getOrganisationId(), 'is_hidden' => false]);
+        $response['error'] = null;
+        $data = [];
+        for ($i = 0; $i < count($fields); $i++) {
+            $field = $fields[$i];
+            $fieldData = [];
+            $fieldData['id'] = $field->getId();
+            $fieldData['essential'] = $field->isEssential();
+            $fieldData['name'] = $field->getName();
+            $fieldData['type'] = $field->getType();
+            $subtype = 0;
+            if($field->getType() == 2) {
+                if($field->hasDefault()) {
+                    if($field->isAllowOther()) {
+                        $subtype = 4;
+                    } elseif($field->isMultiple()) {
+                        $subtype = 5;
+                    } else {
+                        $subtype = 3;
+                    }
+                } else {
+                    if($field->isMultiple()) {
+                        $subtype = 2;
+                    } else {
+                        $subtype = 1;
+                    }
+                }
+            }
+            $fieldData['subtype'] = $subtype;
+            $defaults = $field->getDefaults();
+            $defaultsData = [];
+            for ($k = 0; $k < count($defaults); $k++) {
+                $defaultsData[] = $defaults[$k]->getValue();
+            }
+            $fieldData['defaults'] = $defaultsData;
+            $data[] = $fieldData;
+        }
+        $response['data'] = $data;
+        echo json_encode($response);
     }
 }
