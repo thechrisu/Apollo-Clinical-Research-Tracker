@@ -6,7 +6,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.2.1
+ * @version 0.2.2
  */
 
 /**
@@ -129,6 +129,12 @@ class Util {
         modal.modal('show');
     }
 
+    /**
+     * Removes all instances of an element from another array
+     * @param toSubtractFrom
+     * @param subtractedBy
+     * @returns {any[]}
+     */
     public static arraySubtract(toSubtractFrom:any[], subtractedBy:any[])
     {
         return toSubtractFrom.filter(function(item){
@@ -136,25 +142,79 @@ class Util {
         });
     }
 
+    /**
+     * Removes all instances of an item in an array from another array. Comparison is done with a custom compare function
+     * @param toSubtractFrom
+     * @param subtractedBy
+     * @param compareFunction
+     */
+    public static arraySubtractCmp(toSubtractFrom:any[], subtractedBy:any[], compareFunction)
+    {
+        for(var i = 0; i < subtractedBy.length; i++){
+            this.removeFromArrayCmp(subtractedBy[i], toSubtractFrom, compareFunction);
+        }
+    }
+
+    /**
+     * Removes all instances of an item from an array
+     * @param needle
+     * @param haystack
+     */
     public static removeFromArray(needle:any, haystack:any[]) {
         var index = haystack.indexOf(needle);
         if(index > -1)
             haystack.splice(index, 1);
     }
 
+    /**
+     * Removes all instances of an item from an array using a custom compare function
+     * @param needle
+     * @param haystack
+     * @param compareFunction
+     */
+    public static removeFromArrayCmp(needle:any, haystack:any[], compareFunction) {
+        for(var i = 0; i < haystack.length; i++){
+            if(compareFunction(haystack[i], needle) == 0) {
+                haystack.splice(i, 1);
+                i--; //decrement since the array indices will move up
+            }
+        }
+    }
+
+    /**
+     * Checks if an element is in an array
+     * @param needle
+     * @param haystack
+     * @returns {boolean}
+     */
     public static isIn(needle:any, haystack:any[]) {
         return haystack.indexOf(needle) > -1;
     }
 
-    public static isValIn(needle, haystack, key) {
-        for(var item in haystack)
+    /**
+     * Checks if an element is in an array using a custom compare function
+     * @param needle
+     * @param haystack
+     * @param compareFunction
+     * @returns {boolean}
+     */
+    public static isInCmp(needle:any, haystack:any[], compareFunction) {
+        for(var i = 0; i < haystack.length; i++)
         {
-            if(item[key] == needle[key])
+            var item = haystack[i];
+            if(compareFunction(needle, item) == 0) {
                 return true;
+            }
         }
         return false;
     }
 
+    /**
+     * If a string is larger than a given size, it will shorten the string and replace the last three characters with dots
+     * @param str
+     * @param maxLength
+     * @returns {string}
+     */
     public static shortify(str:string, maxLength:number) {
         var res:string = str;
         if(str.length > maxLength) {

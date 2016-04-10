@@ -440,14 +440,16 @@ class PostController extends GenericController
         $ret = null;
         foreach($data as $person)
         {
-            try{
-                $pEntity = $this->getValidPerson($person['id']);
-                if(!empty($pEntity))
-                {
-                    $arr[] = $pEntity;
+            if($person['id'] > 0){
+                try{
+                    $pEntity = $this->getValidPerson($person['id']);
+                    if(!empty($pEntity))
+                    {
+                        $arr[] = $pEntity;
+                    }
+                } catch (Exception $e) {
+                    $ret['error'] = $this->getJSONError(5, 'Error while trying to find people');
                 }
-            } catch (Exception $e) {
-                $ret['error'] = $this->getJSONError(5, 'Error while trying to find people');
             }
         }
         $ret['people'] = $arr;

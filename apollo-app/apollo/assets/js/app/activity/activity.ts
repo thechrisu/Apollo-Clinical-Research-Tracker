@@ -9,7 +9,7 @@
  *
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.5
+ * @version 0.1.6
  *
  */
 
@@ -54,46 +54,56 @@ interface DetailActivityData {
 
 /**
  * Class to store the token field (the field to add/remove users from a activity)
- * @version 0.0.6
- * TODO Dynamically update the table when new entries were added. Add "autosave"
+ * @version 0.0.7
  */
 class PeopleField {
     private activity_id:number;
     private search:string;
     private bh:BloodHound;
+    private people:ParticipantData[]=  [];
     private temporarily_added:ParticipantData[] = []; //people that are temporarily added to the activity (-> not saved). These should not be suggested.
     private temporarily_removed:ParticipantData[] = []; //people that are temporarily added to the suggestions. These items were removed from the activity
 
+    /**
+     * Initialises the object to the required state
+     * @param activity_id
+     */
     public load(activity_id:number){
         this.activity_id = activity_id;
         this.search = '';
         this.resetAdded();
-        this.setUp();
-    }
-
-    private setUp() {
-        var that = this;
         this.resetBloodhound();
-        /*$('#person-input').keydown(function(e) {
-            that.search = encodeURIComponent($(this).val());
-        }*/
-
     }
 
+    /**
+     * Just saves the current state of suggestions and then sets up bloodhound again
+     */
     public resetBloodhound() {
+        for(var item in this.temporarily_added){
+            Util.removeFromArrayCmp(item, this.people, cmpIds);
+        }
+        for(var item in this.temporarily_removed){
+            if(!Util.isInCmp(item, this.people, cmpIds))
+                this.people.push(item);
+        }
         this.setBloodhound();
         var promise = this.bh.initialize();
         promise.fail(function() { Util.error('failed to load the suggestion engine');});
         this.resetTypeahead();
     }
 
+    /**
+     * Removes all people from the current state that have been added manually
+     */
     public resetAdded() {
         this.temporarily_added = [];
         this.temporarily_removed = [];
     }
 
+    /**
+     * Resets the typeahead suggestion engine
+     */
     public resetTypeahead() {
-        //console.log('resetting typehead');
         var that = this;
         $('#person-input').val("");
         $('#person-input').typeahead('destroy');
@@ -102,21 +112,21 @@ class PeopleField {
         }, {
             name: 'data',
             displayKey: 'name',
-            allowDuplicates: false,
+            //allowDuplicates: false,
             source: that.bh.ttAdapter(),
             templates: {
                 suggestion: function (data) {
-                    var str = '';
-                    if(!Util.isIn(data, that.temporarily_added))
-                        str += '<div class="noselect">' + data.name + '</div>';
+                      var str = '<div class="noselect">' + data.name + '</div>';
                     return str;
                 }
             }
         });
     }
 
-    //http://stackoverflow.com/questions/25419972/twitter-typeahead-add-custom-data-to-dataset
-
+    /**
+     * Sets up the bloodhound suggestion engine: This is the place where you have to go to find how exactly data is received from the server
+     * http://stackoverflow.com/questions/25419972/twitter-typeahead-add-custom-data-to-dataset
+     */
     private setBloodhound() {
         var that = this;
         this.bh = new Bloodhound({
@@ -126,49 +136,37 @@ class PeopleField {
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             initialize: true,
             identify: function(item) {return item.id;},
-            sorter: sortParticipants,
+            sorter: cmpNames,
             remote: {
                 url: Util.url('get/activitypeople') + '?activity_id=' + that.activity_id + that.formatTemporarily_added() + '&search=' + that.search,
                 filter: function (data) {
                     if (!data) {
                         return {};
                     } else {
-
-                        function destringify(data) {
-                            ////console.log(data);
-                            $.map(data, function (item) {
-                                return {
-                                    'id': item.id,
-                                    'name': item.name
-                                }
-                            });
-                        }
-
+                        //Adds all of the people to the suggestion engine
                         function carryout(data) {
-                            //console.log(data);
-                            var objs = destringify(data);
-                            var output = [];
-                            $.each(data, function(k,v){
-                                if (!Util.isIn(v, that.temporarily_added) && !Util.isIn(v, that.temporarily_removed)){
-                                    output.push(v);
+                            var output;
+                            if(that.people != null && that.people.length > 0 && that.people[0] != null)
+                                output = that.people;
+                            else
+                                output = [];
+                            $.each(that.temporarily_added, function(k,v){
+                                if(Util.isInCmp(v, output, cmpIds)){
+                                    Util.removeFromArrayCmp(v, output, cmpIds);
                                 }
                             });
-                            //console.log('added all normal people:');
-                            //console.log(output);
-                            $.each(that.temporarily_removed, function(k,v){
-                               output.push(v);
+                            $.each(data, function(k,v){
+                                if(!Util.isInCmp(v, output, cmpIds))
+                                    output.push(v);
                             });
-                            //console.log('after adding temporarily_removed:');
-                            //console.log(output);
+                            $.each(that.temporarily_removed, function(k,v){
+                                if(!Util.isInCmp(v, output, cmpIds))
+                                    output.push(v);
+                            });
+                            that.people = output;
                             return output;
                         }
                         var co = carryout(data.data);
-                        //console.log('temp added (carryout): ');
-                        //console.log(that.temporarily_added);
-                        //console.log('temp removed (carryout): ');
-                        //console.log(that.temporarily_removed);
-                        //console.log('after adding:');
-                        //console.log(co);
                         return co;
 
                     }
@@ -179,38 +177,38 @@ class PeopleField {
         });
     }
 
+    /**
+     * Removes an item from the suggestions: This means it will no longer be suggested. It also assumes,
+     * the item has been added to the activity
+     * @param data
+     */
     public removeItemFromSuggestions(data:ParticipantData) {
         this.temporarily_added.push(data);
-        //console.log('removing item from suggestions, adding to temporarily_added ' + data.name + data.id);
-        Util.removeFromArray(data, this.temporarily_removed);
-            //console.log('removing item from suggestions, removing from temporarily removed ' + data.name + data.id);
+        Util.removeFromArrayCmp(data, this.temporarily_removed, cmpIds);
     }
 
+    /**
+     * Parallel function to the latter: Adds an item to the suggestions and assumes it has been removed from the activity
+     * @param data
+     */
     public addItemToSuggestions(data:ParticipantData) {
         this.temporarily_removed.push(data);
-        //console.log('adding item to suggestions, adding to temporarily removed ' + data.name + data.id);
-        Util.removeFromArray(data, this.temporarily_added);
-            //console.log('adding item to suggestions, removing from temporarily_added ' + data.name + data.id);
+        Util.removeFromArrayCmp(data, this.temporarily_added, cmpIds);
     }
 
-    public addDataToSuggestions(data:ParticipantData[]) {
-        $.each(data, function(key, obj){
-            this.addItemToSuggestions(obj);
-        });
-    }
-
+    /**
+     * Helper function for the API request: Adds an URL argument for every person temporarily added to the activity
+     * These people should not be displayed in the suggestions
+     * @returns {string}
+     */
     private formatTemporarily_added ()
     {
         var tA = this.temporarily_added;
-        //console.log('formatting:');
-        //console.log(tA);
         var query = '';
         for(var i = 0; i < tA.length; i++) {
             var pa = tA[i];
-            //console.log(pa);
             query += '&temporarily_added[]=' + pa.id;
         }
-        //console.log(query);
         return query;
     }
 
@@ -220,7 +218,7 @@ class PeopleField {
 }
 
 /**
- * Defines the menu/table on the left of the view.
+ * Defines the menu/table on the left of the view. Also responsible for all the buttons and their functions
  * @version 0.0.6
  */
 class ActivityTable {
@@ -236,6 +234,7 @@ class ActivityTable {
     private page:number;
     private loader;
     private content:ActivityInformation;
+
     /**
      * Loads up all of the information and sets up the instance variables
      */
@@ -262,15 +261,7 @@ class ActivityTable {
     private setUp() {
         this.setUpButtons();
         this.setUpPagination();
-        var timer = null;
-        var that = this
-        $('#activities-search').keyup(function () {
-            clearTimeout(timer);
-            that.search = encodeURIComponent($(this).val());
-            timer = setTimeout(function () {
-                that.updateTable();
-            }, AJAX_DELAY);
-        });
+        this.setUpActivitySearch();
         this.activateButtons();
     }
 
@@ -353,7 +344,10 @@ class ActivityTable {
         );
     }
 
-
+    /**
+     * The function called when the user clicks on the duplicate activity button: Brings up the modal and calls the API
+     * @param e
+     */
     private duplicateActivity (e) {
         e.preventDefault();
         bootbox.dialog({
@@ -382,7 +376,10 @@ class ActivityTable {
         );
     }
 
-
+    /**
+     * Comes up when the user clicks on the hide button: Confirms user's selection and then performs the right API call
+     * @param id
+     */
     private hideActivity(id) {
         bootbox.confirm('Are you sure you want to hide this activity? The data won\'t be deleted and can be restored later.', function (result) {
             if (result) {
@@ -397,8 +394,9 @@ class ActivityTable {
             }
         });
     }
+
     /**
-     * Sets up the pagination
+     * Sets up the JQuery pagination plugin
      * @since 0.0.4
      */
     private setUpPagination() {
@@ -429,12 +427,29 @@ class ActivityTable {
         this.duplicateButton = $('#duplicate-activity');
         this.hideButton = $('#hide-activity');
         this.targetGroupButton = $("#target-button");
-
         this.addButton.click(this.addActivity);
         this.duplicateButton.click({id: active}, this.duplicateActivity);
         this.hideButton.click(function() {that.hideActivity.call(null, active)});
     }
 
+    /**
+     * Adds the keyup event, so that the API request is automatically being done after the user didn't press anything
+     */
+    private setUpActivitySearch() {
+        var timer = null;
+        var that = this;
+        $('#activities-search').keyup(function () {
+            clearTimeout(timer);
+            that.search = encodeURIComponent($(this).val());
+            timer = setTimeout(function () {
+                that.updateTable();
+            }, AJAX_DELAY);
+        });
+    };
+
+    /**
+     * Removes all of the disabled-classes from the buttons
+     */
     private activateButtons() {
         this.saveButton.removeClass('btn-warning');
         this.saveButton.addClass('btn-success');
@@ -461,8 +476,10 @@ class ActivityTable {
     }
 
     /**
-     * Successively adds the parameters to one row and adds it to the DOM
+     * Successively adds the parameters to one row and adds it to the DOM.
+     * If the current row should be the current programme (passed by parameter), it will highlight it
      * @param data
+     * @param active
      */
     private addRowToTable(data:ShortActivityData, active:boolean) {
         var row:JQuery;
@@ -472,15 +489,17 @@ class ActivityTable {
         startD = Util.formatShortDate(Util.parseSQLDate(<string> data.start_date));
         endD = Util.formatShortDate(Util.parseSQLDate(<string> data.end_date));
         row = $('<tr></tr>');
-        if(active){
-            row.addClass('active');
-        }
         row.append('<td>' + Util.shortify(data.name, 20) + '</td>');
         row.append('<td>' + startD + '-' + endD + '</td>');
         row.click(function() {
             that.displayActivity.call(null, data.id);
         });
-        row.addClass('noselect');
+        row.addClass('selectionItem');
+        row.addClass('clickable');
+        if(active){
+            row.addClass('activeItem');
+            row.removeClass('selectionItem');
+        }
         this.table.append(row);
     }
 
@@ -490,29 +509,36 @@ class ActivityTable {
 }
 
 /**
- * carries out all the tasks related to displaying the actual information of one activity on the right of the view
- * @since 0.0.4
- * TODO: fix autosave
+ * Carries out all the tasks related to displaying the actual information of one activity on the right of the view
+ * @since 0.0.5
  */
 class ActivityInformation {
 
-    private peopleTable:JQuery;
-    private title:JQuery;
-    private targetComment:JQuery;
-    private startDate:JQuery;
-    private endDate:JQuery;
-    private existingPeople:PeopleField;
-    private activeTargetGroup:TargetGroupData;
-    private people:ParticipantData[];
-    private addedPeople:ParticipantData[] = [];
-    private removedPeople:ParticipantData[] = [];
-    private onPage:number;
-    private id:number;
+    private peopleTable:JQuery; //the table for all of the people in the activity
+    private title:JQuery; //the activity title
+    private targetComment:JQuery; //the comment for the target group of the activity
+    private startDate:JQuery; //the activity start date
+    private endDate:JQuery; //the activity end date
+    private existingPeople:PeopleField; //the object for Twitter Typeahead to suggest people to add to the activity
+    private activeTargetGroup:TargetGroupData; //the current target group selection
+    private people:ParticipantData[]; //the people in the activity
+    private addedPeople:ParticipantData[] = []; //the people that have been added to the activity since page was loaded
+    private removedPeople:ParticipantData[] = []; //the people that have been removed from the activity since page was loaded
+    private onPage:number; //the page on which the activity is
+    private id:number; //the activity id
 
+    /**
+     * Since this is the object responsible for the activity, it is necessary that this knows of the activity id
+     * @returns {number}
+     */
     public getId() {
         return this.id;
     }
 
+    /**
+     * Similar to getId()
+     * @returns {number}
+     */
     public getPage() {
         return this.onPage;
     }
@@ -547,7 +573,7 @@ class ActivityInformation {
         AJAX.get(Util.url('get/activity/?id=' + that.id, false), function(data:DetailActivityData) {
             var breadcrumbs = $('#nav-breadcrumbs');
             breadcrumbs.find('li:nth-child(3)').text('Activity #' + that.id + ': ' + data.name);
-            that.activeTargetGroup = data.target_groups.active;
+            that.activeTargetGroup = data.target_groups.active == null? data.target_groups.data[0] : data.target_groups.active;
             that.people = data.participants;
             that.onPage = data.page;
             that.displayTitle(data.name);
@@ -561,53 +587,99 @@ class ActivityInformation {
         });
     }
 
+    /**
+     * Sends the current object state to the server, resets the object state to account for changes
+     */
     private save() {
-        var that = this;
-        var active = this.getId();
         var saveButton = $('#save-activity');
+        this.displaySaving(saveButton);
+        this.savePeople();
+        var data = this.getObjectState();
+        var that = this;
+        AJAX.post(Util.url('post/activity'), data, function (response:any) {
+            that.displaySuccessfulSave(saveButton);
+        }, function (message:string) {
+            that.displaySaveFailure(saveButton);
+            Util.error('An error has occurred while saving. Error message: ' + message);
+        });
+        this.resetPeople();
+    }
+
+    /**
+     * Sets up the button such that it would show that we currently save the activity
+     * @param saveButton
+     */
+    private displaySaving(saveButton) {
         saveButton.removeClass('btn-danger');
         saveButton.removeClass('btn-success');
         saveButton.addClass('btn-warning');
         saveButton.html('<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>Saving...');
+    };
+
+    /**
+     * Sets up the button such that it indicates saving failed
+     * @param saveButton
+     */
+    private displaySaveFailure(saveButton) {
+        saveButton.removeClass('btn-warning');
+        saveButton.addClass('btn-danger');
+        saveButton.html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Saving failed.');
+    };
+
+    /**
+     * Sets up the button such that it shows saving has been successful
+     * @param saveButton
+     */
+    private displaySuccessfulSave(saveButton) {
+        saveButton.removeClass('btn-warning');
+        saveButton.addClass('btn-success');
+        saveButton.html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Changes saved.');
+    };
+
+    /**
+     * Gets all of the object's information and returns it as an object
+     * @returns {{action: string, activity_id: number, activity_name: any, target_group: string, target_group_comment: any, start_date: string, end_date: string, added_people: ParticipantData[], removed_people: ParticipantData[]}}
+     */
+    private getObjectState() {
         var sd:Date = this.startDate.datepicker('getDate');
         var startDate:string = Util.toMysqlFormat(sd);
         var ed:Date = this.endDate.datepicker('getDate');
         var endDate:string = Util.toMysqlFormat(ed);
-        var added_ppl = this.addedPeople;
-        console.log(added_ppl);
-        var removed_ppl = this.removedPeople;
-        console.log(removed_ppl);
-        var tg = this.activeTargetGroup == null? null: this.activeTargetGroup.id;
         var data = {
             action: 'update',
-            activity_id: active,
+            activity_id: this.getId(),
             activity_name: this.title.val(),
-            target_group: tg,
+            target_group: this.activeTargetGroup == null ? null : this.activeTargetGroup.id,
             target_group_comment: this.targetComment.val(),
             start_date: startDate,
             end_date: endDate,
-            added_people: added_ppl,
-            removed_people: removed_ppl
+            added_people: this.addedPeople,
+            removed_people: this.removedPeople
         };
-        AJAX.post(Util.url('post/activity'), data, function (response:any) {
-            saveButton.removeClass('btn-warning');
-            saveButton.addClass('btn-success');
-            saveButton.html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Changes saved.');
-        }, function (message:string) {
-            saveButton.removeClass('btn-warning');
-            saveButton.addClass('btn-danger');
-            saveButton.html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Saving failed.');
-            Util.error('An error has occurred while saving. Error message: ' + message);
-        });
-        //this.resetPeople();
-    }
+        return data;
+    };
 
+    /**
+     * Adjusts the people property to account for changes in people added/removed from the programme
+     */
+    private savePeople() {
+        for (var i = 0; i < this.addedPeople.length; i++) {
+            var item = this.addedPeople[i];
+            if (!Util.isInCmp(item, this.people, cmpIds))
+                this.people.push(item);
+        }
+        for (var i = 0; i < this.removedPeople.length; i++) {
+            var item = this.removedPeople[i];
+            Util.removeFromArrayCmp(item, this.people, cmpIds);
+        }
+    };
+
+    /**
+     * Resets the suggestion engine and re-establishes the link to it (submits etc)
+     */
     private resetPeople(){
-        /*this.addedPeople = [];
-        this.removedPeople = [];
-        this.existingPeople.resetAdded();*/
+        this.displayPeople();
         this.existingPeople.resetBloodhound();
-        //this.displayPeople();
         this.makeLinkWithSuggestions();
     }
 
@@ -628,6 +700,10 @@ class ActivityInformation {
         });
     }
 
+    /**
+     * Adds the submit functions for the suggestion engine: Either Enter-press or on-click can add a person to the activity
+     * Subsequently adds the person to the activity
+     */
     private makeLinkWithSuggestions(){
         var ta = $('.twitter-typeahead');
         ta.keyup(function(e){
@@ -671,19 +747,6 @@ class ActivityInformation {
             dropD.append(option);
         }
     }
-
-    /*private resetTimer(){
-        $.idleTimer(600);
-        var that = this;
-        $(document).bind("idle.idleTimer", that.save);
-        $(document).bind("active.idleTimer", that.resetTimer);
-    }
-
-    private save(){
-        //console.log("saving...");
-        $.idleTimer('destroy');
-        this.resetTimer();
-    }*/
 
     /**
      * Displays the comment for the target group
@@ -746,21 +809,29 @@ class ActivityInformation {
      * @param people
      */
     private displayPeople(){
-        var people = this.people.concat(this.addedPeople);
+        var people = this.people;
+        for(var i = 0; i < this.addedPeople.length; i++){
+            var item = this.addedPeople[i];
+            if(!Util.isInCmp(item, people, cmpIds))
+                people.push(item)
+        }
         people = Util.arraySubtract(people, this.removedPeople);
-        acGlobal.peopleTable.empty();
-        people.sort(sortParticipants);
-        console.log(people);
+        this.peopleTable.empty();
+        people.sort(cmpNames);
+        //console.log(people);
         for(var i = 0; i < people.length; i++) {
             var person:ParticipantData = people[i];
             this.displayPerson(person);
         }
     }
 
+    /**
+     * Adds a row to the table showing the people currently in the activity
+     * @param person
+     */
     private displayPerson(person:ParticipantData) {
         var that = this;
-        if (!Util.isIn(person, this.removedPeople)){// && ((Util.isValIn(person, this.people, 'id') && !Util.isValIn(person, this.addedPeople, 'id')) || (!Util.isValIn(person, this.people, 'id') && Util.isValIn(person, this.addedPeople, 'id')))) {
-            var row = $('<td class="col-md-11"></td>');
+            var row = $('<td class="col-md-11 selectionItem clickable"></td>');
             row.append(person.name);
             var removeButton = $('<td class="col-md-1"><button type="button" class="btn btn-xs btn-default" style="display:block; text-align:center"><small><span class="glyphicon glyphicon-remove" aria-hidden="false"></span></small></button></td>');
             that.addRemoveClick(removeButton, person);
@@ -769,25 +840,29 @@ class ActivityInformation {
             fullRow.append(removeButton);
             that.addOnClickToRow(row, person.id);
             that.peopleTable.append(fullRow);
-        }
     }
 
+    /**
+     * Adds the onclick function: If a user wants to remove a person, we have to add it to the suggestion field
+     * Also have to remove it from the people table
+     * @param button
+     * @param person
+     */
     private addRemoveClick(button, person:ParticipantData) {
         var that = this;
         var timer;
         function removePerson(e) {
-            var c = e.data; //context
-            //console.log('removing from activityinfo array added people name ' + c.person.name);
-            Util.removeFromArray(c.person, c.that.addedPeople);
-            c.that.removedPeople.push(c.person);
+            var c = e.data;
+            Util.removeFromArrayCmp(c.person, c.that.addedPeople, cmpIds);
+            if(!Util.isInCmp(c.person, c.that.removedPeople, cmpIds))
+                c.that.removedPeople.push(c.person);
             c.that.existingPeople.addItemToSuggestions(c.person);
-            //that.removePerson.call(null, person.id);
-            c.that.displayPeople();
-            c.that.existingPeople.resetBloodhound();
-            c.that.makeLinkWithSuggestions();
             clearTimeout(timer);
             timer = setTimeout(function() {
+                //console.log('saving because person removed');
                 c.that.save();
+                c.that.existingPeople.resetBloodhound();
+                c.that.makeLinkWithSuggestions();
             }, AJAX_DELAY);
         }
         button.click({person: person, that: that}, removePerson);
@@ -805,13 +880,35 @@ class ActivityInformation {
     }
 }
 
-function sortParticipants(a, b) {
+/**
+ * Compare function for property name
+ * @param a
+ * @param b
+ * @returns {number}
+ */
+function cmpNames(a, b) {
     if (a.name > b.name)
         return 1;
     if (b.name > a.name)
         return -1;
     return 0;
 }
+
+/**
+ * Compare function for property id
+ * @param a
+ * @param b
+ * @returns {number}
+ */
+function cmpIds(a, b) {
+    if (parseInt(a.id) > parseInt(b.id))
+        return 1;
+    if (parseInt(b.id) > parseInt(a.id))
+        return -1;
+    return 0;
+}
+
+
 
 /**
  * Function for handling the event of adding a new person
@@ -821,15 +918,18 @@ function sortParticipants(a, b) {
 function addItemFromSuggestion(e, item){
     var c = e.data;
     //console.log('adding activityinfo array added people name ' + item.name);
-    if(Util.isIn(item, c.that.removedPeople)){
-        Util.removeFromArray(item, c.that.removedPeople);
-    } else {
+    Util.removeFromArrayCmp(item, c.that.removedPeople, cmpIds);
+    if(!Util.isInCmp(item, c.that.addedPeople, cmpIds))
         c.that.addedPeople.push(item);
-    }
     c.that.existingPeople.removeItemFromSuggestions(item);
-    c.that.displayPeople();
-    c.that.existingPeople.resetBloodhound();
-    c.that.makeLinkWithSuggestions();
+    var timer;
+    clearTimeout(timer);
+    timer = setTimeout(function() {
+        //console.log('saving because person added');
+        c.that.save();
+        c.that.existingPeople.resetBloodhound();
+        c.that.makeLinkWithSuggestions();
+    });
 }
 
 $(document).ready(function () {
