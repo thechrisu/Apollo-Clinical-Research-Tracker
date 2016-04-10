@@ -1,7 +1,8 @@
 {
   "require": {
     "doctrine/orm": "*",
-    "philo/laravel-blade": "3.*"
+    "philo/laravel-blade": "3.*",
+    "faisalman/simple-excel-php": "0.3.*"
   },
   "require-dev": {
     "phpunit/phpunit": "3.7.*",

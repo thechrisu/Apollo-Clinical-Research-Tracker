@@ -12,6 +12,7 @@ namespace Apollo\Controllers;
 use Apollo\Apollo;
 use Apollo\Components\Activity;
 use Apollo\Components\DB;
+use Apollo\Components\ExcelExporter;
 use Apollo\Components\TargetGroup;
 use Apollo\Components\Field;
 use Apollo\Components\Person;
@@ -314,6 +315,12 @@ class GetController extends GenericController
             $response['error'] = ['id' => 1, 'description' => 'The supplied ID is invalid!'];
         }
         echo json_encode($response);
+    }
+
+    public function actionPeopleExcel()
+    {
+        $ee = new ExcelExporter();
+        $ee->getTestFile();
     }
 
     /**
