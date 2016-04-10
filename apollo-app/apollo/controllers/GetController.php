@@ -198,7 +198,9 @@ class GetController extends GenericController
         /**
          * @var RecordEntity[] $other_records
          */
-        $other_records = Record::getRepository()->findBy(['person' => $record->getPerson()->getId(), 'is_hidden' => 0]);
+        $person = $record->getPerson();
+        $other_records = Record::getRepository()->findBy(['person' => $person->getId(), 'is_hidden' => 0]);
+
         $id_array = [];
         $name_array = [];
         foreach ($other_records as $other_record) {
@@ -208,9 +210,9 @@ class GetController extends GenericController
             }
         }
         return [
-            "given_name" => $record->getPerson()->getGivenName(),
-            "middle_name" => $record->getPerson()->getMiddleName(),
-            "last_name" => $record->getPerson()->getLastName(),
+            "given_name" => $person->getGivenName(),
+            "middle_name" => $person->getMiddleName(),
+            "last_name" => $person->getLastName(),
             "email" => $record->findVarchar(FIELD_EMAIL),
             "address" => $record->findMultiple(FIELD_ADDRESS),
             "phone" => $record->findVarchar(FIELD_PHONE),
@@ -218,12 +220,23 @@ class GetController extends GenericController
             "publications" => $record->findMultiple(FIELD_PUBLICATIONS),
             "start_date" => $record->findDateTime(FIELD_START_DATE)->format('Y-m-d H:i:s'),
             "end_date" => $record->findDateTime(FIELD_END_DATE)->format('Y-m-d H:i:s'),
-            "person_id" => $record->getPerson()->getId(),
+            "person_id" => $person->getId(),
             "record_id" => $record->getId(),
             "record_name" => $record->findVarchar(FIELD_RECORD_NAME),
             "record_ids" => $id_array,
-            "record_names" => $name_array
+            "record_names" => $name_array,
+            "activities" => $this->getFormattedActivitiesOfPerson($person)
         ];
+    }
+
+    private function getFormattedActivitiesOfPerson($person)
+    {
+        $activities = $person->getActivities();
+        $ret = [];
+        foreach($activities as $activity){
+            $ret[] = $this->getFormattedShortActivityData($activity);
+        }
+        return $ret;
     }
 
     /**

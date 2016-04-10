@@ -45,6 +45,7 @@ var SingleView = (function () {
                 LoaderManager.destroyLoader(loader);
             });
         });
+        var that = this;
         var loader2 = LoaderManager.createLoader($('#additional-panel'));
         LoaderManager.showLoader(loader2, function () {
             var awards = new DataTextMultiple(data.awards);
@@ -55,8 +56,11 @@ var SingleView = (function () {
             var publicationsContainer = $('#publications');
             publicationsContainer.html('');
             publications.render(publicationsContainer);
-            var activitiesContainer = $('#activities');
-            activitiesContainer.html('<div class="apollo-data-text-multiple"><span class="undefined">None</span></div>');
+            that.activityTable = $('#activities');
+            if (!data.activities)
+                that.activityTable.html('<div class="apollo-data-text-multiple"><span class="undefined">None</span></div>');
+            else
+                that.addActivitiesToTable(data);
             LoaderManager.hideLoader(loader2, function () {
                 LoaderManager.destroyLoader(loader2);
             });
@@ -96,6 +100,43 @@ var SingleView = (function () {
                 LoaderManager.destroyLoader(loader);
             });
         });
+    };
+    /**
+     * With the data of all the activities, it successively creates the rows for each activity
+     * @param data
+     */
+    SingleView.prototype.addActivitiesToTable = function (data) {
+        this.activityTable.empty();
+        this.activityTable.append($('<div class="table-responsive menu-loader-ready" id="activityTable"><table class="table table-hover small-table table-condensed no-border-top"><tbody id="activity-table-body"></tbody></table></div>'));
+        this.activityTable = $('#activity-table-body');
+        for (var i = 0; i < data.activities.length; i++) {
+            var item = data.activities[i];
+            this.addActivityToTable(item);
+        }
+    };
+    /**
+     * Successively adds the parameters to one row and adds it to the DOM.
+     * @param data
+     */
+    SingleView.prototype.addActivityToTable = function (data) {
+        var row;
+        var startD;
+        var endD;
+        var that = this;
+        startD = Util.formatShortDate(Util.parseSQLDate(data.start_date));
+        endD = Util.formatShortDate(Util.parseSQLDate(data.end_date));
+        row = $('<tr></tr>');
+        row.append('<td>' + Util.shortify(data.name, 20) + '</td>');
+        row.append('<td>' + startD + '-' + endD + '</td>');
+        row.click(function () {
+            that.displayActivity.call(null, data.id);
+        });
+        row.addClass('selectionItem');
+        row.addClass('clickable');
+        this.activityTable.append(row);
+    };
+    SingleView.prototype.displayActivity = function (activityId) {
+        Util.to('/activity/view/' + activityId);
     };
     SingleView.prototype.setupButtons = function (data) {
         var dropdownCurrent = $('#current-record');

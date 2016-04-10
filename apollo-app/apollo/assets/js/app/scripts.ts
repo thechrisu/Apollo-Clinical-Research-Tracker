@@ -54,9 +54,18 @@ interface EssentialData {
     record_id:number,
     record_name:string,
     record_ids:number[],
-    record_names:string[]
-
+    record_names:string[],
+    activities:ShortActivityData[]
 }
+
+interface ShortActivityData {
+    name:string,
+    start_date:string,
+    end_date:string,
+    id:string
+}
+
+
 /**
  * Default error interface
  * @since 0.0.3
