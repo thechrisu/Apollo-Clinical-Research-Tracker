@@ -19,7 +19,7 @@ use Apollo\Helpers\URLHelper;
             <tr>
                 <th>Field name</th>
                 <th>Type</th>
-                <th>Subtype</th>
+                <th>Defaults</th>
                 <th>Actions</th>
             </tr>
             </thead>

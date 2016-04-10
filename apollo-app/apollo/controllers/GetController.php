@@ -793,7 +793,7 @@ class GetController extends GenericController
             $fieldData['defaults'] = $defaultsData;
             $data[] = $fieldData;
         }
-        $response['data'] = $data;
+        $response['data'] = array_reverse($data);
         echo json_encode($response);
     }
 }

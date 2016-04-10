@@ -60,9 +60,7 @@ use Apollo\Helpers\URLHelper;
              --><a href="#" id="record-edit" class="btn btn-sm btn-warning disabled"><span
                             class="glyphicon glyphicon-pencil"
                             aria-hidden="true"></span>Edit</a><!--
-             --><a href="#" id="record-hide" class="btn btn-sm btn-danger disabled"><span
-                            class="glyphicon glyphicon-remove"
-                            aria-hidden="true"></span>Hide</a>
+             --><a href="#" id="record-hide" class="btn btn-sm btn-danger disabled"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Hide</a>
             </span>
             <span>
                 <span>Current record:</span><!--

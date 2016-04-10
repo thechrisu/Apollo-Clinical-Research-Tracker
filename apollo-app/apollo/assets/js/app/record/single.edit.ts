@@ -184,7 +184,7 @@ class SingleView {
                         } else if (field.is_multiple) {
                             renderable = new InputTextMultiple(field.id, function (id:number, value:string[]) {
                                 that.submitCallback('text-multiple', id, value);
-                            }, {placeholder: field.name}, <string[]> field.value)
+                            }, {placeholder: field.name}, <string[]> field.value);
                         } else {
                             renderable = new InputText(field.id, function (id:number, value:string) {
                                 that.submitCallback('text', id, value);
