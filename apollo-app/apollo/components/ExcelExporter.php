@@ -6,9 +6,11 @@
  */
 
 namespace Apollo\Components;
+use Apollo\Apollo;
 use Apollo\Components\Record;
 use Apollo\Components\Field;
 use Apollo\Components\Person;
+use Exception;
 use SimpleExcel\SimpleExcel;
 use SimpleExcel\Writer\BaseWriter;
 use SimpleExcel\Writer\XLSXWriter;
@@ -26,27 +28,76 @@ use SimpleExcel\Writer\XLSXWriter;
  */
 class ExcelExporter
 {
-    //private function getRecordInformation
-    public function getTestFile()
+    public function getDataFromRecordIds($record_ids){
+        $people = Record::getPeopleFromRecordIds($record_ids);
+
+        $headers = array_merge(Field::getFieldNames(), ['record name']);
+        $headers = array_merge($headers, ['activities']);
+        $data = [];
+        $i = 0;
+        while(empty($people[$i]))
+            $i++;
+        for($data[] = $this->getPersonDataAsArray($people[$i]); $i < count($people); $i++){
+            if(!empty($people[$i])){
+                $temp = $this->getPersonDataAsArray($people[$i]);
+                if(!empty($temp)){
+                    $data = array_merge($data, [$temp]);
+                }
+            }
+        }
+        $this->sendXML('people', $headers, $data);
+    }
+
+    private function getPersonDataAsArray($person)
     {
-        $excel = new SimpleExcel('XML');                    // instantiate new object (will automatically construct the parser & writer type as XML)
-        $record = Record::getRepository()->find(1);
-        $essential = Record::getFormattedFields($record, true);
-        $non_essential = Record::getFormattedFields($record, false);
-        $activityNames = Person::getActivityNames($record->getPerson());
-        $formattedNames = Data::concatMultiple($activityNames);
-        $strings = array_merge(Data::formattedDataArrayToString($essential), Data::formattedDataArrayToString($non_essential));
-        $strings = array_merge($strings, [$formattedNames]);
-        $headers = array_merge(Field::getFieldNames(), ['activities']);
+        try {
+            $data = [];
+            foreach ($person->getRecords() as $record) {
+                $temp = $this->getRecordDataAsArray($record);
+                if (!empty($temp)) {
+                    $data[] = $temp;
+                }
+            }
+            return $data;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    private function getRecordDataAsArray($record)
+    {
+        if(!$record->getIsHidden()) {
+            try {
+                $essential = Record::getFormattedFields($record, true);
+                $record_name = $record->getName();
+                $non_essential = Record::getFormattedFields($record, false);
+                $activityNames = Person::getActivityNames($record->getPerson());
+                $formattedNames = Data::concatMultiple($activityNames);
+                $strings = array_merge($record_name, Data::formattedDataArrayToString($essential));
+                $strings = array_merge($strings, Data::formattedDataArrayToString($non_essential));
+                $strings = array_merge($strings, [$formattedNames]);
+                return $strings;
+            } catch (Exception $e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    //private function getRecordInformation
+    public function sendXML($fileName, $headers, $strings)
+    {
+        $excel = new SimpleExcel('XML');
 
         $excel->writer->setData(
             array
             (
-                array_merge(Field::getFieldNames(), ['activities']),
-                $strings,
+                $headers,
+                $strings
             )
         );                                                  // add some data to the writer
-        $excel->writer->saveFile('people-' . date('Y-m-d'));
+        $excel->writer->saveFile($fileName . '-' . date('Y-m-d'));
     }
 
 }

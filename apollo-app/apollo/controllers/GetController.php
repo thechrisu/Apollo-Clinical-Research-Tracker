@@ -266,8 +266,11 @@ class GetController extends GenericController
 
     public function actionPeopleExcel()
     {
+        $data = $this->parseRequest(['ids' => null]);
         $ee = new ExcelExporter();
-        $ee->getTestFile();
+        if(!empty($data['ids']))
+            $ee->getDataFromRecordIds($data['ids']);
+        //$ee->getTestFile();
     }
 
     /**

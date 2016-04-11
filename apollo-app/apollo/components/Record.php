@@ -11,6 +11,7 @@ namespace Apollo\Components;
 use Apollo\Apollo;
 use Apollo\Entities\FieldEntity;
 use Apollo\Entities\RecordEntity;
+use Exception;
 
 
 /**
@@ -50,6 +51,19 @@ class Record extends DBComponent
         }
     }
 
+    public static function getValidRecordWithId($record_id) {
+        try{
+            $record = Record::getRepository()->findOneBy(['is_hidden' => false, 'id' => $record_id, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
+            if(!empty($record))
+                return $record;
+            else
+                return null;
+        } catch (Exception $e) {
+            return null;
+        }
+
+    }
+
     public static function getFormattedFields($record, $is_essential) {
         $fieldsData = [];
         $fieldRepo = Field::getRepository();
@@ -70,5 +84,16 @@ class Record extends DBComponent
     {
         $fieldData = $record->findOrCreateData($field->getId());
         return Data::getFormattedData($fieldData);
+    }
+
+    public static function getPeopleFromRecordIds($record_ids)
+    {
+        $people = [];
+        foreach($record_ids as $id){
+            $temp = self::getValidRecordWithId($id);
+            if(!empty($temp) && !in_array($temp->getPerson(), $people, true))
+                $people[] = $temp->getPerson();
+        }
+        return $people;
     }
 }
