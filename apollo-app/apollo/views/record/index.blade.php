@@ -87,18 +87,18 @@ use Apollo\Helpers\URLHelper;
                        aria-label="Quick Search">
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 col-sx-12 top-buffer">
+        <div class="col-md-2 col-sm-6 col-sx-12 top-buffer">
             <a href="{{ URLHelper::url('record/search') }}" class="btn btn-primary btn-block"><span
                         class="glyphicon glyphicon-search"
                         aria-hidden="true"></span>Advanced search</a>
         </div>
-        <div class="col-md-3 col-sm-6 col-sx-12 top-buffer">
+        <div class="col-md-2 col-sm-6 col-sx-12 top-buffer">
             <a href="#" id="add-record" class="btn btn-success btn-block"><span class="glyphicon glyphicon-plus"
                                                                                 aria-hidden="true"></span>Add record</a>
         </div>
-        {{--<div class="col-lg-1 col-md-3 col-sm-6 col-sx-12 top-buffer">--}}
-            {{--<a href="{{URLHelper::url('get/peopleexcel')}}" target="_blank" id="download-records" class="btn btn-warning btn-block" > <span class="glyphicon glyphicon-download" aria-hidden="true"></span>DL</a>--}}
-        {{--</div>--}}
+        <div class="col-lg-2 col-md-2 col-sm-6 col-sx-12 top-buffer">
+            <a href="{{URLHelper::url('get/peopleexcel')}}" target="_blank" id="download-records" class="btn btn-warning btn-block" > <span class="glyphicon glyphicon-download" aria-hidden="true"></span>Download</a>
+        </div>
     </div>
     <div class="table-responsive top-buffer loader-ready">
         <table class="table table-striped table-hover">
