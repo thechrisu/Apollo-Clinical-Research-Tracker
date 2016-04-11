@@ -157,7 +157,7 @@ var PeopleField = (function () {
         this.activity_id = id;
     };
     return PeopleField;
-}());
+})();
 /**
  * Defines the menu/table on the left of the view. Also responsible for all the buttons and their functions
  * @version 0.0.7
@@ -426,7 +426,7 @@ var ActivityTable = (function () {
         Util.to('/activity/view/' + activityId);
     };
     return ActivityTable;
-}());
+})();
 /**
  * Carries out all the tasks related to displaying the actual information of one activity on the right of the view
  * @since 0.0.6
@@ -782,7 +782,7 @@ var ActivityInformation = (function () {
         });
     };
     return ActivityInformation;
-}());
+})();
 /**
  * Compare function for property name
  * @param a
