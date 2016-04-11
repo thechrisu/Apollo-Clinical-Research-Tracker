@@ -56,6 +56,7 @@ var SingleView = (function () {
             var publicationsContainer = $('#publications');
             publicationsContainer.html('');
             publications.render(publicationsContainer);
+            that.activityTable = $('#activities');
             if (data.activities == null || data.activities.length < 1)
                 that.activityTable.html('<div class="apollo-data-text-multiple"><span class="undefined">None</span></div>');
             else
@@ -105,34 +106,42 @@ var SingleView = (function () {
      * @param data
      */
     SingleView.prototype.addActivitiesToTable = function (data) {
-        var activityTable = $('#activities');
-        activityTable.empty();
+        this.activityTable.empty();
+        this.activityTable.append($('<div class="table-responsive menu-loader-ready" id="activityTable"><table class="table table-hover small-table table-condensed no-border-top"><tbody id="activity-table-body"></tbody></table></div>'));
+        this.activityTable = $('#activity-table-body');
         for (var i = 0; i < data.activities.length; i++) {
             var item = data.activities[i];
-            this.addActivityToTable(activityTable, item);
+            this.addActivityToTable(item);
         }
+    };
+    SingleView.prototype.getTd = function () {
+        return $('<td></td>');
     };
     /**
      * Successively adds the parameters to one row and adds it to the DOM.
      * @param target
      * @param data
      */
-    SingleView.prototype.addActivityToTable = function (target, data) {
-        //TODO: Perhaps display full activity name on hover?
+    SingleView.prototype.addActivityToTable = function (data) {
         var row;
         var startD;
         var endD;
+        var that = this;
         startD = Util.formatShortDate(Util.parseSQLDate(data.start_date));
         endD = Util.formatShortDate(Util.parseSQLDate(data.end_date));
         row = $('<div class="apollo-data-text-multiple"></div>');
-        row.append('<span>' + Util.shortify(data.name, 20) + '</span>');
-        row.append('<span class="pull-right undefined">' + startD + ' - ' + endD + '</span>');
+        var name = $('<span></span>');
+        name.text(Util.shortify(data.name, 20));
+        row.append(name);
+        var date = $('<span class="pull-right undefined"></span>');
+        date.text(startD + ' - ' + endD);
+        row.append(date);
         row.click(function () {
             Util.to('/activity/view/' + data.id);
         });
         row.addClass('selectionItem');
         row.addClass('clickable');
-        target.append(row);
+        this.activityTable.append(row);
     };
     SingleView.prototype.setupButtons = function (data) {
         var dropdownCurrent = $('#current-record');

@@ -24,6 +24,7 @@ interface RecordData {
 }
 
 class SingleView {
+    private activityTable:JQuery;
 
     public load() {
         var that = this;
@@ -68,6 +69,7 @@ class SingleView {
             var publicationsContainer = $('#publications');
             publicationsContainer.html('');
             publications.render(publicationsContainer);
+            that.activityTable = $('#activities');
 
             if(data.activities == null || data.activities.length < 1)
                 that.activityTable.html('<div class="apollo-data-text-multiple"><span class="undefined">None</span></div>');
@@ -120,12 +122,17 @@ class SingleView {
      * @param data
      */
     private addActivitiesToTable(data) {
-        var activityTable = $('#activities');
-        activityTable.empty();
+        this.activityTable.empty();
+        this.activityTable.append($('<div class="table-responsive menu-loader-ready" id="activityTable"><table class="table table-hover small-table table-condensed no-border-top"><tbody id="activity-table-body"></tbody></table></div>'));
+        this.activityTable = $('#activity-table-body');
         for (var i = 0; i < data.activities.length; i++) {
             var item:ShortActivityData = data.activities[i];
-            this.addActivityToTable(activityTable, item);
+            this.addActivityToTable(item);
         }
+    }
+
+    private getTd(){
+        return $('<td></td>');
     }
 
     /**
@@ -133,22 +140,26 @@ class SingleView {
      * @param target
      * @param data
      */
-    private addActivityToTable(target:JQuery, data:ShortActivityData) {
-        //TODO: Perhaps display full activity name on hover?
+    private addActivityToTable(data:ShortActivityData) {
         var row:JQuery;
         var startD;
         var endD;
+        var that = this;
         startD = Util.formatShortDate(Util.parseSQLDate(<string> data.start_date));
         endD = Util.formatShortDate(Util.parseSQLDate(<string> data.end_date));
         row = $('<div class="apollo-data-text-multiple"></div>');
-        row.append('<span>' + Util.shortify(data.name, 20) + '</span>');
-        row.append('<span class="pull-right undefined">' + startD + ' - ' + endD + '</span>');
+        var name = $('<span></span>');
+        name.text(Util.shortify(data.name, 20));
+        row.append(name);
+        var date = $('<span class="pull-right undefined"></span>');
+        date.text(startD + ' - ' + endD);
+        row.append(date);
         row.click(function() {
             Util.to('/activity/view/' + data.id);
         });
         row.addClass('selectionItem');
         row.addClass('clickable');
-        target.append(row);
+        this.activityTable.append(row);
     }
 
     private setupButtons(data:EssentialData) {
