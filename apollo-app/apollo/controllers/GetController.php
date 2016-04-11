@@ -443,7 +443,7 @@ class GetController extends GenericController
      */
     private function getInfoActivity(ActivityEntity $activity)
     {
-        $people = $this->formatPeopleShortConcatName($activity->getPeople());
+        $people = $this->formatPeopleShortWithRecords($activity->getPeople());
         $activityInfo = [
             'error' => null,
             'id' => $activity->getId(),
@@ -507,7 +507,7 @@ class GetController extends GenericController
                 $response['error'] = null;
                 $query = $pqb->getQuery();
                 $result = $query->getResult();
-                $response['data'] = $this->formatPeopleShortConcatName($result);
+                $response['data'] = $this->formatPeopleShortWithRecords($result);
             } catch (Exception $e) {
                 $response['error'] = $this->getJSONError(1, "Query failed with exception " . $e->getMessage());
             }
@@ -525,6 +525,23 @@ class GetController extends GenericController
         foreach ($people as $person) {
             $person_obj = [
                 'id' => $person->getId(),
+                'name' => implode(' ', [$person->getGivenName(), $person->getMiddleName(), $person->getLastName()])
+            ];
+            $people_obj[] = $person_obj;
+        }
+        return $people_obj;
+    }
+
+    /**
+     * @param $people
+     * @return array
+     */
+    private function formatPeopleShortWithRecords($people)
+    {
+        $people_obj = [];
+        foreach ($people as $person) {
+            $person_obj = [
+                'id' => $person->getRecords()[0]->getId(),
                 'name' => implode(' ', [$person->getGivenName(), $person->getMiddleName(), $person->getLastName()])
             ];
             $people_obj[] = $person_obj;
