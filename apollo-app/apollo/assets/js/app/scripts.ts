@@ -96,6 +96,9 @@ interface Attributes {
  */
 class Util {
 
+    public static getOuterHTML(elem:JQuery){
+        return $('<div />').append(elem.eq(0).clone()).html();
+    }
     /**
      * Returns the full URL to resource
      *
@@ -110,6 +113,22 @@ class Util {
             url += '/';
         }
         return url;
+    }
+
+    public static escapeHTML(unsafe:string){
+        var cast = '';
+        if((typeof unsafe).localeCompare("string") == 0)
+            cast = unsafe;
+        else
+            cast = unsafe; //unsafe.toString();
+        return cast
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        //return _.escape(midsafe);
+        //return midsafe;
     }
 
     /**
@@ -226,6 +245,7 @@ class Util {
      */
     public static shortify(str:string, maxLength:number) {
         var res:string = str;
+        str = <string> str;
         if(str.length > maxLength) {
             var spliceLocation = maxLength - 3;
             res = str.substring(0, spliceLocation);

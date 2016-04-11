@@ -120,11 +120,15 @@ class RecordTable {
 
     private renderTr(data:RecordData) {
         var tr = $('<tr class="record-tr clickable" data-id="' + data.id + '"></tr>');
-        tr.append('<td>' + data.given_name + '</td>');
-        tr.append('<td>' + data.last_name + '</td>');
-        tr.append('<td>' + data.email + '</td>');
-        tr.append('<td>' + data.phone + '</td>');
+        tr.append(this.getTd().text(Util.shortify(data.given_name, 50)));
+        tr.append(this.getTd().text(Util.shortify(data.last_name, 50)));
+        tr.append(this.getTd().text(Util.shortify(data.email, 50)));
+        tr.append(this.getTd().text(Util.shortify(data.phone, 50)));
         this.table.append(tr);
+    }
+
+    private getTd(){
+        return $('<td></td>');
     }
 
 }

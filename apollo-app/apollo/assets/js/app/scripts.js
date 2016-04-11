@@ -39,6 +39,9 @@ var FIELD_PUBLICATIONS = 8;
 var Util = (function () {
     function Util() {
     }
+    Util.getOuterHTML = function (elem) {
+        return $('<div />').append(elem.eq(0).clone()).html();
+    };
     /**
      * Returns the full URL to resource
      *
@@ -54,6 +57,21 @@ var Util = (function () {
             url += '/';
         }
         return url;
+    };
+    Util.escapeHTML = function (unsafe) {
+        var cast = '';
+        if ((typeof unsafe).localeCompare("string") == 0)
+            cast = unsafe;
+        else
+            cast = unsafe; //unsafe.toString();
+        return cast
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        //return _.escape(midsafe);
+        //return midsafe;
     };
     /**
      * Sends the user to specified URL
@@ -160,6 +178,7 @@ var Util = (function () {
      */
     Util.shortify = function (str, maxLength) {
         var res = str;
+        str = str;
         if (str.length > maxLength) {
             var spliceLocation = maxLength - 3;
             res = str.substring(0, spliceLocation);
