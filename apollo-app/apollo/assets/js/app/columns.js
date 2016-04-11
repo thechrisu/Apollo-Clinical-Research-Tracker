@@ -106,11 +106,11 @@ var ColumnRow = (function () {
 var DataField = (function () {
     function DataField(value) {
         this.parentNode = $('<div class="apollo-data-container"></div>');
-        this.parentNode.html(this.parse(value));
+        this.parentNode.append(this.parse(value));
     }
     DataField.prototype.parse = function (value) {
         if (value == null || value.length == 0) {
-            return '<span class="undefined">None</span>';
+            return $('<span class="undefined">None</span>');
         }
         return this.decorate(value);
     };
@@ -125,7 +125,7 @@ var DataText = (function (_super) {
         _super.apply(this, arguments);
     }
     DataText.prototype.decorate = function (value) {
-        return Util.strong(value);
+        return Util.buildNode('strong').text(value);
     };
     return DataText;
 }(DataField));
@@ -135,18 +135,19 @@ var DataTextMultiple = (function (_super) {
         _super.apply(this, arguments);
     }
     DataTextMultiple.prototype.decorate = function (value) {
-        var values = '';
+        var node = Util.buildNode('div');
         for (var i = 0; i < value.length; i++) {
             var string = value[i];
+            var line = $('<div class="apollo-data-text-multiple"></div>');
             if (string == null || string.length == 0) {
-                string = '<span class="undefined">None</span>';
+                line.html('<span class="undefined">None</span>');
             }
             else {
-                string = Util.strong(string);
+                line.append(Util.buildNode('strong').text(string));
             }
-            values += '<div class="apollo-data-text-multiple">' + string + '</div>';
+            node.append(line);
         }
-        return values;
+        return node;
     };
     return DataTextMultiple;
 }(DataField));
@@ -159,7 +160,7 @@ var DataDate = (function (_super) {
         if (Util.isString(value)) {
             value = Util.parseSQLDate(value);
         }
-        return Util.strong(Util.formatDate(value));
+        return Util.buildNode('strong').text(Util.formatDate(value));
     };
     return DataDate;
 }(DataField));
@@ -172,7 +173,7 @@ var DataDateShort = (function (_super) {
         if (Util.isString(value)) {
             value = Util.parseSQLDate(value);
         }
-        return Util.strong(Util.formatShortDate(value));
+        return Util.buildNode('strong').text(Util.formatShortDate(value));
     };
     return DataDateShort;
 }(DataField));
@@ -182,7 +183,7 @@ var DataLongText = (function (_super) {
         _super.apply(this, arguments);
     }
     DataLongText.prototype.decorate = function (value) {
-        return Util.strong(value.replace(/\n/gi, '<br>'));
+        return Util.buildNode('strong').text(value.replace(/\n/gi, '<br>'));
     };
     return DataLongText;
 }(DataField));

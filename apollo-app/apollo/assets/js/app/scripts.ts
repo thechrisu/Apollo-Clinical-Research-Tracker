@@ -457,6 +457,7 @@ class Util {
      * @param value
      * @returns {string}
      * @since 0.1.9
+     * @deprecated
      */
     public static strong(value:string):string {
         return '<strong>' + value + '</strong>';

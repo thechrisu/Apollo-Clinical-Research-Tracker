@@ -386,6 +386,7 @@ var Util = (function () {
      * @param value
      * @returns {string}
      * @since 0.1.9
+     * @deprecated
      */
     Util.strong = function (value) {
         return '<strong>' + value + '</strong>';

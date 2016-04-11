@@ -29,11 +29,11 @@ class ColumnManager {
     }
 
     public add(row:ColumnRow) {
-        if(this.totalRows == null) {
+        if (this.totalRows == null) {
             var bestColumn = this.columns[0];
             for (var i = 0; i < this.columnCount; i++) {
                 var column = this.columns[i];
-                if(column.countRows() < bestColumn.countRows()) {
+                if (column.countRows() < bestColumn.countRows()) {
                     bestColumn = column;
                 }
             }
@@ -128,17 +128,17 @@ abstract class DataField implements Renderable {
 
     public constructor(value:any) {
         this.parentNode = $('<div class="apollo-data-container"></div>');
-        this.parentNode.html(this.parse(value));
+        this.parentNode.append(this.parse(value));
     }
 
-    private parse(value:any) {
-        if(value == null || value.length == 0) {
-            return '<span class="undefined">None</span>';
+    private parse(value:any):JQuery {
+        if (value == null || value.length == 0) {
+            return $('<span class="undefined">None</span>');
         }
         return this.decorate(value);
     }
 
-    protected abstract decorate(value:any):string;
+    protected abstract decorate(value:any):JQuery;
 
     public render(target:JQuery) {
         target.append(this.parentNode);
@@ -146,47 +146,48 @@ abstract class DataField implements Renderable {
 }
 
 class DataText extends DataField {
-    protected decorate(value:string):string {
-        return Util.strong(value);
+    protected decorate(value:string):JQuery {
+        return Util.buildNode('strong').text(value);
     }
 }
 
 class DataTextMultiple extends DataField {
-    protected decorate(value:string[]):string {
-        var values = '';
-        for(var i = 0; i < value.length; i++) {
+    protected decorate(value:string[]):JQuery {
+        var node = Util.buildNode('div');
+        for (var i = 0; i < value.length; i++) {
             var string = value[i];
-            if(string == null || string.length == 0) {
-                string = '<span class="undefined">None</span>';
+            var line = $('<div class="apollo-data-text-multiple"></div>');
+            if (string == null || string.length == 0) {
+                line.html('<span class="undefined">None</span>');
             } else {
-                string = Util.strong(string);
+                line.append(Util.buildNode('strong').text(string))
             }
-            values += '<div class="apollo-data-text-multiple">' + string + '</div>';
+            node.append(line);
         }
-        return values;
+        return node;
     }
 }
 
 class DataDate extends DataField {
-    protected decorate(value:Date|string):string {
-        if(Util.isString(value)) {
+    protected decorate(value:Date|string):JQuery {
+        if (Util.isString(value)) {
             value = Util.parseSQLDate(<string> value);
         }
-        return Util.strong(Util.formatDate(<Date> value));
+        return Util.buildNode('strong').text(Util.formatDate(<Date> value));
     }
 }
 
 class DataDateShort extends DataField {
-    protected decorate(value:Date|string):string {
-        if(Util.isString(value)) {
+    protected decorate(value:Date|string):JQuery {
+        if (Util.isString(value)) {
             value = Util.parseSQLDate(<string> value);
         }
-        return Util.strong(Util.formatShortDate(<Date> value));
+        return Util.buildNode('strong').text(Util.formatShortDate(<Date> value));
     }
 }
 
 class DataLongText extends DataField {
-    protected decorate(value:string):string {
-        return Util.strong(value.replace(/\n/gi, '<br>'));
+    protected decorate(value:string):JQuery {
+        return Util.buildNode('strong').text(value.replace(/\n/gi, '<br>'));
     }
 }
