@@ -34,7 +34,7 @@ class FieldEntity
 
     /**
      * @ManyToOne(targetEntity="OrganisationEntity")
-     * @var int
+     * @var OrganisationEntity
      */
     protected $organisation;
 
@@ -109,7 +109,7 @@ class FieldEntity
     }
 
     /**
-     * @return int
+     * @return OrganisationEntity
      */
     public function getOrganisation()
     {
@@ -117,7 +117,7 @@ class FieldEntity
     }
 
     /**
-     * @param int $organisation
+     * @param OrganisationEntity $organisation
      */
     public function setOrganisation($organisation)
     {

@@ -1,10 +1,9 @@
 <?php
 /**
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.5
+ * @version 0.0.6
  */
 use Apollo\Helpers\AssetHelper;
 use Apollo\Helpers\URLHelper;
@@ -12,6 +11,44 @@ use Apollo\Helpers\URLHelper;
 ?>
 @extends('layouts.extended')
 @section('content')
+
+    <div id="add-modal" style="display: none;">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label class="col-md-3 control-label" for="last-name">Field name:</label>
+                <div class="col-md-8">
+                    <input id="add-field-name" name="field-name" placeholder="Field name" type="text"
+                           class="form-control input-md">
+                    <span class="help-block">Display name of the field</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-3 control-label" for="record">Field type:</label>
+                <div class="col-md-8">
+                    <select id="add-field-type" name="record"
+                            class="form-control input-md">
+                        <option value="integer">Integer</option>
+                        <option value="single">Single text input</option>
+                        <option value="multiple">Multiple inputs</option>
+                        <option value="dropdown">Dropdown</option>
+                        <option value="dropdown-other">Dropdown & input</option>
+                        <option value="dropdown-multiple">Multiple options</option>
+                        <option value="date">Date</option>
+                        <option value="text">Long text</option>
+                    </select>
+                    <span class="help-block">Type of the data to be stored</span>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-offset-10 col-md-2">
+            <a href="#" id="add-field" class="btn btn-success btn-block"><span class="glyphicon glyphicon-plus"
+                                                                               aria-hidden="true"></span>Add field</a>
+        </div>
+    </div>
 
     <div class="table-responsive loader-ready">
         <table class="table">

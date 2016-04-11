@@ -166,4 +166,36 @@ var FieldTable = (function () {
 }());
 $(document).ready(function () {
     new FieldTable().load();
+    $('#add-field').click(function (e) {
+        e.preventDefault();
+        bootbox.dialog({
+            title: 'Adding a new field',
+            message: $('#add-modal').html(),
+            buttons: {
+                main: {
+                    label: "Cancel",
+                    className: "btn-primary",
+                    callback: function () {
+                    }
+                },
+                success: {
+                    label: "Add",
+                    className: "btn-success",
+                    callback: function () {
+                        var modal = $('.modal');
+                        var name = modal.find('#add-field-name').val();
+                        var type = modal.find('#add-field-type').val();
+                        AJAX.post(Util.url('post/field/add'), {
+                            name: name,
+                            type: type
+                        }, function (response) {
+                            Util.to('field');
+                        }, function (message) {
+                            Util.error('An error has occurred during the process of adding of a new field. Error message: ' + message);
+                        });
+                    }
+                }
+            }
+        });
+    });
 });
