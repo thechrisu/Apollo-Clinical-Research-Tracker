@@ -40,7 +40,7 @@ var RecordTable = (function () {
         this.addTabFunctions();
         this.addRecordClick();
         this.addAutoSearch();
-        this.addDownload();
+        //this.addDownload();
     };
     RecordTable.prototype.addTabFunctions = function () {
         var that = this;
