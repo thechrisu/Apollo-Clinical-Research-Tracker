@@ -30,6 +30,7 @@ class RecordTable {
 
     private table:JQuery;
     private pagination:JQuery;
+    private downloadElement:JQuery;
     private loader:number;
     private page:number;
     private sort:number;
@@ -62,6 +63,7 @@ class RecordTable {
         this.addTabFunctions();
         this.addRecordClick();
         this.addAutoSearch();
+        this.addDownload();
     }
 
     private addTabFunctions() {

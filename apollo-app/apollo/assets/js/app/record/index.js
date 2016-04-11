@@ -40,6 +40,7 @@ var RecordTable = (function () {
         this.addTabFunctions();
         this.addRecordClick();
         this.addAutoSearch();
+        this.addDownload();
     };
     RecordTable.prototype.addTabFunctions = function () {
         var that = this;
@@ -100,7 +101,7 @@ var RecordTable = (function () {
         this.table.append(tr);
     };
     return RecordTable;
-}());
+})();
 $(document).ready(function () {
     new RecordTable().load();
     $('#add-record').click(function (e) {
