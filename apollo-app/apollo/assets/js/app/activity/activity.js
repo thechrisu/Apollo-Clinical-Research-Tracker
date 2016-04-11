@@ -5,7 +5,7 @@
 ///<reference path="../bootbox.d.ts"/>
 /**
  * Class to store the token field (the field to add/remove users from a activity)
- * @version 0.0.7
+ * @version 0.0.8
  */
 var PeopleField = (function () {
     function PeopleField() {
@@ -62,7 +62,9 @@ var PeopleField = (function () {
             source: that.bh.ttAdapter(),
             templates: {
                 suggestion: function (data) {
-                    var str = '<div class="noselect">' + data.name + '</div>';
+                    var elem = $('<div class="noselect"></div>');
+                    elem.text(Util.shortify(data.name, 45));
+                    var str = Util.getOuterHTML(elem);
                     return str;
                 }
             }
@@ -158,7 +160,7 @@ var PeopleField = (function () {
 })();
 /**
  * Defines the menu/table on the left of the view. Also responsible for all the buttons and their functions
- * @version 0.0.6
+ * @version 0.0.7
  */
 var ActivityTable = (function () {
     function ActivityTable() {
@@ -403,8 +405,12 @@ var ActivityTable = (function () {
         startD = Util.formatShortDate(Util.parseSQLDate(data.start_date));
         endD = Util.formatShortDate(Util.parseSQLDate(data.end_date));
         row = $('<tr></tr>');
-        row.append('<td>' + Util.shortify(data.name, 20) + '</td>');
-        row.append('<td>' + startD + '-' + endD + '</td>');
+        var name = $('<td></td>');
+        name.text(Util.shortify(data.name, 20));
+        row.append(name);
+        var date = $('<td></td>');
+        date.text(startD + '-' + endD);
+        row.append(date);
         row.click(function () {
             that.displayActivity.call(null, data.id);
         });
@@ -423,7 +429,7 @@ var ActivityTable = (function () {
 })();
 /**
  * Carries out all the tasks related to displaying the actual information of one activity on the right of the view
- * @since 0.0.5
+ * @since 0.0.6
  */
 var ActivityInformation = (function () {
     function ActivityInformation() {
@@ -619,9 +625,13 @@ var ActivityInformation = (function () {
         var dropD = $('#target-dropdown');
         dropD.append('<li class="dropdown-header">Choose a target group:</li>');
         var bt = $('#target-button');
-        bt.append(this.activeTargetGroup.name + ' <span class="caret"></span>');
+        bt.text(this.activeTargetGroup.name);
+        bt.append('<span class="caret"></span>');
         for (var i = 0; i < options.length; i++) {
-            var option = $('<li optionNameUnique="' + options[i].name + '" optionIdUnique="' + options[i].id + '"><a>' + options[i].name + '</a></li>');
+            var option = $('<li optionNameUnique="' + Util.escapeHTML(options[i].name) + '" optionIdUnique="' + Util.escapeHTML(options[i].id) + '"></li>');
+            var link = $('<a></a>');
+            link.text(options[i].name);
+            option.append(link);
             var timer;
             if (options[i].id == this.activeTargetGroup.id) {
                 option.addClass('disabled');
@@ -722,8 +732,13 @@ var ActivityInformation = (function () {
     ActivityInformation.prototype.displayPerson = function (person) {
         var that = this;
         var row = $('<td class="col-md-11 selectionItem clickable"></td>');
-        row.append(person.name);
-        var removeButton = $('<td class="col-md-1"><button type="button" class="btn btn-xs btn-default" style="display:block; text-align:center"><small><span class="glyphicon glyphicon-remove" aria-hidden="false"></span></small></button></td>');
+        var width = row.width();
+        row.text(Util.shortify(person.name, 40));
+        var removeButton = $('<td class="col-md-1">' +
+            '<button type="button" class="btn btn-xs btn-default" style="display:block; text-align:center">' +
+            '<small>' +
+            '<span class="glyphicon glyphicon-remove" aria-hidden="false">' +
+            '</span></small></button></td>');
         that.addRemoveClick(removeButton, person);
         var fullRow = $('<tr class="row"></tr>');
         fullRow.append(row);
