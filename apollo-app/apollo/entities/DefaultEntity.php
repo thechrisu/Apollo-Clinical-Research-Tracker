@@ -39,7 +39,7 @@ class DefaultEntity
      * @Column(type="integer")
      * @var int
      */
-    protected $order;
+    protected $_order;
 
     /**
      * @Column(type="string")
@@ -76,7 +76,7 @@ class DefaultEntity
      */
     public function getOrder()
     {
-        return $this->order;
+        return $this->_order;
     }
 
     /**
@@ -84,7 +84,7 @@ class DefaultEntity
      */
     public function setOrder($order)
     {
-        $this->order = $order;
+        $this->_order = $order;
     }
 
     /**

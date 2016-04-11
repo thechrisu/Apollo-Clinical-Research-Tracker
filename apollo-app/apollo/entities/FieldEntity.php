@@ -59,7 +59,7 @@ class FieldEntity
 
     /**
      * @OneToMany(targetEntity="DefaultEntity", mappedBy="field")
-     * @OrderBy({"order" = "ASC"})
+     * @OrderBy({"_order" = "ASC"})
      * @var DefaultEntity[]
      */
     protected $defaults = null;
