@@ -338,9 +338,22 @@ class PostController extends GenericController
                 $error['id'] = 0;
                 $error['description'] = 'Missing post request parameters.';
             }
+        } elseif($action == 'hide') {
+            $data = $this->parseRequest(['id' => 0]);
+            $fieldsRepo = Field::getRepository();
+            /** @var FieldEntity $field */
+            $field = $fieldsRepo->findOneBy(['id' => $data['id'], 'organisation' => Apollo::getInstance()->getUser()->getOrganisation()]);
+            if($field != null) {
+                $field->setIsHidden(true);
+                DB::getEntityManager()->flush();
+            } else {
+                $error['id'] = 0;
+                $error['description'] = 'Invalid ID.';
+            }
         } else {
             $error['id'] = 0;
-            $error['description'] = 'No action was specified.';
+            $error['description'] = 'Invalid action.';
+            $response['error'] = $error;
         }
         echo json_encode($response);
     }
