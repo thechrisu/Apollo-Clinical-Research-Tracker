@@ -20,7 +20,7 @@ use Apollo\Helpers\URLHelper;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.7
+ * @version 0.0.8
  */
 class RecordController extends GenericController
 {
@@ -80,5 +80,17 @@ class RecordController extends GenericController
             ['Record name (Record ID)', null, true]
         ];
         View::render('record.edit', 'Edit Record', $breadcrumbs);
+    }
+
+    /**
+     * Action to deal with advanced search
+     *
+     * TODO: Complete this
+     *
+     * @since 0.0.8
+     */
+    public function actionSearch()
+    {
+
     }
 }
