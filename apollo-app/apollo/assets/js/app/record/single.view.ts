@@ -71,7 +71,7 @@ class SingleView {
             publications.render(publicationsContainer);
             that.activityTable = $('#activities');
 
-            if(!data.activities)
+            if(data.activities == null || data.activities.length < 1)
                 that.activityTable.html('<div class="apollo-data-text-multiple"><span class="undefined">None</span></div>');
             else
                 that.addActivitiesToTable(data);

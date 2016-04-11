@@ -205,6 +205,7 @@ class PostController extends GenericController
      * Parses the data/field info and saves it into database
      *
      * TODO Tim: Fix dates, Extract!!!!!!!!!
+     * TODO: Update records updated_by
      *
      * @since 0.0.4
      */
@@ -338,9 +339,75 @@ class PostController extends GenericController
                 $error['id'] = 0;
                 $error['description'] = 'Missing post request parameters.';
             }
+        } elseif($action == 'add') {
+            $data = $this->parseRequest(['name' => null, 'type' => null]);
+            if(!empty($data['name']) && !empty($data['type'])) {
+                $field = new FieldEntity();
+                $field->setOrganisation(Apollo::getInstance()->getUser()->getOrganisation());
+                $field->setName($data['name']);
+                switch($data['type']) {
+                    case 'integer':
+                        $field->setType(1);
+                        break;
+                    case 'single':
+                        $field->setType(2);
+                        break;
+                    case 'multiple':
+                        $field->setType(2);
+                        $field->setIsMultiple(true);
+                        break;
+                    case 'dropdown':
+                        $field->setType(2);
+                        $field->setHasDefault(true);
+                        break;
+                    case 'dropdown-other':
+                        $field->setType(2);
+                        $field->setHasDefault(true);
+                        $field->setAllowOther(true);
+                        break;
+                    case 'dropdown-multiple':
+                        $field->setType(2);
+                        $field->setHasDefault(true);
+                        $field->setIsMultiple(true);
+                        break;
+                    case 'date':
+                        $field->setType(3);
+                        break;
+                    case 'text':
+                        $field->setType(4);
+                        break;
+                }
+                DB::getEntityManager()->persist($field);
+                DB::getEntityManager()->flush();
+                if(in_array($data['type'], ['dropdown', 'dropdown-other', 'dropdown-multiple'])) {
+                    $default = new DefaultEntity();
+                    $default->setField($field);
+                    $default->setOrder(0);
+                    $default->setValue('Default value');
+                    DB::getEntityManager()->persist($default);
+                    DB::getEntityManager()->flush();
+                }
+            } else {
+                $error['id'] = 0;
+                $error['description'] = 'Missing post request parameters.';
+            }
+        } elseif($action == 'hide') {
+            //TODO: Check if essential
+            $data = $this->parseRequest(['id' => 0]);
+            $fieldsRepo = Field::getRepository();
+            /** @var FieldEntity $field */
+            $field = $fieldsRepo->findOneBy(['id' => $data['id'], 'organisation' => Apollo::getInstance()->getUser()->getOrganisation()]);
+            if($field != null) {
+                $field->setIsHidden(true);
+                DB::getEntityManager()->flush();
+            } else {
+                $error['id'] = 0;
+                $error['description'] = 'Invalid ID.';
+            }
         } else {
             $error['id'] = 0;
-            $error['description'] = 'No action was specified.';
+            $error['description'] = 'Invalid action.';
+            $response['error'] = $error;
         }
         echo json_encode($response);
     }

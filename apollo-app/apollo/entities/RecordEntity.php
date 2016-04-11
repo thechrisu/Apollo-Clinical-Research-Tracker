@@ -232,7 +232,7 @@ class RecordEntity
                 }
                 $data->setIsDefault(true);
             } else if($field->isMultiple()) {
-                $value = [];
+                $value = [''];
                 $data->setLongText(serialize($value));
             }
             DB::getEntityManager()->persist($data);
