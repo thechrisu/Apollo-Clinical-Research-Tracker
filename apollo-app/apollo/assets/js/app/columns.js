@@ -60,7 +60,7 @@ var ColumnManager = (function () {
         this.target.append(this.container);
     };
     return ColumnManager;
-}());
+})();
 var Column = (function () {
     function Column(target) {
         this.target = target;
@@ -87,7 +87,7 @@ var Column = (function () {
         return this.rows.length;
     };
     return Column;
-}());
+})();
 var ColumnRow = (function () {
     function ColumnRow(key, value) {
         this.key = key;
@@ -102,7 +102,7 @@ var ColumnRow = (function () {
         target.append(rowHTML);
     };
     return ColumnRow;
-}());
+})();
 var DataField = (function () {
     function DataField(value) {
         this.parentNode = $('<div class="apollo-data-container"></div>');
@@ -118,7 +118,7 @@ var DataField = (function () {
         target.append(this.parentNode);
     };
     return DataField;
-}());
+})();
 var DataText = (function (_super) {
     __extends(DataText, _super);
     function DataText() {
@@ -128,7 +128,7 @@ var DataText = (function (_super) {
         return Util.strong(value);
     };
     return DataText;
-}(DataField));
+})(DataField);
 var DataTextMultiple = (function (_super) {
     __extends(DataTextMultiple, _super);
     function DataTextMultiple() {
@@ -149,7 +149,7 @@ var DataTextMultiple = (function (_super) {
         return values;
     };
     return DataTextMultiple;
-}(DataField));
+})(DataField);
 var DataDate = (function (_super) {
     __extends(DataDate, _super);
     function DataDate() {
@@ -162,7 +162,7 @@ var DataDate = (function (_super) {
         return Util.strong(Util.formatDate(value));
     };
     return DataDate;
-}(DataField));
+})(DataField);
 var DataDateShort = (function (_super) {
     __extends(DataDateShort, _super);
     function DataDateShort() {
@@ -175,7 +175,7 @@ var DataDateShort = (function (_super) {
         return Util.strong(Util.formatShortDate(value));
     };
     return DataDateShort;
-}(DataField));
+})(DataField);
 var DataLongText = (function (_super) {
     __extends(DataLongText, _super);
     function DataLongText() {
@@ -185,4 +185,4 @@ var DataLongText = (function (_super) {
         return Util.strong(value.replace(/\n/gi, '<br>'));
     };
     return DataLongText;
-}(DataField));
+})(DataField);

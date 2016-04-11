@@ -270,6 +270,8 @@ class GetController extends GenericController
         $ee = new ExcelExporter();
         if(!empty($data['ids']))
             $ee->getDataFromRecordIds($data['ids']);
+        else
+            $ee->downloadAllRecords();
         //$ee->getTestFile();
     }
 

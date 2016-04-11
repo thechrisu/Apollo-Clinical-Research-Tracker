@@ -53,7 +53,7 @@ class Record extends DBComponent
 
     public static function getValidRecordWithId($record_id) {
         try{
-            $record = Record::getRepository()->findOneBy(['is_hidden' => false, 'id' => $record_id, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
+            $record = Record::getRepository()->findBy(['is_hidden' => false, 'id' => $record_id])[0];
             if(!empty($record))
                 return $record;
             else
@@ -91,7 +91,7 @@ class Record extends DBComponent
         $people = [];
         foreach($record_ids as $id){
             $temp = self::getValidRecordWithId($id);
-            if(!empty($temp) && !in_array($temp->getPerson(), $people, true))
+            if(!empty($temp))
                 $people[] = $temp->getPerson();
         }
         return $people;

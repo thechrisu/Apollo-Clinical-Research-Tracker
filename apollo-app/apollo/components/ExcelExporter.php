@@ -28,31 +28,42 @@ use SimpleExcel\Writer\XLSXWriter;
  */
 class ExcelExporter
 {
+
+    public function downloadAllRecords(){
+        $records = Record::getRepository()->findBy(['is_hidden' => false]);
+        $ids = [];
+        foreach($records as $record){
+            $ids[] = $record->getId();
+        }
+        $this->getDataFromRecordIds($ids);
+    }
+
     public function getDataFromRecordIds($record_ids){
         $people = Record::getPeopleFromRecordIds($record_ids);
-
-        $headers = array_merge(Field::getFieldNames(), ['record name']);
-        $headers = array_merge($headers, ['activities']);
+        $headers = array_merge(Field::getFieldNames(), ['activities']);
         $data = [];
         $i = 0;
-        while(empty($people[$i]))
+        while(empty($people[$i]) && $i < count($people))
             $i++;
-        for($data[] = $this->getPersonDataAsArray($people[$i]); $i < count($people); $i++){
-            if(!empty($people[$i])){
-                $temp = $this->getPersonDataAsArray($people[$i]);
-                if(!empty($temp)){
-                    $data = array_merge($data, [$temp]);
+        if($i < count($people)) {
+            for ($data = $this->getPersonDataAsArray($people[$i++]); $i < count($people); $i++) {
+                if (!empty($people[$i])) {
+                    $temp = $this->getPersonDataAsArray($people[$i]);
+                    if (!empty($temp)) {
+                        $data = array_merge($data, $temp);
+                    }
                 }
             }
         }
-        $this->sendXML('people', $headers, $data);
+        $this->sendXML('people', $headers, $data, SORT_NATURAL);
     }
 
     private function getPersonDataAsArray($person)
     {
         try {
             $data = [];
-            foreach ($person->getRecords() as $record) {
+            $records = $person->getRecords();
+            foreach ($records as $record) {
                 $temp = $this->getRecordDataAsArray($record);
                 if (!empty($temp)) {
                     $data[] = $temp;
@@ -66,14 +77,15 @@ class ExcelExporter
 
     private function getRecordDataAsArray($record)
     {
-        if(!$record->getIsHidden()) {
+        if(!$record->isHidden()) {
             try {
                 $essential = Record::getFormattedFields($record, true);
-                $record_name = $record->getName();
+                /*foreach($essential as $item)
+                    echo $item['value'];*/
                 $non_essential = Record::getFormattedFields($record, false);
                 $activityNames = Person::getActivityNames($record->getPerson());
                 $formattedNames = Data::concatMultiple($activityNames);
-                $strings = array_merge($record_name, Data::formattedDataArrayToString($essential));
+                $strings = Data::formattedDataArrayToString($essential);
                 $strings = array_merge($strings, Data::formattedDataArrayToString($non_essential));
                 $strings = array_merge($strings, [$formattedNames]);
                 return $strings;
@@ -89,14 +101,9 @@ class ExcelExporter
     public function sendXML($fileName, $headers, $strings)
     {
         $excel = new SimpleExcel('XML');
+        $data = array_merge([$headers], $strings);
 
-        $excel->writer->setData(
-            array
-            (
-                $headers,
-                $strings
-            )
-        );                                                  // add some data to the writer
+        $excel->writer->setData($data);
         $excel->writer->saveFile($fileName . '-' . date('Y-m-d'));
     }
 
