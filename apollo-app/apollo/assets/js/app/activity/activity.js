@@ -628,7 +628,7 @@ var ActivityInformation = (function () {
         bt.text(this.activeTargetGroup.name);
         bt.append('<span class="caret"></span>');
         for (var i = 0; i < options.length; i++) {
-            var option = $('<li optionNameUnique="' + Util.escapeHTML(options[i].name) + '" optionIdUnique="' + Util.escapeHTML(options[i].id) + '"></li>');
+            var option = $('<li optionNameUnique="' + options[i].name + '" optionIdUnique="' + options[i].id + '"></li>');
             var link = $('<a></a>');
             link.text(options[i].name);
             option.append(link);

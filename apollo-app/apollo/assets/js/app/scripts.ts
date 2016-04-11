@@ -245,6 +245,7 @@ class Util {
      */
     public static shortify(str:string, maxLength:number) {
         var res:string = str;
+        str = <string> str;
         if(str.length > maxLength) {
             var spliceLocation = maxLength - 3;
             res = str.substring(0, spliceLocation);

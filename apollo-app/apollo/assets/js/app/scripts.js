@@ -178,6 +178,7 @@ var Util = (function () {
      */
     Util.shortify = function (str, maxLength) {
         var res = str;
+        str = str;
         if (str.length > maxLength) {
             var spliceLocation = maxLength - 3;
             res = str.substring(0, spliceLocation);
