@@ -406,10 +406,10 @@ var ActivityTable = (function () {
         endD = Util.formatShortDate(Util.parseSQLDate(data.end_date));
         row = $('<tr></tr>');
         var name = $('<td></td>');
-        name.text(Util.shortify(data.name, 20));
+        name.text(Util.shortify(data.name, 22));
         row.append(name);
-        var date = $('<td></td>');
-        date.text(startD + '-' + endD);
+        var date = $('<td class="undefined text-right"></td>');
+        date.append($('<small></small>').text(startD + ' - ' + endD));
         row.append(date);
         row.click(function () {
             that.displayActivity.call(null, data.id);
@@ -735,7 +735,7 @@ var ActivityInformation = (function () {
         var width = row.width();
         row.text(Util.shortify(person.name, 40));
         var removeButton = $('<td class="col-md-1">' +
-            '<button type="button" class="btn btn-xs btn-default" style="display:block; text-align:center">' +
+            '<button type="button" class="btn btn-xs btn-primary" style="display:block; text-align:center">' +
             '<small>' +
             '<span class="glyphicon glyphicon-remove" aria-hidden="false">' +
             '</span></small></button></td>');
