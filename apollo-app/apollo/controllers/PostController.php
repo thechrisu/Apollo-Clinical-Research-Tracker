@@ -392,6 +392,7 @@ class PostController extends GenericController
                 $error['description'] = 'Missing post request parameters.';
             }
         } elseif($action == 'hide') {
+            //TODO: Check if essential
             $data = $this->parseRequest(['id' => 0]);
             $fieldsRepo = Field::getRepository();
             /** @var FieldEntity $field */
