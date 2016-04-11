@@ -14,12 +14,12 @@ use Apollo\Helpers\URLHelper;
 @section('content')
 
     <div class="table-responsive loader-ready">
-        <table class="table table-striped table-hover">
+        <table class="table">
             <thead>
             <tr>
                 <th>Field name</th>
                 <th>Type</th>
-                <th>Parameters</th>
+                <th>Defaults</th>
                 <th>Actions</th>
             </tr>
             </thead>
@@ -31,5 +31,7 @@ use Apollo\Helpers\URLHelper;
 @stop
 @section('scripts')
     @parent
+    <script src="{{ AssetHelper::js('app/inputs') }}"></script>
+    <script src="{{ AssetHelper::js('app/columns') }}"></script>
     <script src="{{ AssetHelper::js('app/field') }}"></script>
 @stop

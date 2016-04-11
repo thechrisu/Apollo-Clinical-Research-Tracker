@@ -2,6 +2,8 @@
 ///<reference path="scripts.ts"/>
 ///<reference path="jquery.d.ts"/>
 ///<reference path="bootbox.d.ts"/>
+///<reference path="inputs.ts"/>
+///<reference path="columns.ts"/>
 /**
  * Fields index typescript
  *
@@ -9,102 +11,44 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.1
+ * @version 0.0.2
  */
 
-interface RecordData {
+interface FieldData {
     id:number,
-    given_name:string,
-    middle_name:string,
-    last_name:string,
-    email:string,
-    phone:string,
+    essential:boolean,
+    name:string,
+    type:number,
+    subtype:number, /*Only for type 2 (varchar): 1->Input, 2->Multiple inputs, 3->Dropdown, 4->Dropdown + Input, 5->Multiple dropdown*/
+    defaults:string[],
 }
 interface TableData {
     error:Error,
-    count:number,
-    data:RecordData[]
+    data:FieldData[]
 }
 
-class RecordTable {
+class FieldTable {
 
     private table:JQuery;
-    private pagination:JQuery;
     private loader:number;
-    private page:number;
-    private sort:number;
-    private search:string;
 
     public load() {
         this.table = $('#table-body');
-        this.pagination = $('#pagination');
         this.loader = LoaderManager.createLoader($('.table-responsive.loader-ready'));
-        this.page = 1;
-        this.sort = 1;
-        this.search = '';
         this.setup();
         this.updateTable();
     }
 
     private setup() {
         var that = this;
-        this.pagination.pagination({
-            items: 0,
-            itemsOnPage: 10,
-            onPageClick: function (page, event) {
-                if(event != null) {
-                    event.preventDefault();
-                }
-                that.page = page;
-                that.updateTable();
-            }
-        });
-        this.addTabFunctions();
-        this.addRecordClick();
-        this.addAutoSearch();
-    }
-
-    private addTabFunctions() {
-        var that = this;
-        $('#sort-tabs').on('click', '.sort-tab', function () {
-            $('.sort-tab').removeClass('active');
-            $(this).addClass('active');
-            that.sort = $(this).data('sort');
-            that.updateTable();
-        });
-    }
-
-    private addRecordClick() {
-        this.table.on('click', '.record-tr', function (e) {
-            e.preventDefault();
-            Util.to('record/view/' + $(this).data('id'));
-        });
-    }
-
-    private addAutoSearch() {
-        var that = this;
-        var timer = null;
-        $('#records-search').keyup(function () {
-            clearTimeout(timer);
-            that.search = encodeURIComponent($(this).val());
-            timer = setTimeout(function () {
-                that.updateTable();
-            }, AJAX_DELAY);
-        });
     }
 
     private updateTable() {
         var that = this;
         LoaderManager.showLoader(that.loader, function () {
-            AJAX.get(Util.url('get/records/?page=' + that.page + '&sort=' + that.sort + '&search=' + that.search, false), function (data:TableData) {
-                if(data.count < (that.page - 1) * 10) {
-                    that.pagination.pagination('selectPage', data.count / 10 - data.count % 10);
-                    return;
-                }
-                that.pagination.pagination('updateItems', data.count);
-                that.table.html('');
-                if (data.count > 0) {
-                    for (var i = 0; i < data.data.length; i++) {
+            AJAX.get(Util.url('get/fields'), function (data:TableData) {
+                if(data.data.length > 0) {
+                    for(var i = 0; i < data.data.length; i++) {
                         that.renderTr(data.data[i]);
                     }
                 } else {
@@ -112,22 +56,109 @@ class RecordTable {
                 }
                 LoaderManager.hideLoader(that.loader);
             }, function (message:string) {
-                Util.error('An error has occurred during the loading of the list of records. Please reload the page or contact the administrator. Error message: ' + message);
+                Util.error('An error has occurred during the loading of the list of fields. Please reload the page or contact the administrator. Error message: ' + message);
             });
         });
     }
 
-    private renderTr(data:RecordData) {
-        var tr = $('<tr class="record-tr clickable" data-id="' + data.id + '"></tr>');
-        tr.append('<td>' + data.given_name + '</td>');
-        tr.append('<td>' + data.last_name + '</td>');
-        tr.append('<td>' + data.email + '</td>');
-        tr.append('<td>' + data.phone + '</td>');
+    private updateCallback(type:string, id:number, value:string|string[], button:JQuery) {
+        var that = this;
+        button.removeClass('btn-danger');
+        button.removeClass('btn-success');
+        button.addClass('btn-warning');
+        button.html('<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>Saving...');
+        var data = {
+            type: type,
+            id: id,
+            value: value
+        };
+        AJAX.post(Util.url('post/field/update'), data, function (response:any) {
+            button.removeClass('btn-warning');
+            button.addClass('btn-success');
+            button.html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Changes saved.');
+        }, function (message:string) {
+            button.removeClass('btn-warning');
+            button.addClass('btn-danger');
+            button.html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Saving failed.');
+            Util.error('An error has occurred during the process of updating of the data. Error message: ' + message);
+        });
+    }
+
+    private renderTr(data:FieldData) {
+        var that = this;
+        var tr = $('<tr class="record-tr' + (data.essential ? ' active' : '') +'" data-id="' + data.id + '"></tr>');
+        var td = $('<td width="25%"></td>');
+        var addButton = $('<button class="btn btn-block btn-sm btn-success disabled"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span>No changes.</button>');
+        var removeButton = $('<button class="btn btn-block btn-sm btn-warning' + (data.essential ? ' disabled' : '') +'"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Hide</a></button>');
+        if(data.essential) {
+            var field = new DataText(data.name);
+            field.render(td);
+        } else {
+            var input = new InputText(data.id, function (id:number, value:string) {
+                (function() {
+                    var button = addButton;
+                    that.updateCallback('name', id, value, button);
+                })();
+            }, {placeholder: 'Field name'}, <string> data.name);
+            input.render(td);
+        }
+        tr.append(td);
+        var type = 'Integer';
+        switch(data.type) {
+            case 2:
+                type = 'String';
+                break;
+            case 3:
+                type = 'Date';
+                break;
+            case 4:
+                type = 'Long text';
+                break;
+        }
+        td = $('<td width="30%"></td>');
+        var subtype = '<span class="undefined">None</span>';
+        if(data.type == 2) {
+            var defaults = false;
+            switch(data.subtype) {
+                case 1:
+                    subtype = 'Single input';
+                    break;
+                case 2:
+                    subtype = 'Multiple inputs';
+                    break;
+                case 3:
+                    subtype = 'Dropdown';
+                    defaults = true;
+                    break;
+                case 4:
+                    subtype = 'Dropdown & input';
+                    defaults = true;
+                    break;
+                case 5:
+                    subtype = 'Multiple options';
+                    defaults = true;
+                    break;
+            }
+        }
+        tr.append('<td width="20%">' + type + '&nbsp;&nbsp; <span class="undefined">/</span> &nbsp;&nbsp;' + subtype + '</td>');
+        if(defaults) {
+            var defaultsInput = new InputTextMultiple(data.id, function (id:number, value:string[]) {
+                that.updateCallback('defaults', id, value, addButton);
+            }, {placeholder: 'Default value'}, <string[]> data.defaults);
+            defaultsInput.render(td);
+        } else {
+            td.html('<span class="undefined">Not applicable</span>');
+        }
+        tr.append(td);
+        var row = $('<div class="row"></div>');
+        row.append($('<div class="col-md-7"></div>').append(addButton));
+        row.append($('<div class="col-md-5"></div>').append(removeButton));
+        tr.append($('<td width="25%"></td>').append(row));
         this.table.append(tr);
     }
 
 }
 
 $(document).ready(function () {
-    new RecordTable().load();
+    new FieldTable().load();
 });

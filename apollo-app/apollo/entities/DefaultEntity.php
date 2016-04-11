@@ -31,7 +31,7 @@ class DefaultEntity
 
     /**
      * @ManyToOne(targetEntity="FieldEntity", inversedBy="defaults")
-     * @var int
+     * @var FieldEntity
      */
     protected $field;
 
@@ -39,7 +39,7 @@ class DefaultEntity
      * @Column(type="integer")
      * @var int
      */
-    protected $order;
+    protected $_order;
 
     /**
      * @Column(type="string")
@@ -56,7 +56,7 @@ class DefaultEntity
     }
 
     /**
-     * @return int
+     * @return FieldEntity
      */
     public function getField()
     {
@@ -64,7 +64,7 @@ class DefaultEntity
     }
 
     /**
-     * @param int $field
+     * @param FieldEntity $field
      */
     public function setField($field)
     {
@@ -76,7 +76,7 @@ class DefaultEntity
      */
     public function getOrder()
     {
-        return $this->order;
+        return $this->_order;
     }
 
     /**
@@ -84,7 +84,7 @@ class DefaultEntity
      */
     public function setOrder($order)
     {
-        $this->order = $order;
+        $this->_order = $order;
     }
 
     /**

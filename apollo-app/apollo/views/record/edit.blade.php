@@ -18,9 +18,7 @@ use Apollo\Helpers\URLHelper;
     <div class="panel panel-default loader-ready" id="essential-panel">
         <div class="panel-heading">
             <span class="pull-right">Record actions:<!--
-             --><a href="#" id="record-save" class="btn btn-sm btn-warning disabled"><span
-                            class="glyphicon glyphicon-refresh"
-                            aria-hidden="true"></span>Loading...</a><!--
+             --><a href="#" id="record-save" class="btn btn-sm btn-warning disabled"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>Loading...</a><!--
              --><a href="#" id="record-view" class="btn btn-sm btn-primary disabled"><span
                             class="glyphicon glyphicon-eye-open"
                             aria-hidden="true"></span>View Record</a>
