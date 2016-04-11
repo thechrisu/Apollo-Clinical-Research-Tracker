@@ -63,7 +63,6 @@ class RecordTable {
         this.addTabFunctions();
         this.addRecordClick();
         this.addAutoSearch();
-        this.addDownload();
     }
 
     private addTabFunctions() {
