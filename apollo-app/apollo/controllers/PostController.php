@@ -11,6 +11,7 @@ namespace Apollo\Controllers;
 
 use Apollo\Apollo;
 use Apollo\Components\DB;
+use Apollo\Entities\DefaultEntity;
 use Doctrine\ORM\EntityRepository;
 use Apollo\Components\Activity;
 use Apollo\Components\Field;
@@ -37,7 +38,7 @@ use Symfony\Component\Debug\Exception\FatalErrorException;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.9
+ * @version 0.1.0
  */
 class PostController extends GenericController
 {
@@ -278,6 +279,68 @@ class PostController extends GenericController
             }
         } else {
             $response['error'] = $this->getJSONError(1, 'Supplied record ID is invalid.');
+        }
+        echo json_encode($response);
+    }
+
+    /**
+     * Action responsible for handling requests related to fields
+     *
+     * @param string $action
+     */
+    public function actionField($action = null)
+    {
+        $response['error'] = null;
+        if($action == 'update') {
+            $data = $this->parseRequest(['type' => null, 'id' => 0, 'value' => null]);
+            if(!empty($data['type']) && $data['id'] > 0 && !empty($data['value'])) {
+                if(in_array($data['type'], ['name', 'defaults'])) {
+                    $fieldsRepo = Field::getRepository();
+                    /** @var FieldEntity $field */
+                    $field = $fieldsRepo->findOneBy(['id' => $data['id'], 'organisation' => Apollo::getInstance()->getUser()->getOrganisation()]);
+                    if($field != null) {
+                        $em = DB::getEntityManager();
+                        if($data['type'] == 'name') {
+                            $field->setName($data['value']);
+                        } elseif($data['type'] == 'defaults') {
+                            //TODO: Anything but this
+                            $length = max(count($data['value']), count($field->getDefaults()));
+                            $defaults = $field->getDefaults();
+                            for($i = 0; $i < $length; $i++) {
+                                if(count($field->getDefaults()) > $i) {
+                                    $default = $defaults[$i];
+                                    if(count($data['value']) > $i) {
+                                        $default->setValue($data['value'][$i]);
+                                        $default->setOrder($i);
+                                    } else {
+                                        $em->remove($default);
+                                    }
+                                } else {
+                                    $default = new DefaultEntity();
+                                    $default->setField($field);
+                                    $default->setValue($data['value'][$i]);
+                                    $default->setOrder($i);
+                                    $em->persist($default);
+                                }
+                            }
+                            $em->flush();
+                        }
+                        $em->flush();
+                    } else {
+                        $error['id'] = 0;
+                        $error['description'] = 'Invalid ID.';
+                    }
+                } else {
+                    $error['id'] = 0;
+                    $error['description'] = 'Invalid field type.';
+                }
+            } else {
+                $error['id'] = 0;
+                $error['description'] = 'Missing post request parameters.';
+            }
+        } else {
+            $error['id'] = 0;
+            $error['description'] = 'No action was specified.';
         }
         echo json_encode($response);
     }

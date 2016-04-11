@@ -31,7 +31,7 @@ class DefaultEntity
 
     /**
      * @ManyToOne(targetEntity="FieldEntity", inversedBy="defaults")
-     * @var int
+     * @var FieldEntity
      */
     protected $field;
 
@@ -56,7 +56,7 @@ class DefaultEntity
     }
 
     /**
-     * @return int
+     * @return FieldEntity
      */
     public function getField()
     {
@@ -64,7 +64,7 @@ class DefaultEntity
     }
 
     /**
-     * @param int $field
+     * @param FieldEntity $field
      */
     public function setField($field)
     {

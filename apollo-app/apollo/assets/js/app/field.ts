@@ -3,6 +3,7 @@
 ///<reference path="jquery.d.ts"/>
 ///<reference path="bootbox.d.ts"/>
 ///<reference path="inputs.ts"/>
+///<reference path="columns.ts"/>
 /**
  * Fields index typescript
  *
@@ -60,18 +61,47 @@ class FieldTable {
         });
     }
 
-    private updateCallback() {
-
+    private updateCallback(type:string, id:number, value:string|string[], button:JQuery) {
+        var that = this;
+        button.removeClass('btn-danger');
+        button.removeClass('btn-success');
+        button.addClass('btn-warning');
+        button.html('<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>Saving...');
+        var data = {
+            type: type,
+            id: id,
+            value: value
+        };
+        AJAX.post(Util.url('post/field/update'), data, function (response:any) {
+            button.removeClass('btn-warning');
+            button.addClass('btn-success');
+            button.html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Changes saved.');
+        }, function (message:string) {
+            button.removeClass('btn-warning');
+            button.addClass('btn-danger');
+            button.html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Saving failed.');
+            Util.error('An error has occurred during the process of updating of the data. Error message: ' + message);
+        });
     }
 
     private renderTr(data:FieldData) {
         var that = this;
-        var tr = $('<tr class="record-tr" data-id="' + data.id + '"></tr>');
-        var input = new InputText(data.id, function (id:number, value:string) {
-            //TODO: Callback
-        }, {placeholder: 'Field name'}, <string> data.name);
+        var tr = $('<tr class="record-tr' + (data.essential ? ' active' : '') +'" data-id="' + data.id + '"></tr>');
         var td = $('<td width="25%"></td>');
-        input.render(td);
+        var addButton = $('<button class="btn btn-block btn-sm btn-success disabled"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span>No changes.</button>');
+        var removeButton = $('<button class="btn btn-block btn-sm btn-warning' + (data.essential ? ' disabled' : '') +'"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Hide</a></button>');
+        if(data.essential) {
+            var field = new DataText(data.name);
+            field.render(td);
+        } else {
+            var input = new InputText(data.id, function (id:number, value:string) {
+                (function() {
+                    var button = addButton;
+                    that.updateCallback('name', id, value, button);
+                })();
+            }, {placeholder: 'Field name'}, <string> data.name);
+            input.render(td);
+        }
         tr.append(td);
         var type = 'Integer';
         switch(data.type) {
@@ -113,15 +143,13 @@ class FieldTable {
         tr.append('<td width="20%">' + type + '&nbsp;&nbsp; <span class="undefined">/</span> &nbsp;&nbsp;' + subtype + '</td>');
         if(defaults) {
             var defaultsInput = new InputTextMultiple(data.id, function (id:number, value:string[]) {
-                //TODO: Callback
+                that.updateCallback('defaults', id, value, addButton);
             }, {placeholder: 'Default value'}, <string[]> data.defaults);
             defaultsInput.render(td);
         } else {
             td.html('<span class="undefined">Not applicable</span>');
         }
         tr.append(td);
-        var addButton = $('<button class="btn btn-block btn-sm btn-success disabled"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span>No changes.</button>');
-        var removeButton = $('<button class="btn btn-block btn-sm btn-warning' + (data.essential ? ' disabled' : '') +'"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Hide</a></button>');
         var row = $('<div class="row"></div>');
         row.append($('<div class="col-md-7"></div>').append(addButton));
         row.append($('<div class="col-md-5"></div>').append(removeButton));

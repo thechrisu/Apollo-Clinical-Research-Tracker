@@ -14,7 +14,7 @@ use Apollo\Helpers\URLHelper;
 @section('content')
 
     <div class="table-responsive loader-ready">
-        <table class="table table-striped">
+        <table class="table">
             <thead>
             <tr>
                 <th>Field name</th>
@@ -32,5 +32,6 @@ use Apollo\Helpers\URLHelper;
 @section('scripts')
     @parent
     <script src="{{ AssetHelper::js('app/inputs') }}"></script>
+    <script src="{{ AssetHelper::js('app/columns') }}"></script>
     <script src="{{ AssetHelper::js('app/field') }}"></script>
 @stop
