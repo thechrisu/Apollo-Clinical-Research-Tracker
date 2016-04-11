@@ -88,7 +88,7 @@ use Apollo\Helpers\URLHelper;
             </div>
         </div>
         <div class="col-md-3 col-sm-6 col-sx-12 top-buffer">
-            <a href="{{ URLHelper::url('record/search') }}" class="btn btn-primary btn-block"><span
+            <a href="{{ URLHelper::url('record/search') }}" class="btn btn-primary btn-block disabled"><span
                         class="glyphicon glyphicon-search"
                         aria-hidden="true"></span>Advanced search</a>
         </div>

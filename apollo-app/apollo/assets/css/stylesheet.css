@@ -62,9 +62,6 @@ body {
 #essential strong {
   font-size: 1.05em; }
 
-.divider-vertical {
-  border-right: 1px solid #333333; }
-
 /* Extension to bootstrap */
 .undefined {
   color: #aaa;
@@ -155,6 +152,15 @@ body {
 #main-panel > .panel:last-child {
   margin-bottom: 0; }
 
+#activity-wrapper .pagination {
+  margin: 0 0; }
+
+#activityTable td {
+  padding: 8px; }
+
+#activityContent {
+  padding-left: 0; }
+
 .noselect {
   -moz-user-select: none;
   -webkit-touch-callout: none;
@@ -214,8 +220,7 @@ body {
     border-color: #2780e3; }
 
 .selectionItem {
-  width: 100%;
-  background-color: #f2f2f2; }
+  width: 100%; }
   .selectionItem:hover {
     background-color: #2780e3 !important;
     border-color: #2780e3;

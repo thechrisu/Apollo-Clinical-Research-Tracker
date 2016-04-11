@@ -81,8 +81,8 @@ $page = Activity::getNumSmallerIds($id)/10 + 1;
 
         <div class="panel-body">
             <div id="activity-wrapper" class="row">
-                <div class="col-lg-4 divider-vertical table-responsive menu-loader-ready" id="activityTable">
-                    <table class="table table-hover small-table table-condensed no-border-top">
+                <div class="col-lg-4 table-responsive menu-loader-ready" id="activityTable">
+                    <table class="table table-hover small-table table-condensed no-border-top table-striped">
                         <tbody id="table-body">
                         </tbody>
                     </table>
@@ -95,14 +95,14 @@ $page = Activity::getNumSmallerIds($id)/10 + 1;
                 </div>
                 <div class="col-lg-8 content-loader-ready" id="activityContent">
                     <div class="row">
-                        <div class="col-lg-8 col-md-6 col-sx-12 top-buffer">
-                            <input class="form-control input-medium" id="activity-title"/>
+                        <div class="col-lg-8 col-md-6 col-sx-12">
+                            <input class="form-control input-medium" placeholder="Activity name" id="activity-title"/>
                         </div>
-                        <div class="col-lg-4 col-md-6 col-sm-12 col-sx-12 top-buffer top-buffer">
+                        <div class="col-lg-4 col-md-6 col-sm-12 col-sx-12">
                             <div class="btn-group btn-block">
                                 <button class="btn btn-block btn-primary dropdown-toggle disabled" type="button"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                        id="target-button">
+                                        id="target-button"> Loading...
                                 </button>
                                 <ul class="dropdown-menu" id="target-dropdown"></ul>
                             </div>
@@ -110,7 +110,7 @@ $page = Activity::getNumSmallerIds($id)/10 + 1;
                     </div>
                     <div class="row top-buffer">
                         <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
-                            <table class="table table-hover small-table table-condensed table-responsive no-border-top">
+                            <table class="table table-hover small-table table-condensed table-responsive no-border-top table-striped">
                                 <tbody id="existingPeople">
                                 </tbody>
                             </table>
@@ -121,7 +121,7 @@ $page = Activity::getNumSmallerIds($id)/10 + 1;
                         </div>
                         <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
                             <div class="form-group">
-                                <textarea class="form-control" id="target-comment" rows="5" placeholder="Enter activity description"></textarea>
+                                <textarea class="form-control" id="target-comment" rows="5" placeholder="Activity description"></textarea>
                             </div>
                         </div>
                     </div>

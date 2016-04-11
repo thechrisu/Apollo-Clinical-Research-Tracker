@@ -490,7 +490,7 @@ class ActivityTable {
         endD = Util.formatShortDate(Util.parseSQLDate(<string> data.end_date));
         row = $('<tr></tr>');
         row.append('<td>' + Util.shortify(data.name, 20) + '</td>');
-        row.append('<td>' + startD + '-' + endD + '</td>');
+        row.append('<td class="text-right undefined"><small>' + startD + ' - ' + endD + '</small></td>');
         row.click(function() {
             that.displayActivity.call(null, data.id);
         });
@@ -724,7 +724,7 @@ class ActivityInformation {
         var dropD = $('#target-dropdown');
         dropD.append('<li class="dropdown-header">Choose a target group:</li>');
         var bt = $('#target-button');
-        bt.append(this.activeTargetGroup.name + ' <span class="caret"></span>');
+        bt.html(this.activeTargetGroup.name + ' <span class="caret"></span>');
         for(var i = 0; i < options.length; i++) {
             var option = $('<li optionNameUnique="' + options[i].name + '" optionIdUnique="' + options[i].id + '"><a>' + options[i].name + '</a></li>');
             var timer;

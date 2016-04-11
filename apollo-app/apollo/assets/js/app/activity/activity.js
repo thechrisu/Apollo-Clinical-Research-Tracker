@@ -155,7 +155,7 @@ var PeopleField = (function () {
         this.activity_id = id;
     };
     return PeopleField;
-})();
+}());
 /**
  * Defines the menu/table on the left of the view. Also responsible for all the buttons and their functions
  * @version 0.0.6
@@ -404,7 +404,7 @@ var ActivityTable = (function () {
         endD = Util.formatShortDate(Util.parseSQLDate(data.end_date));
         row = $('<tr></tr>');
         row.append('<td>' + Util.shortify(data.name, 20) + '</td>');
-        row.append('<td>' + startD + '-' + endD + '</td>');
+        row.append('<td class="text-right undefined"><small>' + startD + ' - ' + endD + '</small></td>');
         row.click(function () {
             that.displayActivity.call(null, data.id);
         });
@@ -420,7 +420,7 @@ var ActivityTable = (function () {
         Util.to('/activity/view/' + activityId);
     };
     return ActivityTable;
-})();
+}());
 /**
  * Carries out all the tasks related to displaying the actual information of one activity on the right of the view
  * @since 0.0.5
@@ -619,7 +619,7 @@ var ActivityInformation = (function () {
         var dropD = $('#target-dropdown');
         dropD.append('<li class="dropdown-header">Choose a target group:</li>');
         var bt = $('#target-button');
-        bt.append(this.activeTargetGroup.name + ' <span class="caret"></span>');
+        bt.html(this.activeTargetGroup.name + ' <span class="caret"></span>');
         for (var i = 0; i < options.length; i++) {
             var option = $('<li optionNameUnique="' + options[i].name + '" optionIdUnique="' + options[i].id + '"><a>' + options[i].name + '</a></li>');
             var timer;
@@ -767,7 +767,7 @@ var ActivityInformation = (function () {
         });
     };
     return ActivityInformation;
-})();
+}());
 /**
  * Compare function for property name
  * @param a

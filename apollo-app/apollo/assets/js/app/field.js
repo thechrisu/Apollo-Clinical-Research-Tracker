@@ -70,7 +70,7 @@ var FieldTable = (function () {
         var tr = $('<tr class="record-tr' + (data.essential ? ' active' : '') + '" id="field-' + data.id + '" data-id="' + data.id + '"></tr>');
         var td = $('<td width="25%"></td>');
         var addButton = $('<button class="btn btn-block btn-sm btn-success disabled"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span>No changes.</button>');
-        var removeButton = $('<button class="btn btn-block btn-sm btn-warning' + (data.essential ? ' disabled' : '') + '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Hide</a></button>');
+        var removeButton = $('<button class="btn btn-block btn-sm btn-danger' + (data.essential ? ' disabled' : '') + '"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Hide</a></button>');
         if (!data.essential) {
             removeButton.on({
                 click: function (e) {

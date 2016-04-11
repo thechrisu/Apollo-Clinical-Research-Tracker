@@ -6,7 +6,6 @@
 @import "core/core"
 @import "partials/loader"
 @import "partials/record"
-@import "partials/menu"
 
 /* Extension to bootstrap
 .undefined
@@ -112,6 +111,20 @@
 #main-panel > .panel:last-child
   margin-bottom: 0
 
+// Removing the margin on the pagination on the activities view
+#activity-wrapper
+  .pagination
+    margin: 0 0
+
+// Adding margin to the activity table
+#activityTable
+  td
+    padding: 8px
+
+// Removing the padding on the activity content
+#activityContent
+  padding-left: 0
+
 .noselect
   &:hover
     cursor: pointer
@@ -179,4 +192,3 @@
     background-color: $apollo-link-colour
     border-color: $apollo-link-colour
   width: 100%
-  background-color: $apollo-background-colour
