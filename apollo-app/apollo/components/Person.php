@@ -49,4 +49,13 @@ class Person extends DBComponent
         }
         return $recentRecord;
     }
+
+    public static function getActivityNames($person)
+    {
+        $ret = [];
+        foreach ($person->getActivities() as $activity) {
+            $ret[] = $activity->getName();
+        }
+        return $ret;
+    }
 }

@@ -79,7 +79,7 @@ use Apollo\Helpers\URLHelper;
         <li role="presentation" class="sort-tab" data-sort="3"><a href="#">Recently updated</a></li>
     </ul>
     <div class="row">
-        <div class="col-lg-8 col-md-6 col-sx-12 top-buffer">
+        <div class="col-lg-7 col-md-6 col-sx-12 top-buffer">
             <div class="input-group">
                         <span class="input-group-addon" id="basic-addon2"><span
                                     class="glyphicon glyphicon-search" aria-hidden="true"></span></span>
@@ -94,8 +94,10 @@ use Apollo\Helpers\URLHelper;
         </div>
         <div class="col-lg-2 col-md-3 col-sm-6 col-sx-12 top-buffer">
             <a href="#" id="add-record" class="btn btn-success btn-block"><span class="glyphicon glyphicon-plus"
-                                                                                aria-hidden="true"></span>Add a
-                record</a>
+                                                                                aria-hidden="true"></span>Add record</a>
+        </div>
+        <div class="col-lg-1 col-md-3 col-sm-6 col-sx-12 top-buffer">
+            <a href="{{URLHelper::url('get/peopleexcel')}}" target="_blank" id="download-records" class="btn btn-warning btn-block" > <span class="glyphicon glyphicon-download" aria-hidden="true"></span>DL</a>
         </div>
     </div>
     <div class="table-responsive top-buffer loader-ready">

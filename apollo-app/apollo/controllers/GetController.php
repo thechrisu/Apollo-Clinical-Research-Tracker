@@ -256,7 +256,7 @@ class GetController extends GenericController
         if ($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
             Record::prepare($record);
             $response['essential'] = $this->getInfoRecord($record);
-            $fieldsViewData = Record::getFormattedFields($record);
+            $fieldsViewData = Record::getFormattedFields($record, false);
             $response['data'] = $fieldsViewData;
         } else {
             $response['error'] = ['id' => 1, 'description' => 'The supplied ID is invalid!'];

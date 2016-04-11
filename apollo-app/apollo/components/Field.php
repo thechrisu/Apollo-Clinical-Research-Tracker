@@ -15,7 +15,8 @@ use Apollo\Apollo;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @version 0.0.2
  */
 class Field extends DBComponent
 {

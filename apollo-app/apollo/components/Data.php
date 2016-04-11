@@ -1,6 +1,7 @@
 <?php
 /**
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
  */
@@ -14,7 +15,8 @@ namespace Apollo\Components;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.1
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @version 0.0.2
  */
 class Data extends DBComponent
 {
@@ -42,7 +44,10 @@ class Data extends DBComponent
     {
         $field = $data->getField();
         $ret['name'] = $field->getName();
-        $ret['type'] = $field->getType();
+        if($field->hasDefault() && $field->isMultiple())
+            $ret['type'] = 2;
+        else
+            $ret['type'] = $field->getType();
         $ret['value'] = self::getDataValue($data);
         return $ret;
     }
@@ -63,7 +68,6 @@ class Data extends DBComponent
                     $value = $data->getVarchar();
                 }
             } else {
-                $ret['type'] = 2;
                 $value = self::getMultiple($data);
             }
         } else if ($field->isMultiple()) {
@@ -96,6 +100,22 @@ class Data extends DBComponent
         }
     }
 
+    public static function formattedDataArrayToString($array)
+    {
+        $ret = [];
+        foreach($array as $data)
+            $ret[] = self::formattedDataToString($data);
+        return $ret;
+    }
+
+    public static function formattedDataToString($data)
+    {
+        if(is_array($data['value']))
+            return self::concatMultiple($data['value']);
+        else
+            return $data['value'];
+    }
+
     /**
      * @param $data
      * @return mixed
@@ -125,18 +145,8 @@ class Data extends DBComponent
         return $value;
     }
 
-    private static function concatMultiple($values)
+    public static function concatMultiple($values)
     {
         return implode("; ", $values);
-    }
-
-    private static function concatMultipleDates($dates)
-    {
-        $values = [];
-        foreach($dates as $date)
-        {
-            $values[] = $date->format('Y-m-d');
-        }
-        return self::concatMultiple($values);
     }
 }
