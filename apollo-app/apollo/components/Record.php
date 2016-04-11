@@ -1,6 +1,7 @@
 <?php
 /**
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
  */
@@ -17,7 +18,8 @@ use Apollo\Entities\RecordEntity;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @version 0.0.4
  */
 class Record extends DBComponent
 {
@@ -46,5 +48,27 @@ class Record extends DBComponent
         foreach($fields as $field) {
             $record->findOrCreateData($field->getId());
         }
+    }
+
+    public static function getFormattedFields($record, $is_essential) {
+        $fieldsData = [];
+        $fieldRepo = Field::getRepository();
+        $fields = $fieldRepo->findBy(['is_essential' => $is_essential, 'is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
+        foreach ($fields as $field) {
+            $fieldData = self::getFormattedFieldOfRecord($record, $field);
+            $fieldsData[] = $fieldData;
+        }
+        return $fieldsData;
+    }
+
+    /**
+     * @param $record
+     * @param $field
+     * @return mixed
+     */
+    private static function getFormattedFieldOfRecord($record, $field)
+    {
+        $fieldData = $record->findOrCreateData($field->getId());
+        return Data::getFormattedData($fieldData);
     }
 }

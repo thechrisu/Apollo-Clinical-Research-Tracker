@@ -6,8 +6,9 @@
  */
 
 namespace Apollo\Components;
-use Apollo\Components\Person;
+use Apollo\Components\Record;
 use Apollo\Components\Field;
+use Apollo\Components\Person;
 use SimpleExcel\SimpleExcel;
 use SimpleExcel\Writer\BaseWriter;
 use SimpleExcel\Writer\XLSXWriter;
@@ -25,29 +26,27 @@ use SimpleExcel\Writer\XLSXWriter;
  */
 class ExcelExporter
 {
+    //private function getRecordInformation
     public function getTestFile()
     {
         $excel = new SimpleExcel('XML');                    // instantiate new object (will automatically construct the parser & writer type as XML)
+        $record = Record::getRepository()->find(1);
+        $essential = Record::getFormattedFields($record, true);
+        $non_essential = Record::getFormattedFields($record, false);
+        $activityNames = Person::getActivityNames($record->getPerson());
+        $formattedNames = Data::concatMultiple($activityNames);
+        $strings = array_merge(Data::formattedDataArrayToString($essential), Data::formattedDataArrayToString($non_essential));
+        $strings = array_merge($strings, [$formattedNames]);
+        $headers = array_merge(Field::getFieldNames(), ['activities']);
 
         $excel->writer->setData(
             array
             (
-                $this->getFieldNames(),
-                array('1',   'Kab. Bogor',       '1'    ),
-                array('2',   'Kab. Cianjur',     '1'    ),
-                array('3',   'Kab. Sukabumi',    '1'    ),
-                array('4',   'Kab. Tasikmalaya', '2'    )
+                array_merge(Field::getFieldNames(), ['activities']),
+                $strings,
             )
         );                                                  // add some data to the writer
         $excel->writer->saveFile('people-' . date('Y-m-d'));
     }
 
-    private function getFieldNames()
-    {
-        $fields = Field::getRepository()->findBy(['is_hidden' => '0']);
-        $names = [];
-        foreach($fields as $field)
-            $names[] = $field->getName();
-        return $names;
-    }
 }

@@ -12,6 +12,7 @@ namespace Apollo\Controllers;
 use Apollo\Apollo;
 use Apollo\Components\Activity;
 use Apollo\Components\DB;
+use Apollo\Components\Data;
 use Apollo\Components\ExcelExporter;
 use Apollo\Components\TargetGroup;
 use Apollo\Components\Field;
@@ -255,61 +256,7 @@ class GetController extends GenericController
         if ($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
             Record::prepare($record);
             $response['essential'] = $this->getInfoRecord($record);
-            $fieldsViewData = [];
-            $fieldRepo = Field::getRepository();
-            /**
-             * @var FieldEntity[] $fields
-             */
-            $fields = $fieldRepo->findBy(['is_essential' => false, 'is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
-            foreach ($fields as $field) {
-                $fieldViewData['name'] = $field->getName();
-                $fieldViewData['type'] = $field->getType();
-                $defaults = $field->getDefaults();
-                $defaultArray = [];
-                foreach ($defaults as $default) {
-                    $defaultArray[] = $default->getValue();
-                }
-                $fieldData = $record->findOrCreateData($field->getId());
-                $value = [];
-                if ($field->hasDefault()) {
-                    if (!$field->isMultiple()) {
-                        if ($fieldData->isDefault() || !$field->isAllowOther()) {
-                            $value = $defaultArray[$fieldData->getInt()];
-                        } else {
-                            $value = $fieldData->getVarchar();
-                        }
-                    } else {
-                        $selected = unserialize($fieldData->getLongText());
-                        $fieldViewData['type'] = 2;
-                        if (count($selected) > 0) {
-                            for ($i = 0; $i < count($selected); $i++) {
-                                $value[] = $defaultArray[intval($selected[$i])];
-                            }
-                        } else {
-                            $value = '';
-                        }
-                    }
-                } else if ($field->isMultiple()) {
-                    $value = unserialize($fieldData->getLongText());
-                } else {
-                    switch ($field->getType()) {
-                        case 1:
-                            $value = $fieldData->getInt();
-                            break;
-                        case 2:
-                            $value = $fieldData->getVarchar();
-                            break;
-                        case 3:
-                            $value = $fieldData->getDateTime()->format('Y-m-d H:i:s');
-                            break;
-                        case 4:
-                            $value = $fieldData->getLongText();
-                            break;
-                    }
-                }
-                $fieldViewData['value'] = $value;
-                $fieldsViewData[] = $fieldViewData;
-            }
+            $fieldsViewData = Record::getFormattedFields($record, false);
             $response['data'] = $fieldsViewData;
         } else {
             $response['error'] = ['id' => 1, 'description' => 'The supplied ID is invalid!'];
@@ -372,20 +319,7 @@ class GetController extends GenericController
                 } else if ($field->isMultiple()) {
                     $value = unserialize($fieldData->getLongText());
                 } else {
-                    switch ($field->getType()) {
-                        case 1:
-                            $value = $fieldData->getInt();
-                            break;
-                        case 2:
-                            $value = $fieldData->getVarchar();
-                            break;
-                        case 3:
-                            $value = $fieldData->getDateTime()->format('Y-m-d H:i:s');
-                            break;
-                        case 4:
-                            $value = $fieldData->getLongText();
-                            break;
-                    }
+                    $value = Data::serialize($fieldData);
                 }
                 $fieldEditData['value'] = $value;
                 $fieldsEditData[] = $fieldEditData;
