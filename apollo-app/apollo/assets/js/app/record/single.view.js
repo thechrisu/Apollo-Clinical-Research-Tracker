@@ -114,19 +114,14 @@ var SingleView = (function () {
             this.addActivityToTable(item);
         }
     };
-    SingleView.prototype.getTd = function () {
-        return $('<td></td>');
-    };
     /**
      * Successively adds the parameters to one row and adds it to the DOM.
-     * @param target
      * @param data
      */
     SingleView.prototype.addActivityToTable = function (data) {
         var row;
         var startD;
         var endD;
-        var that = this;
         startD = Util.formatShortDate(Util.parseSQLDate(data.start_date));
         endD = Util.formatShortDate(Util.parseSQLDate(data.end_date));
         row = $('<div class="apollo-data-text-multiple"></div>');
@@ -234,7 +229,7 @@ var SingleView = (function () {
         editButton.attr('href', Util.url('record/edit/' + data.record_id));
         hideButton.click(function (e) {
             e.preventDefault();
-            bootbox.confirm('Are you sure you want to hide this record (belonging to ' + data.given_name + ' ' + data.last_name + ')? The data won\'t be deleted and can be restored later.', function (result) {
+            bootbox.confirm('Are you sure you want to hide this record (belonging to ' + $('<span>' + data.given_name + '</span>').text() + ' ' + $('<span>' + data.last_name + '</span>').text() + ')? The data won\'t be deleted and can be restored later.', function (result) {
                 if (result) {
                     AJAX.post(Util.url('post/record'), {
                         action: 'hide',

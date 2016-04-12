@@ -14,13 +14,6 @@
  *
  */
 
-interface ShortActivityData {
-    name:string,
-    start_date:string,
-    end_date:string,
-    id:string
-}
-
 interface MenuData {
     error:Error,
     count:number,
@@ -60,7 +53,7 @@ interface DetailActivityData {
 class PeopleField {
     private activity_id:number;
     private search:string;
-    private bh:BloodHound;
+    private bh:Bloodhound;
     private people:ParticipantData[]=  [];
     private temporarily_added:ParticipantData[] = []; //people that are temporarily added to the activity (-> not saved). These should not be suggested.
     private temporarily_removed:ParticipantData[] = []; //people that are temporarily added to the suggestions. These items were removed from the activity
@@ -106,9 +99,10 @@ class PeopleField {
      */
     public resetTypeahead() {
         var that = this;
-        $('#person-input').val("");
-        $('#person-input').typeahead('destroy');
-        $('#person-input').typeahead({
+        var personInput = $('#person-input');
+        personInput.val("");
+        personInput.typeahead('destroy');
+        personInput.typeahead({
             highlight: true
         }, {
             name: 'data',
@@ -389,7 +383,7 @@ class ActivityTable {
                     action: 'hide',
                     activity_id: id
                 }, function (response:any) {
-                    Util.to('activity/');
+                    Util.to('activity');
                 }, function (message:string) {
                     Util.error('An error has occurred while hiding activity. Error message: ' + message);
                 });
@@ -651,7 +645,7 @@ class ActivityInformation {
         var startDate:string = Util.toMysqlFormat(sd);
         var ed:Date = this.endDate.datepicker('getDate');
         var endDate:string = Util.toMysqlFormat(ed);
-        var data = {
+        return {
             action: 'update',
             activity_id: this.getId(),
             activity_name: this.title.val(),
@@ -662,7 +656,6 @@ class ActivityInformation {
             added_people: this.addedPeople,
             removed_people: this.removedPeople
         };
-        return data;
     };
 
     /**
@@ -842,7 +835,6 @@ class ActivityInformation {
     private displayPerson(person:ParticipantData) {
         var that = this;
         var row = $('<td class="col-md-11 selectionItem clickable"></td>');
-        var width = row.width();
         row.text(Util.shortify(person.name, 40));
         var removeButton = $('<td class="col-md-1">' +
             '<button type="button" class="btn btn-xs btn-primary" style="display:block; text-align:center">' +
@@ -955,12 +947,11 @@ $(document).ready(function () {
     if(isNaN(id)){
         var breadcrumbs = $('#nav-breadcrumbs');
         var fullLink = breadcrumbs.find('li:nth-child(2)').find("a").attr("href");
-        var newId = Util.extractId(fullLink);
-        id = newId;
+        id = Util.extractId(fullLink);
     }
     var activity:ActivityInformation = new ActivityInformation();
     var existingPeopleField:PeopleField = new PeopleField();
     activity.load(id, existingPeopleField);
-    var menu:ActivityTable = new ActivityTable().load(activity, page);
+    new ActivityTable().load(activity, page);
 });
 

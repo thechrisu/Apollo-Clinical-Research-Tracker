@@ -2,6 +2,7 @@
 ///<reference path="../scripts.ts"/>
 ///<reference path="../jquery.d.ts"/>
 ///<reference path="../bootbox.d.ts"/>
+///<reference path="../columns.ts"/>
 /**
  * Records index typescript
  *
@@ -93,17 +94,21 @@ var RecordTable = (function () {
     };
     RecordTable.prototype.renderTr = function (data) {
         var tr = $('<tr class="record-tr clickable" data-id="' + data.id + '"></tr>');
-        tr.append(this.getTd().text(Util.shortify(data.given_name, 50)));
-        tr.append(this.getTd().text(Util.shortify(data.last_name, 50)));
-        tr.append(this.getTd().text(Util.shortify(data.email, 50)));
-        tr.append(this.getTd().text(Util.shortify(data.phone, 50)));
+        [data.given_name, data.last_name, data.email, data.phone].forEach(function (string) {
+            var td = $('<td></td>');
+            var dataValue = new DataText(Util.shortify(string, 50)).getValue();
+            if (dataValue.prop("tagName").toLowerCase() == 'strong') {
+                td.text(dataValue.text());
+            }
+            else {
+                td.append(dataValue);
+            }
+            tr.append(td);
+        });
         this.table.append(tr);
     };
-    RecordTable.prototype.getTd = function () {
-        return $('<td></td>');
-    };
     return RecordTable;
-})();
+}());
 $(document).ready(function () {
     new RecordTable().load();
     $('#add-record').click(function (e) {

@@ -4,7 +4,7 @@
  * Column manager typescript
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.5
+ * @version 0.0.6
  */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -106,7 +106,8 @@ var ColumnRow = (function () {
 var DataField = (function () {
     function DataField(value) {
         this.parentNode = $('<div class="apollo-data-container"></div>');
-        this.parentNode.append(this.parse(value));
+        this.value = this.parse(value);
+        this.parentNode.append(this.value);
     }
     DataField.prototype.parse = function (value) {
         if (value == null || value.length == 0) {
@@ -116,6 +117,9 @@ var DataField = (function () {
     };
     DataField.prototype.render = function (target) {
         target.append(this.parentNode);
+    };
+    DataField.prototype.getValue = function () {
+        return this.value;
     };
     return DataField;
 }());

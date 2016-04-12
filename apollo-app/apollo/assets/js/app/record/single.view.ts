@@ -131,20 +131,14 @@ class SingleView {
         }
     }
 
-    private getTd(){
-        return $('<td></td>');
-    }
-
     /**
      * Successively adds the parameters to one row and adds it to the DOM.
-     * @param target
      * @param data
      */
     private addActivityToTable(data:ShortActivityData) {
         var row:JQuery;
         var startD;
         var endD;
-        var that = this;
         startD = Util.formatShortDate(Util.parseSQLDate(<string> data.start_date));
         endD = Util.formatShortDate(Util.parseSQLDate(<string> data.end_date));
         row = $('<div class="apollo-data-text-multiple"></div>');
@@ -258,7 +252,7 @@ class SingleView {
         editButton.attr('href', Util.url('record/edit/' + data.record_id));
         hideButton.click(function (e) {
             e.preventDefault();
-            bootbox.confirm('Are you sure you want to hide this record (belonging to ' + data.given_name + ' ' + data.last_name + ')? The data won\'t be deleted and can be restored later.', function (result) {
+            bootbox.confirm('Are you sure you want to hide this record (belonging to ' + $('<span>' + data.given_name + '</span>').text() + ' ' + $('<span>' + data.last_name + '</span>').text() + ')? The data won\'t be deleted and can be restored later.', function (result) {
                 if (result) {
                     AJAX.post(Util.url('post/record'), {
                         action: 'hide',

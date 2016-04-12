@@ -2,6 +2,7 @@
 ///<reference path="../scripts.ts"/>
 ///<reference path="../jquery.d.ts"/>
 ///<reference path="../bootbox.d.ts"/>
+///<reference path="../columns.ts"/>
 /**
  * Records index typescript
  *
@@ -30,7 +31,6 @@ class RecordTable {
 
     private table:JQuery;
     private pagination:JQuery;
-    private downloadElement:JQuery;
     private loader:number;
     private page:number;
     private sort:number;
@@ -120,15 +120,17 @@ class RecordTable {
 
     private renderTr(data:RecordData) {
         var tr = $('<tr class="record-tr clickable" data-id="' + data.id + '"></tr>');
-        tr.append(this.getTd().text(Util.shortify(data.given_name, 50)));
-        tr.append(this.getTd().text(Util.shortify(data.last_name, 50)));
-        tr.append(this.getTd().text(Util.shortify(data.email, 50)));
-        tr.append(this.getTd().text(Util.shortify(data.phone, 50)));
+        [data.given_name, data.last_name, data.email, data.phone].forEach(function(string) {
+            var td = $('<td></td>');
+            var dataValue = new DataText(Util.shortify(string, 50)).getValue();
+            if((<string>dataValue.prop("tagName")).toLowerCase() == 'strong') {
+                td.text(dataValue.text());
+            } else {
+                td.append(dataValue);
+            }
+            tr.append(td);
+        });
         this.table.append(tr);
-    }
-
-    private getTd(){
-        return $('<td></td>');
     }
 
 }
@@ -154,7 +156,7 @@ $(document).ready(function () {
                             var modal = $('.modal');
                             var givenName = modal.find('#add-given-name').val();
                             var middleName = modal.find('#add-middle-name').val();
-                            var lastName = modal.find('#add-last-name').val()
+                            var lastName = modal.find('#add-last-name').val();
                             var recordName = modal.find('#add-record-name').val();
                             var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
                             var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));

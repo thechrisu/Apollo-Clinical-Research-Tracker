@@ -52,9 +52,10 @@ var PeopleField = (function () {
      */
     PeopleField.prototype.resetTypeahead = function () {
         var that = this;
-        $('#person-input').val("");
-        $('#person-input').typeahead('destroy');
-        $('#person-input').typeahead({
+        var personInput = $('#person-input');
+        personInput.val("");
+        personInput.typeahead('destroy');
+        personInput.typeahead({
             highlight: true
         }, {
             name: 'data',
@@ -309,7 +310,7 @@ var ActivityTable = (function () {
                     action: 'hide',
                     activity_id: id
                 }, function (response) {
-                    Util.to('activity/');
+                    Util.to('activity');
                 }, function (message) {
                     Util.error('An error has occurred while hiding activity. Error message: ' + message);
                 });
@@ -549,7 +550,7 @@ var ActivityInformation = (function () {
         var startDate = Util.toMysqlFormat(sd);
         var ed = this.endDate.datepicker('getDate');
         var endDate = Util.toMysqlFormat(ed);
-        var data = {
+        return {
             action: 'update',
             activity_id: this.getId(),
             activity_name: this.title.val(),
@@ -560,7 +561,6 @@ var ActivityInformation = (function () {
             added_people: this.addedPeople,
             removed_people: this.removedPeople
         };
-        return data;
     };
     ;
     /**
@@ -732,7 +732,6 @@ var ActivityInformation = (function () {
     ActivityInformation.prototype.displayPerson = function (person) {
         var that = this;
         var row = $('<td class="col-md-11 selectionItem clickable"></td>');
-        var width = row.width();
         row.text(Util.shortify(person.name, 40));
         var removeButton = $('<td class="col-md-1">' +
             '<button type="button" class="btn btn-xs btn-primary" style="display:block; text-align:center">' +
@@ -838,11 +837,10 @@ $(document).ready(function () {
     if (isNaN(id)) {
         var breadcrumbs = $('#nav-breadcrumbs');
         var fullLink = breadcrumbs.find('li:nth-child(2)').find("a").attr("href");
-        var newId = Util.extractId(fullLink);
-        id = newId;
+        id = Util.extractId(fullLink);
     }
     var activity = new ActivityInformation();
     var existingPeopleField = new PeopleField();
     activity.load(id, existingPeopleField);
-    var menu = new ActivityTable().load(activity, page);
+    new ActivityTable().load(activity, page);
 });

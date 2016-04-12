@@ -121,5 +121,6 @@ use Apollo\Helpers\URLHelper;
 @stop
 @section('scripts')
     @parent
+    <script src="{{ AssetHelper::js('app/columns') }}"></script>
     <script src="{{ AssetHelper::js('app/record/index') }}"></script>
 @stop

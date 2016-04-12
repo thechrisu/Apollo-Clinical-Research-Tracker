@@ -4,7 +4,7 @@
  * Column manager typescript
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.5
+ * @version 0.0.6
  */
 
 class ColumnManager {
@@ -124,11 +124,13 @@ class ColumnRow {
 
 abstract class DataField implements Renderable {
 
-    private parentNode;
+    private parentNode:JQuery;
+    private value:JQuery;
 
     public constructor(value:any) {
         this.parentNode = $('<div class="apollo-data-container"></div>');
-        this.parentNode.append(this.parse(value));
+        this.value = this.parse(value);
+        this.parentNode.append(this.value);
     }
 
     private parse(value:any):JQuery {
@@ -142,6 +144,10 @@ abstract class DataField implements Renderable {
 
     public render(target:JQuery) {
         target.append(this.parentNode);
+    }
+
+    public getValue():JQuery {
+        return this.value;
     }
 }
 
