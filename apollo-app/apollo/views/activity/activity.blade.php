@@ -143,6 +143,5 @@ $page = Activity::getNumSmallerIds($id)/10 + 1;
 @stop
 @section('scripts')
 @parent
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-idletimer/1.0.0/idle-timer.min.js"></script>-->
-    <script src="{{ AssetHelper::js('app/activity/activity') }}"></script>
+    <script src="{{ AssetHelper::js('app/activity') }}"></script>
 @stop
