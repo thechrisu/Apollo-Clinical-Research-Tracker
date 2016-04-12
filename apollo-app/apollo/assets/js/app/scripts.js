@@ -1,4 +1,4 @@
-///<reference path="jquery.d.ts"/>
+///<reference path="../typings/jquery.d.ts"/>
 /**
  * Scripts file containing functions related to modal windows
  *

@@ -1,7 +1,7 @@
 ///<reference path="ajax.ts"/>
 ///<reference path="scripts.ts"/>
-///<reference path="jquery.d.ts"/>
-///<reference path="bootbox.d.ts"/>
+///<reference path="../typings/jquery.d.ts"/>
+///<reference path="../typings/bootbox.d.ts"/>
 ///<reference path="inputs.ts"/>
 ///<reference path="columns.ts"/>
 /**

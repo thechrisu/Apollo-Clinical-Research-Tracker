@@ -1,9 +1,9 @@
 ///<reference path="../ajax.ts"/>
 ///<reference path="../scripts.ts"/>
-///<reference path="../jquery.d.ts"/>
+///<reference path="../../typings/jquery.d.ts"/>
 ///<reference path="../inputs.ts"/>
-///<reference path="../bootbox.d.ts"/>
-///<reference path="../typeahead.d.ts"/>
+///<reference path="../../typings/bootbox.d.ts"/>
+///<reference path="../../typings/typeahead.d.ts"/>
 /**
  * Class to store the token field (the field to add/remove users from a activity)
  * @version 0.0.8

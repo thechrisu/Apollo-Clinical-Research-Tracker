@@ -1,4 +1,4 @@
-///<reference path="jquery.d.ts"/>
+///<reference path="../typings/jquery.d.ts"/>
 ///<reference path="scripts.ts"/>
 /**
  * Typescript for inputs (and some other renderable elements)
