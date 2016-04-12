@@ -165,7 +165,7 @@ var FieldTable = (function () {
         this.table.append(tr);
     };
     return FieldTable;
-}());
+})();
 $(document).ready(function () {
     new FieldTable().load();
     $('#add-field').click(function (e) {

@@ -115,22 +115,6 @@ class Util {
         return url;
     }
 
-    public static escapeHTML(unsafe:string){
-        var cast = '';
-        if((typeof unsafe).localeCompare("string") == 0)
-            cast = unsafe;
-        else
-            cast = unsafe; //unsafe.toString();
-        return cast
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-        //return _.escape(midsafe);
-        //return midsafe;
-    }
-
     /**
      * Sends the user to specified URL
      *
@@ -161,7 +145,7 @@ class Util {
      * Removes all instances of an element from another array
      * @param toSubtractFrom
      * @param subtractedBy
-     * @returns {any[]}
+     * @returns any[]
      */
     public static arraySubtract(toSubtractFrom:any[], subtractedBy:any[])
     {

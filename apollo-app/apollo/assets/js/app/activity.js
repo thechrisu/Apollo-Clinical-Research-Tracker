@@ -6,6 +6,11 @@
 ///<reference path="../typings/typeahead.d.ts"/>
 /**
  * Class to store the token field (the field to add/remove users from a activity)
+ * @todo Make this more general: Make a sort-of wrapper for typescript with the added/removed arrays
+ * Note that at the moment, there is the problem of typeahead not being updated for typescript, as it seems.
+ * This means we have to keep seeing ugly errors in our IDE.
+ * Also see
+ * @link http://stackoverflow.com/questions/32395563/twitter-typeahead-bloodhound-error-in-typescript
  * @version 0.0.8
  */
 var PeopleField = (function () {
@@ -29,11 +34,11 @@ var PeopleField = (function () {
      */
     PeopleField.prototype.resetBloodhound = function () {
         for (var i = 0; i < this.temporarily_added.length; i++) {
-            Util.removeFromArrayCmp(this.temporarily_added[i], this.people, cmpIds);
+            Util.removeFromArrayCmp(this.temporarily_added[i], this.people, cmpPIds);
         }
         for (var i = 0; i < this.temporarily_added.length; i++) {
             var item = this.temporarily_added[i];
-            if (!Util.isInCmp(item, this.people, cmpIds))
+            if (!Util.isInCmp(item, this.people, cmpPIds))
                 this.people.push(item);
         }
         this.setBloodhound();
@@ -52,18 +57,20 @@ var PeopleField = (function () {
     };
     /**
      * Resets the typeahead suggestion engine
+     * Note: We get an error in typescript in the second line when setting typescript. This is not our fault.
+     * ALso see typeahead docs, they do the same:
+     * @link https://github.com/twitter/typeahead.js
      */
     PeopleField.prototype.resetTypeahead = function () {
         var that = this;
         var personInput = $('#person-input');
         personInput.val("");
         personInput.typeahead('destroy');
-        personInput.typeahead({
-            highlight: true
-        }, {
+        personInput.typeahead(null, {
+            highlight: true,
             name: 'data',
             displayKey: 'name',
-            source: that.bh.ttAdapter(),
+            source: that.bh,
             templates: {
                 suggestion: function (data) {
                     var elem = $('<div class="noselect"></div>');
@@ -75,7 +82,7 @@ var PeopleField = (function () {
     };
     /**
      * Sets up the bloodhound suggestion engine: This is the place where you have to go to find how exactly data is received from the server
-     * http://stackoverflow.com/questions/25419972/twitter-typeahead-add-custom-data-to-dataset
+     * @link http://stackoverflow.com/questions/25419972/twitter-typeahead-add-custom-data-to-dataset
      */
     PeopleField.prototype.setBloodhound = function () {
         var that = this;
@@ -86,45 +93,22 @@ var PeopleField = (function () {
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             initialize: true,
             identify: function (item) {
-                return item.id;
+                return item.p_id;
             },
             sorter: cmpNames,
             remote: {
                 url: Util.url('get/activitypeople') + '?activity_id=' + that.activity_id + that.formatTemporarily_added() + '&search=' + that.search,
                 filter: function (data) {
-                    if (!data) {
-                        return {};
+                    if (data) {
+                        return that.processNewSuggestionData(data.data);
                     }
                     else {
-                        //Adds all of the people to the suggestion engine
-                        function carryout(data) {
-                            var output;
-                            if (that.people != null && that.people.length > 0 && that.people[0] != null)
-                                output = that.people;
-                            else
-                                output = [];
-                            $.each(that.temporarily_added, function (k, v) {
-                                if (Util.isInCmp(v, output, cmpIds)) {
-                                    Util.removeFromArrayCmp(v, output, cmpIds);
-                                }
-                            });
-                            $.each(data, function (k, v) {
-                                if (!Util.isInCmp(v, output, cmpIds))
-                                    output.push(v);
-                            });
-                            $.each(that.temporarily_removed, function (k, v) {
-                                if (!Util.isInCmp(v, output, cmpIds))
-                                    output.push(v);
-                            });
-                            that.people = output;
-                            return output;
-                        }
-                        return carryout(data.data);
+                        return {};
                     }
                 }
             }
         });
-        console.log(Object.getPrototypeOf(this.bh));
+        //console.log(Object.getPrototypeOf(this.bh));
     };
     /**
      * Removes an item from the suggestions: This means it will no longer be suggested. It also assumes,
@@ -133,7 +117,7 @@ var PeopleField = (function () {
      */
     PeopleField.prototype.removeItemFromSuggestions = function (data) {
         this.temporarily_added.push(data);
-        Util.removeFromArrayCmp(data, this.temporarily_removed, cmpIds);
+        Util.removeFromArrayCmp(data, this.temporarily_removed, cmpPIds);
     };
     /**
      * Parallel function to the latter: Adds an item to the suggestions and assumes it has been removed from the activity
@@ -141,7 +125,41 @@ var PeopleField = (function () {
      */
     PeopleField.prototype.addItemToSuggestions = function (data) {
         this.temporarily_removed.push(data);
-        Util.removeFromArrayCmp(data, this.temporarily_added, cmpIds);
+        Util.removeFromArrayCmp(data, this.temporarily_added, cmpPIds);
+    };
+    /**
+     * Processes some new data: Adds all the people not yet in suggestions to them
+     * Also considers the people just added to the activity
+     * Also considers the people just removed from the activity
+     * Also updates the "people"-variable to the return value of the function
+     * @param data
+     * @returns ParticipantEntity[]
+     */
+    PeopleField.prototype.processNewSuggestionData = function (data) {
+        var output;
+        if (this.people != null && this.people.length > 0 && this.people[0] != null) {
+            output = this.people;
+        }
+        else {
+            output = [];
+        }
+        $.each(data, function (k, v) {
+            if (!Util.isInCmp(v, output, cmpPIds)) {
+                output.push(v);
+            }
+        });
+        $.each(this.temporarily_removed, function (k, v) {
+            if (!Util.isInCmp(v, output, cmpPIds)) {
+                output.push(v);
+            }
+        });
+        $.each(this.temporarily_added, function (k, v) {
+            if (Util.isInCmp(v, output, cmpPIds)) {
+                Util.removeFromArrayCmp(v, output, cmpPIds);
+            }
+        });
+        this.people = output;
+        return output;
     };
     /**
      * Helper function for the API request: Adds an URL argument for every person temporarily added to the activity
@@ -153,7 +171,7 @@ var PeopleField = (function () {
         var query = '';
         for (var i = 0; i < tA.length; i++) {
             var pa = tA[i];
-            query += '&temporarily_added[]=' + pa.id;
+            query += encodeURIComponent('&temporarily_added[]=' + pa.p_id);
         }
         return query;
     };
@@ -161,7 +179,7 @@ var PeopleField = (function () {
         this.activity_id = id;
     };
     return PeopleField;
-}());
+})();
 /**
  * Defines the menu/table on the left of the view. Also responsible for all the buttons and their functions
  * @version 0.0.7
@@ -407,13 +425,13 @@ var ActivityTable = (function () {
         var row;
         var startD;
         var endD;
+        var name = $('<td></td>');
+        var date = $('<td class="undefined text-right"></td>');
         startD = Util.formatShortDate(Util.parseSQLDate(data.start_date));
         endD = Util.formatShortDate(Util.parseSQLDate(data.end_date));
         row = $('<tr></tr>');
-        var name = $('<td></td>');
         name.text(Util.shortify(data.name, 22));
         row.append(name);
-        var date = $('<td class="undefined text-right"></td>');
         date.append($('<small></small>').text(startD + ' - ' + endD));
         row.append(date);
         row.click(function () {
@@ -428,7 +446,7 @@ var ActivityTable = (function () {
         this.table.append(row);
     };
     return ActivityTable;
-}());
+})();
 /**
  * Carries out all the tasks related to displaying the actual information of one activity on the right of the view
  * @since 0.0.6
@@ -496,12 +514,14 @@ var ActivityInformation = (function () {
     };
     /**
      * Sends the current object state to the server, resets the object state to account for changes
+     * @todo Find out why we perform 3-4 POST-requests each time we add a person
      */
     ActivityInformation.prototype.save = function () {
         var saveButton = $('#save-activity');
         this.displaySaving(saveButton);
         this.savePeople();
         var data = this.getObjectState();
+        data['action'] = 'update';
         var that = this;
         AJAX.post(Util.url('post/activity'), data, function (response) {
             that.displaySuccessfulSave(saveButton);
@@ -552,7 +572,6 @@ var ActivityInformation = (function () {
         var ed = this.endDate.datepicker('getDate');
         var endDate = Util.toMysqlFormat(ed);
         return {
-            action: 'update',
             activity_id: this.getId(),
             activity_name: this.title.val(),
             target_group: this.activeTargetGroup == null ? null : this.activeTargetGroup.id,
@@ -570,12 +589,12 @@ var ActivityInformation = (function () {
     ActivityInformation.prototype.savePeople = function () {
         for (var i = 0; i < this.addedPeople.length; i++) {
             var item = this.addedPeople[i];
-            if (!Util.isInCmp(item, this.people, cmpIds))
+            if (!Util.isInCmp(item, this.people, cmpPIds))
                 this.people.push(item);
         }
         for (var i = 0; i < this.removedPeople.length; i++) {
             var item = this.removedPeople[i];
-            Util.removeFromArrayCmp(item, this.people, cmpIds);
+            Util.removeFromArrayCmp(item, this.people, cmpPIds);
         }
     };
     ;
@@ -609,12 +628,12 @@ var ActivityInformation = (function () {
      */
     ActivityInformation.prototype.makeLinkWithSuggestions = function () {
         var ta = $('.twitter-typeahead');
+        var that = this;
         ta.keyup(function (e) {
             if (e.which == 13) {
                 $('.tt-suggestion:first-child', this).trigger('click');
             }
         });
-        var that = this;
         ta.on('typeahead:selected', { that: that }, addItemFromSuggestion);
     };
     /**
@@ -624,8 +643,8 @@ var ActivityInformation = (function () {
     ActivityInformation.prototype.displayTargetGroup = function (options) {
         var that = this;
         var dropD = $('#target-dropdown');
-        dropD.append('<li class="dropdown-header">Choose a target group:</li>');
         var bt = $('#target-button');
+        dropD.append('<li class="dropdown-header">Choose a target group:</li>');
         bt.text(this.activeTargetGroup.name);
         bt.append('<span class="caret"></span>');
         for (var i = 0; i < options.length; i++) {
@@ -643,7 +662,7 @@ var ActivityInformation = (function () {
                     dropD.empty();
                     bt.empty();
                     that.displayTargetGroup(options);
-                    //TODO: Timer here didn't have the timeout specified, hence was redundant
+                    //@todo Timer here didn't have the timeout specified, hence was redundant - why is this a @todo TODO?
                     that.save();
                 });
                 option.addClass('noselect');
@@ -656,10 +675,10 @@ var ActivityInformation = (function () {
      * @param initialData
      */
     ActivityInformation.prototype.displayComment = function (initialData) {
-        this.targetComment = $('#target-comment');
-        this.targetComment.val(initialData);
         var timer;
         var that = this;
+        this.targetComment = $('#target-comment');
+        this.targetComment.val(initialData);
         this.targetComment.on('input propertychange change', function () {
             clearTimeout(timer);
             timer = setTimeout(function () {
@@ -669,15 +688,15 @@ var ActivityInformation = (function () {
     };
     /**
      * Displays the start date of the activity
-     * @param sqlDate
+     * @param sqlDate:string
      */
     ActivityInformation.prototype.displayStartDate = function (sqlDate) {
+        var timer;
+        var that = this;
         var startD = Util.formatNumberDate(Util.parseSQLDate(sqlDate));
         this.startDate = Util.getDatePicker(startD, "start-date-picker");
         $('#start-date').append(this.startDate);
         this.startDate = $('#start-date-picker'); //otherwise it would not work properly
-        var timer;
-        var that = this;
         this.startDate.on('input propertychange change', function () {
             clearTimeout(timer);
             timer = setTimeout(function () {
@@ -687,15 +706,15 @@ var ActivityInformation = (function () {
     };
     /**
      * Displays the end date of the activity
-     * @param sqldate
+     * @param sqldate:string
      */
     ActivityInformation.prototype.displayEndDate = function (sqldate) {
+        var timer;
+        var that = this;
         var endD = Util.formatNumberDate(Util.parseSQLDate(sqldate));
         this.endDate = Util.getDatePicker(endD, "end-date-picker");
         $('#end-date').append(this.endDate);
         this.endDate = $('#end-date-picker'); //otherwise it would not work properly
-        var timer;
-        var that = this;
         this.endDate.on('input propertychange change', function () {
             clearTimeout(timer);
             timer = setTimeout(function () {
@@ -705,17 +724,19 @@ var ActivityInformation = (function () {
     };
     /**
      * Creates the table with all the people in a activity
+     * In doing so, it creates a copy of the people in the activity and actually considers that copy when displaying people
      */
     ActivityInformation.prototype.displayPeople = function () {
         var people = this.people;
         for (var i = 0; i < this.addedPeople.length; i++) {
             var item = this.addedPeople[i];
-            if (!Util.isInCmp(item, people, cmpIds))
+            if (!Util.isInCmp(item, people, cmpPIds)) {
                 people.push(item);
+            }
         }
         people = Util.arraySubtract(people, this.removedPeople);
-        this.peopleTable.empty();
         people.sort(cmpNames);
+        this.peopleTable.empty();
         //console.log(people);
         for (var i = 0; i < people.length; i++) {
             var person = people[i];
@@ -724,7 +745,7 @@ var ActivityInformation = (function () {
     };
     /**
      * Adds a row to the table showing the people currently in the activity
-     * @param person
+     * @param person:ParticipantData
      */
     ActivityInformation.prototype.displayPerson = function (person) {
         var that = this;
@@ -739,22 +760,22 @@ var ActivityInformation = (function () {
         var fullRow = $('<tr class="row"></tr>');
         fullRow.append(row);
         fullRow.append(removeButton);
-        that.addOnClickToRow(row, person.id);
+        that.addOnClickToRow(row, person.r_id);
         that.peopleTable.append(fullRow);
     };
     /**
      * Adds the onclick function: If a user wants to remove a person, we have to add it to the suggestion field
      * Also have to remove it from the people table
-     * @param button
-     * @param person
+     * @param button:JQuery
+     * @param person:ParticipantData
      */
     ActivityInformation.prototype.addRemoveClick = function (button, person) {
         var that = this;
         var timer;
         function removePerson(e) {
             var c = e.data;
-            Util.removeFromArrayCmp(c.person, c.that.addedPeople, cmpIds);
-            if (!Util.isInCmp(c.person, c.that.removedPeople, cmpIds))
+            Util.removeFromArrayCmp(c.person, c.that.addedPeople, cmpPIds);
+            if (!Util.isInCmp(c.person, c.that.removedPeople, cmpPIds))
                 c.that.removedPeople.push(c.person);
             c.that.existingPeople.addItemToSuggestions(c.person);
             clearTimeout(timer);
@@ -769,8 +790,8 @@ var ActivityInformation = (function () {
     };
     /**
      * Adds an on-click event to a row in the table in which all the people going to an activity are displayed
-     * @param row
-     * @param id
+     * @param row:JQuery
+     * @param id:string
      */
     ActivityInformation.prototype.addOnClickToRow = function (row, id) {
         row.click(function () {
@@ -778,43 +799,45 @@ var ActivityInformation = (function () {
         });
     };
     return ActivityInformation;
-}());
+})();
 /**
  * Compare function for property name
- * @param a
- * @param b
+ * @param a:Object
+ * @param b:Object
  * @returns {number}
  */
 function cmpNames(a, b) {
     if (a.name > b.name)
         return 1;
-    if (b.name > a.name)
+    else if (b.name > a.name)
         return -1;
-    return 0;
+    else
+        return 0;
 }
 /**
  * Compare function for property id
- * @param a
- * @param b
+ * @param a:Object
+ * @param b:Object
  * @returns {number}
  */
-function cmpIds(a, b) {
-    if (parseInt(a.id) > parseInt(b.id))
+function cmpPIds(a, b) {
+    if (parseInt(a.p_id) > parseInt(b.p_id))
         return 1;
-    if (parseInt(b.id) > parseInt(a.id))
+    if (parseInt(b.p_id) > parseInt(a.p_id))
         return -1;
     return 0;
 }
 /**
  * Function for handling the event of adding a new person
+ * @todo Put this in ActivityInformation
  * @param e
- * @param item
+ * @param item:ParticipantData
  */
 function addItemFromSuggestion(e, item) {
     var c = e.data;
     //console.log('adding activityinfo array added people name ' + item.name);
-    Util.removeFromArrayCmp(item, c.that.removedPeople, cmpIds);
-    if (!Util.isInCmp(item, c.that.addedPeople, cmpIds))
+    Util.removeFromArrayCmp(item, c.that.removedPeople, cmpPIds);
+    if (!Util.isInCmp(item, c.that.addedPeople, cmpPIds))
         c.that.addedPeople.push(item);
     c.that.existingPeople.removeItemFromSuggestions(item);
     c.that.save();

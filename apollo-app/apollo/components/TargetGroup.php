@@ -7,6 +7,7 @@
 
 namespace Apollo\Components;
 use Apollo\Apollo;
+use Apollo\Entities\TargetGroupEntity;
 
 
 /**
@@ -14,7 +15,7 @@ use Apollo\Apollo;
  *
  * @package Apollo\Components
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.21
+ * @version 0.0.2
  */
 class TargetGroup extends DBComponent
 {
@@ -40,5 +41,24 @@ class TargetGroup extends DBComponent
         $result = $query->getResult();
         $item = $result[0];
         return $item;
+    }
+
+    /**
+     * @return TargetGroupEntity[]
+     */
+    public static function getValidTargetGroups()
+    {
+        $org_id = Apollo::getInstance()->getUser()->getOrganisationId();
+        return TargetGroup::getRepository()->findBy(['organisation' => $org_id, 'is_hidden' => false]);
+    }
+
+    /**
+     * @param $id
+     * @return TargetGroupEntity
+     */
+    public static function getValidTargetGroup($id)
+    {
+        $org_id = Apollo::getInstance()->getUser()->getOrganisationId();
+        return TargetGroup::getRepository()->findBy(['organisation' => $org_id, 'is_hidden' => false, 'id' => $id])[0];
     }
 }

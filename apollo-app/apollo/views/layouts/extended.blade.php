@@ -6,7 +6,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.5
+ * @version 0.0.6
  */
 
 use Apollo\Apollo;
@@ -62,7 +62,7 @@ $organisation = Apollo::getInstance()->getUser()->getOrganisationName();
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">An error has occrurred</h4>
+                    <h4 class="modal-title">An error has occurred</h4>
                 </div>
                 <div class="modal-body">
                     <p id="error-message"></p>

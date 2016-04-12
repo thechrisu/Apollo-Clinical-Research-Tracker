@@ -7,6 +7,7 @@
 
 namespace Apollo\Components;
 use Apollo\Apollo;
+use Apollo\Entities\ActivityEntity;
 
 
 /**
@@ -14,7 +15,7 @@ use Apollo\Apollo;
  *
  * @package Apollo\Components
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  */
 class Activity extends DBComponent
 {
@@ -24,6 +25,9 @@ class Activity extends DBComponent
      */
     protected static $entityNamespace = 'Apollo\\Entities\\ActivityEntity';
 
+    /**
+     * @return int
+     */
     public static function getMinId()
     {
         $em = DB::getEntityManager();
@@ -45,6 +49,10 @@ class Activity extends DBComponent
         return $item;
     }
 
+    /**
+     * @param $id
+     * @return int
+     */
     public static function getNumSmallerIds($id)
     {
         $em = DB::getEntityManager();
@@ -60,4 +68,13 @@ class Activity extends DBComponent
         return count($result);
     }
 
+    /**
+     * @param $id
+     * @return ActivityEntity
+     */
+    public static function getValidActivity($id)
+    {
+        $org = Apollo::getInstance()->getUser()->getOrganisationId();
+        return self::getRepository()->findBy(['id' => $id, 'is_hidden' => false, 'organisation' => $org])[0];
+    }
 }

@@ -23,11 +23,8 @@ use Apollo\Entities\DataEntity;
 use Apollo\Entities\FieldEntity;
 use Apollo\Entities\PersonEntity;
 use Apollo\Entities\RecordEntity;
-use Apollo\Entities\TargetGroupEntity;
 use DateTime;
-use Error;
 use Exception;
-use Symfony\Component\Debug\Exception\FatalErrorException;
 
 
 /**
@@ -38,7 +35,7 @@ use Symfony\Component\Debug\Exception\FatalErrorException;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.1.0
+ * @version 0.1.1
  */
 class PostController extends GenericController
 {
@@ -64,7 +61,7 @@ class PostController extends GenericController
 
     /**
      * Action parsing operations on records, such as hiding, adding, duplicating
-     * TODO: Extract!!!!!
+     * @todo: Extract till you drop!!!!!
      * @since 0.0.2 Parses
      * @since 0.0.1
      */
@@ -204,8 +201,8 @@ class PostController extends GenericController
     /**
      * Parses the data/field info and saves it into database
      *
-     * TODO Tim: Fix dates, Extract!!!!!!!!!
-     * TODO: Update records updated_by
+     * @todo Tim: Fix dates, Extract!!!!!!!!!
+     * @todo: Update records updated_by
      *
      * @since 0.0.4
      */
@@ -304,7 +301,7 @@ class PostController extends GenericController
                         if($data['type'] == 'name') {
                             $field->setName($data['value']);
                         } elseif($data['type'] == 'defaults') {
-                            //TODO: Anything but this
+                            //@todo: Anything but this
                             $length = max(count($data['value']), count($field->getDefaults()));
                             $defaults = $field->getDefaults();
                             for($i = 0; $i < $length; $i++) {
@@ -392,7 +389,7 @@ class PostController extends GenericController
                 $error['description'] = 'Missing post request parameters.';
             }
         } elseif($action == 'hide') {
-            //TODO: Check if essential
+            //@todo: Check if essential
             $data = $this->parseRequest(['id' => 0]);
             $fieldsRepo = Field::getRepository();
             /** @var FieldEntity $field */
@@ -510,70 +507,62 @@ class PostController extends GenericController
             'added_people' => null,
             'removed_people' => null
         ]);
-        $activity = null;
         try {
-            $org = Apollo::getInstance()->getUser()->getOrganisationId();
-            $activity = Activity::getRepository()->findBy(['id' => $data['activity_id'], 'is_hidden' => '0', 'organisation' => $org])[0];
+            $activity = Activity::getValidActivity($data['activity_id']);
+            if ($data['activity_id'] > 0 && !empty($activity)) {
+                if (!empty($data['activity_name']))
+                    $activity->setName($data['activity_name']);
+                if (!empty($data['target_group'])) {
+                    $tg = TargetGroup::getValidTargetGroup($data['target_group']);
+                    if (!empty($tg))
+                        $activity->setTargetGroup($tg);
+                }
+                if (!empty($data['target_group_comment']))
+                    $activity->setTargetGroupComment($data['target_group_comment']);
+                if (!empty($data['start_date'])) {
+                    $start_date = new DateTime($data['start_date']);
+                    $activity->setStartDate($start_date);
+                }
+                if (!empty($data['end_date'])) {
+                    $end_date = new DateTime($data['end_date']);
+                    $activity->setEndDate($end_date);
+                }
+                if (!empty($data['added_people'])) {
+                    $r = $this->getPeopleEntitiesFromData($data['added_people']);
+                    if (!empty($r['error']))
+                        $response['error'] = $r['error'];
+                    else
+                        $activity->addPeople($r['people']);
+                }
+                if (!empty($data['removed_people'])) {
+                    $r = $this->getPeopleEntitiesFromData($data['removed_people']);
+                    if (!empty($r['error']))
+                        $response['error'] = $r['error'];
+                    else
+                        $activity->removePeople($r['people']);
+                }
+                $this->writeActivityToDB($activity);
+            }
         } catch (Exception $e) {
             $response['error'] = $this->getJSONError(2, 'Error while querying database for activity, message: ' . $e->getMessage());
-        } finally {
-            if ($data['activity_id'] > 0 & $activity != null) {
-                try {
-                    if(!empty($data['activity_name']))
-                        $activity->setName($data['activity_name']);
-                    if(!empty($data['target_group'])) {
-                        $tg = $this->getValidTargetGroup($data['target_group']);
-                        if(!empty($tg))
-                            $activity->setTargetGroup($tg);
-                    }
-                    if(!empty($data['target_group_comment']))
-                        $activity->setTargetGroupComment($data['target_group_comment']);
-                    if(!empty($data['start_date'])) {
-                        $start_date = new DateTime($data['start_date']);
-                        $activity->setStartDate($start_date);
-                    }
-                    if(!empty($data['end_date'])) {
-                        $end_date = new DateTime($data['end_date']);
-                        $activity->setEndDate($end_date);
-                    }
-                    if(!empty($data['added_people'])) {
-                        $r = $this->getPeopleEntitiesFromData($data['added_people']);
-                        if(!empty($r['error']))
-                            $response['error'] = $r['error'];
-                        else
-                            $activity->addPeople($r['people']);
-                    }
-                    if(!empty($data['removed_people'])) {
-                        $r  = $this->getPeopleEntitiesFromData($data['removed_people']);
-                        if(!empty($r['error']))
-                            $response['error'] = $r['error'];
-                        else
-                            $activity->removePeople($r['people']);
-                    }
-                    $this->writeActivityToDB($activity);
-                } catch (Exception $e) {
-                    $response['error'] = $this->getJSONError(3, 'Error while writing to database for activity, message: ' . $e->getMessage());
-                } catch (Error $e) {
-                    $response['error'] = $this->getJSONError(4, 'Error while writing to database for activity, message: ' . $e->getMessage());
-                }
-            } else {
-                $response['error'] = $this->getJSONError(1, 'Error in activity id, could not hide');
-            }
-            return $response;
         }
         //$response['error'] = $this->getJSONError(0, 'update not implemented.');
         return $response;
     }
 
+    /**
+     * @todo Consider putting this into person component
+     * @param $data
+     * @return mixed
+     */
     private function getPeopleEntitiesFromData($data)
     {
         $arr = [];
-        $ret = null;
         foreach($data as $person)
         {
-            if($person['id'] > 0){
+            if(intval($person['p_id']) > 0){
                 try{
-                    $pEntity = $this->getValidPerson($person['id']);
+                    $pEntity = Person::getValidPerson($person['p_id']);
                     if(!empty($pEntity))
                     {
                         $arr[] = $pEntity;
@@ -583,11 +572,14 @@ class PostController extends GenericController
                 }
             }
         }
+        if(count($arr) < count($data))
+            $ret['error'] = $this->getJSONError(6, "could not get all people from ids");
         $ret['people'] = $arr;
         return $ret;
     }
 
     /**
+     * @todo: Consider putting this into activity component
      * @param $data
      * @param $bonus
      * @return ActivityEntity
@@ -684,13 +676,6 @@ class PostController extends GenericController
         return $parsedData;
     }
 
-    private function getJSONError($id, $description) {
-        return  [
-            'id' => $id,
-            'description' => $description
-        ];
-    }
-
     /**
      * For a bunch of fields, checks if any of them is empty. Returns true if at least one is empty
      * @param $data
@@ -706,44 +691,7 @@ class PostController extends GenericController
     }
 
     /**
-     * @param $people
-     * @return array
-     */
-    private function formatPeopleShortConcatName($people)
-    {
-        $people_obj = [];
-        foreach($people as $person) {
-            $person_obj = [
-                'id' => $person->getId(),
-                'name' => implode(' ', [$person->getGivenName(), $person->getMiddleName(),$person->getLastName()])
-            ];
-            $people_obj[] = $person_obj;
-        }
-        return $people_obj;
-    }
-
-    /**
-     * @param $id
-     * @return mixed
-     */
-    private function getValidTargetGroup($id)
-    {
-        $org_id = Apollo::getInstance()->getUser()->getOrganisationId();
-        return TargetGroup::getRepository()->findBy(['organisation' => $org_id, 'is_hidden' => 0, 'id' => $id])[0];
-    }
-
-    /**
-     * @param $id
-     * @return mixed
-     */
-    private function getValidPerson($id)
-    {
-        $org_id = Apollo::getInstance()->getUser()->getOrganisationId();
-        return Person::getRepository()->findBy(['organisation' => $org_id, 'is_hidden' => 0, 'id' => $id])[0];
-    }
-
-    /**
-     * @param $activity
+     * @param ActivityEntity $activity
      * @return mixed
      */
     private function registerActivity($activity)
@@ -755,6 +703,18 @@ class PostController extends GenericController
             $response['error'] = $this->getJSONError(2, $e->getMessage());
         }
         return $response;
+    }
+
+    /**
+     * @param int $id
+     * @param string $description
+     * @return array
+     */
+    private function getJSONError($id, $description) {
+        return  [
+            'id' => $id,
+            'description' => $description
+        ];
     }
 
     /**

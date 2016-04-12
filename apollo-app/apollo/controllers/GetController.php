@@ -63,7 +63,7 @@ class GetController extends GenericController
 
     /**
      * Posts a JSON that contains information of the records (for the overview-view)
-     * TODO: Contemplate over putting extracted functions somewhere else
+     * @todo: Contemplate over putting extracted functions somewhere else
      * @since 0.0.8 Extracted a lot more functions
      * @since 0.0.5 Extracted sorting
      * @since 0.0.2 Implemented quick search
@@ -128,7 +128,7 @@ class GetController extends GenericController
 
 
     /**
-     * TODO: Add description for function
+     * @todo: Add description for function
      *
      * @param QueryBuilder $queryBuilder
      * @param $search
@@ -145,7 +145,7 @@ class GetController extends GenericController
 
     /**
      * Given a person (retrieved from the data base), returns an object containing all the data of the person
-     * TODO: Put this function somewhere else, this is a controller
+     * @todo: Put this function somewhere else, this is a controller
      * @param PersonEntity $person
      * @return mixed
      */
@@ -164,7 +164,7 @@ class GetController extends GenericController
 
     /**
      * For a given number of people, return a formatted object of the people's record data
-     * TODO: Put this somewhere else, this is a controller
+     * @todo: Put this somewhere else, this is a controller
      * @param $people
      * @param $page
      * @return $response
@@ -233,10 +233,12 @@ class GetController extends GenericController
 
     private function getFormattedActivitiesOfPerson($person)
     {
+        /** @var PersonEntity $person */
         $activities = $person->getActivities();
         $ret = [];
         foreach($activities as $activity){
-            $ret[] = $this->getFormattedShortActivityData($activity);
+            if(!$activity->isHidden())
+                $ret[] = $this->getFormattedShortActivityData($activity);
         }
         return $ret;
     }
@@ -310,7 +312,6 @@ class GetController extends GenericController
                 }
                 $fieldEditData['defaults'] = $defaultArray;
                 $fieldData = $record->findOrCreateData($field->getId());
-                $value = [];
                 if ($field->hasDefault()) {
                     if ($field->isMultiple()) {
                         $value = unserialize($fieldData->getLongText());
@@ -338,10 +339,8 @@ class GetController extends GenericController
 
     /**
      * It returns short information about several activities
-     * Currently serves dummy data
      *
      * @since 0.0.5
-     * TODO: Serve real data
      */
     public function actionActivities()
     {
@@ -395,6 +394,12 @@ class GetController extends GenericController
         $queryBuilder->setParameter('search', '%' . $search . '%');
     }
 
+    /**
+     * @todo: Put this somewhere else, this is a controller
+     * @param ActivityEntity[] $activities
+     * @param $page
+     * @return mixed
+     */
     private function getFormattedActivities($activities, $page)
     {
         $response['error'] = null;
@@ -406,6 +411,11 @@ class GetController extends GenericController
         return $response;
     }
 
+    /**
+     * @todo: Put this somewhere else, this is a controller
+     * @param ActivityEntity $activity
+     * @return array
+     */
     private function getFormattedShortActivityData($activity)
     {
         $responseActivity = [
@@ -424,11 +434,11 @@ class GetController extends GenericController
     public function actionActivity()
     {
         $data = $this->parseRequest(['id' => 0]);
-        $activity = Activity::getRepository()->findOneBy(['id' => $data['id'], 'is_hidden' => 0, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
+        $activity = Activity::getValidActivity($data['id']);
 
         if ($data['id'] > 0 && $activity != null) {
             $activityInfo = $this->getInfoActivity($activity);
-            //TODO: Check if there is more than one activity. If so, then report that as invalid
+            //@todo: Check if there is more than one activity. If so, then report that as invalid
             $response = $activityInfo;
         } else {
             $response['error'] = $this->getJSONError(1, 'The supplied id is invalid!');
@@ -437,7 +447,8 @@ class GetController extends GenericController
     }
 
     /**
-     * Formats an activity as a valid JSON object
+     * @todo: Put this somewhere else, this is a controller
+     * Formats an activity as a valid JSON object (with all the information about the activity)
      * @param ActivityEntity $activity
      * @return array
      */
@@ -458,16 +469,18 @@ class GetController extends GenericController
     }
 
     /**
-     * @param $activity_activeTarget
+     * @todo: Put this somewhere else, this is a controller
+     * @param TargetGroupEntity $activity_activeTarget
      * @return array
      */
     private function getFormattedTargetGroups($activity_activeTarget)
     {
-        $targetGroups = $this->getValidTargetGroups();
+        $targetGroups = TargetGroup::getValidTargetGroups();
         $arr = [];
         foreach ($targetGroups as $targetGroup) {
             $tg = $this->getFormattedTargetGroup($targetGroup);
-            $arr[] = $tg;
+            if(!empty($tg))
+                $arr[] = $tg;
         }
         $ret['data'] = $arr;
         $ret['active'] = $this->getFormattedTargetGroup($activity_activeTarget);
@@ -475,7 +488,8 @@ class GetController extends GenericController
     }
 
     /**
-     * @param $targetGroup
+     * @todo: Put this somewhere else, this is a controller
+     * @param TargetGroupEntity $targetGroup
      * @return array
      */
     private function getFormattedTargetGroup($targetGroup)
@@ -499,8 +513,7 @@ class GetController extends GenericController
         $data = $this->parseRequest(['activity_id' => null, 'temporarily_added' => null, 'search' => null]);
         $people = null;
         $pqb = $this->getQueryForPeopleNotInProgramme($data);
-        $activity = Activity::getRepository()->findBy(['id' => $data['activity_id'], 'is_hidden' => 0, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
-        if ((empty($activity[0])) || $activity[0]->isHidden()) {
+        if ((empty(Activity::getValidActivity($data['activity_id'])))) {
             $response['error'] = $this->getJSONError(2, "Activity hidden.");
         } else {
             try {
@@ -516,32 +529,18 @@ class GetController extends GenericController
     }
 
     /**
-     * @param $people
-     * @return array
-     */
-    private function formatPeopleShortConcatName($people)
-    {
-        $people_obj = [];
-        foreach ($people as $person) {
-            $person_obj = [
-                'id' => $person->getId(),
-                'name' => implode(' ', [$person->getGivenName(), $person->getMiddleName(), $person->getLastName()])
-            ];
-            $people_obj[] = $person_obj;
-        }
-        return $people_obj;
-    }
-
-    /**
-     * @param $people
+     * @todo: Put this somewhere else, this is a controller
+     * @param PersonEntity[] $people
      * @return array
      */
     private function formatPeopleShortWithRecords($people)
     {
         $people_obj = [];
         foreach ($people as $person) {
+            $p_id = $person->getId();
             $person_obj = [
-                'id' => $person->getRecords()[0]->getId(),
+                'p_id' => $p_id,
+                'r_id' => Person::getMostRecentRecord($p_id)->getId(),
                 'name' => implode(' ', [$person->getGivenName(), $person->getMiddleName(), $person->getLastName()])
             ];
             $people_obj[] = $person_obj;
@@ -550,7 +549,7 @@ class GetController extends GenericController
     }
 
     /**
-     * @param $queryBuilder
+     * @param QueryBuilder $queryBuilder
      * @param $search
      */
     private function addShortPersonSearch($queryBuilder, $search)
@@ -564,13 +563,12 @@ class GetController extends GenericController
     }
 
     /**
-     * @param $queryBuilder
+     * @param QueryBuilder $queryBuilder
      * @param $array
      */
     private function removePeopleInArray($queryBuilder, $array)
     {
         foreach ($array as $id) {
-
             $queryBuilder->andWhere(
                 $queryBuilder->expr()->notIn('p.id', $id)
             );
@@ -578,8 +576,8 @@ class GetController extends GenericController
     }
 
     /**
-     * @param $pqb
-     * @param $aqb
+     * @param QueryBuilder $pqb
+     * @param QueryBuilder $aqb
      */
     private function getPeopleNotInTable($pqb, $aqb)
     {
@@ -589,7 +587,6 @@ class GetController extends GenericController
     }
 
     /**
-     * TODO: Fix bug: When activity is hidden, no people should be returned
      * @param $data
      * @return QueryBuilder
      */
@@ -630,25 +627,7 @@ class GetController extends GenericController
     }
 
     /**
-     * @param $people
-     * @return array
-     */
-    private function formatPeopleShort($people)
-    {
-        $people_obj = [];
-        foreach ($people as $person) {
-            $person_obj = [
-                'id' => $person->getId(),
-                'given_name' => $person->getGivenName(),
-                'last_name' => $person->getLastName()
-            ];
-            $people_obj[] = $person_obj;
-        }
-        return $people_obj;
-    }
-
-    /**
-     * Given an activity id, returns a query bulider that contains the ids of the people in the activity, as long as the activity is valid
+     * Given an activity id, returns a query builder that contains the ids of the people in the activity, as long as the activity is valid
      * @param $data
      * @return QueryBuilder
      */
@@ -667,15 +646,6 @@ class GetController extends GenericController
 
         $activityQB->join('a.' . 'people', 'ppl', 'WHERE', $cond);
         return $activityQB;
-    }
-
-    /**
-     * @return array
-     */
-    private function getValidTargetGroups()
-    {
-        $org_id = Apollo::getInstance()->getUser()->getOrganisationId();
-        return TargetGroup::getRepository()->findBy(['organisation' => $org_id, 'is_hidden' => 0]);
     }
 
     /**
