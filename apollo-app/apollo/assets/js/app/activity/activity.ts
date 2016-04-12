@@ -3,6 +3,7 @@
 ///<reference path="../jquery.d.ts"/>
 ///<reference path="../inputs.ts"/>
 ///<reference path="../bootbox.d.ts"/>
+///<reference path="../typeahead.d.ts"/>
 
 /**
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
@@ -168,8 +169,7 @@ class PeopleField {
                             that.people = output;
                             return output;
                         }
-                        var co = carryout(data.data);
-                        return co;
+                        return carryout(data.data);
 
                     }
 
