@@ -146,8 +146,12 @@ abstract class DataField implements Renderable {
         target.append(this.parentNode);
     }
 
-    public getValue():JQuery {
-        return this.value;
+    public getPlain():string {
+        return this.value.text();
+    }
+
+    public renderPlain(target:JQuery) {
+        target.text(this.value.text());
     }
 }
 
@@ -190,6 +194,25 @@ class DataDateShort extends DataField {
         }
         return Util.buildNode('strong').text(Util.formatShortDate(<Date> value));
     }
+}
+
+interface DateRange {
+    startDate:Date|string,
+    endDate:Date|string
+}
+
+class DataDateRange extends DataField {
+
+    public constructor(value:DateRange) {
+        super(value);
+    }
+
+    protected decorate(data:DateRange):JQuery {
+        var startDate = new DataDateShort(data.startDate).getPlain();
+        var endDate = new DataDateShort(data.endDate).getPlain();
+        return Util.buildNode('strong').text(startDate + ' - ' + endDate);
+    }
+
 }
 
 class DataLongText extends DataField {

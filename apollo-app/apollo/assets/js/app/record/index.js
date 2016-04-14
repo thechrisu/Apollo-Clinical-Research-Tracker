@@ -10,7 +10,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.5
+ * @version 0.0.6
  */
 var RecordTable = (function () {
     function RecordTable() {
@@ -96,13 +96,8 @@ var RecordTable = (function () {
         var tr = $('<tr class="record-tr clickable" data-id="' + data.id + '"></tr>');
         [data.given_name, data.last_name, data.email, data.phone].forEach(function (string) {
             var td = $('<td></td>');
-            var dataValue = new DataText(Util.shortify(string, 50)).getValue();
-            if (dataValue.prop("tagName").toLowerCase() == 'strong') {
-                td.text(dataValue.text());
-            }
-            else {
-                td.append(dataValue);
-            }
+            var field = new DataText(Util.shortify(string, 50));
+            field.renderPlain(td);
             tr.append(td);
         });
         this.table.append(tr);

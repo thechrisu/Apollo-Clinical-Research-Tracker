@@ -4,6 +4,7 @@
 ///<reference path="inputs.ts"/>
 ///<reference path="../typings/bootbox.d.ts"/>
 ///<reference path="../typings/typeahead.d.ts"/>
+///<reference path="columns.ts"/>
 
 /**
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
@@ -156,7 +157,6 @@ class PeopleField {
                 }
             }
         });
-        //console.log(Object.getPrototypeOf(this.bh));
     }
 
     /**
@@ -219,10 +219,6 @@ class PeopleField {
             query += encodeURIComponent('&temporarily_added[]=' + pa.p_id);
         }
         return query;
-    }
-
-    public setId(id:number) {
-        this.activity_id = id;
     }
 }
 
@@ -494,16 +490,18 @@ class ActivityTable {
      */
     private addRowToTable(data:ShortActivityData, active:boolean) {
         var row:JQuery;
-        var startD;
-        var endD;
         var name = $('<td></td>');
-        var date = $('<td class="undefined text-right"></td>');
-        startD = Util.formatShortDate(Util.parseSQLDate(<string> data.start_date));
-        endD = Util.formatShortDate(Util.parseSQLDate(<string> data.end_date));
         row = $('<tr></tr>');
         name.text(Util.shortify(data.name, 22));
         row.append(name);
-        date.append($('<small></small>').text(startD + ' - ' + endD));
+        var date = $('<td class="undefined text-right"></td>');
+        var field = new DataDateRange({
+            startDate: data.start_date,
+            endDate: data.end_date
+        });
+        var small = $('<small></small>');
+        field.renderPlain(small);
+        date.append(small);
         row.append(date);
         row.click(function () {
             Util.to('activity/view/' + data.id);
@@ -524,6 +522,8 @@ class ActivityTable {
  */
 class ActivityInformation {
 
+    // @todo Perhaps use an interface for some of these variables?
+
     private peopleTable:JQuery; //the table for all of the people in the activity
     private title:JQuery; //the activity title
     private targetComment:JQuery; //the comment for the target group of the activity
@@ -543,14 +543,6 @@ class ActivityInformation {
      */
     public getId() {
         return this.id;
-    }
-
-    /**
-     * Similar to getId()
-     * @returns {number}
-     */
-    public getPage() {
-        return this.onPage;
     }
 
     /**
@@ -750,7 +742,6 @@ class ActivityInformation {
                     dropD.empty();
                     bt.empty();
                     that.displayTargetGroup(options);
-                    //@todo Timer here didn't have the timeout specified, hence was redundant - why is this a @todo TODO?
                     that.save();
                 });
                 option.addClass('noselect');

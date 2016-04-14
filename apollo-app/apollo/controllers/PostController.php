@@ -582,6 +582,7 @@ class PostController extends GenericController
 
     /**
      * @todo: Consider putting this into activity component
+     * @todo: I doubt this code will ever get reused anywhere else, might as well put it back where it came from
      * @param $data
      * @param $bonus
      * @return ActivityEntity

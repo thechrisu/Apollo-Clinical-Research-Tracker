@@ -6,7 +6,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.2.2
+ * @version 0.2.3
  */
 /**
  * Constant specifying a delay before the AJAX request after the user
@@ -96,27 +96,6 @@ var Util = (function () {
         });
     };
     /**
-     * Removes all instances of an item in an array from another array. Comparison is done with a custom compare function
-     * @param toSubtractFrom
-     * @param subtractedBy
-     * @param compareFunction
-     */
-    Util.arraySubtractCmp = function (toSubtractFrom, subtractedBy, compareFunction) {
-        for (var i = 0; i < subtractedBy.length; i++) {
-            this.removeFromArrayCmp(subtractedBy[i], toSubtractFrom, compareFunction);
-        }
-    };
-    /**
-     * Removes all instances of an item from an array
-     * @param needle
-     * @param haystack
-     */
-    Util.removeFromArray = function (needle, haystack) {
-        var index = haystack.indexOf(needle);
-        if (index > -1)
-            haystack.splice(index, 1);
-    };
-    /**
      * Removes all instances of an item from an array using a custom compare function
      * @param needle
      * @param haystack
@@ -129,15 +108,6 @@ var Util = (function () {
                 i--; //decrement since the array indices will move up
             }
         }
-    };
-    /**
-     * Checks if an element is in an array
-     * @param needle
-     * @param haystack
-     * @returns {boolean}
-     */
-    Util.isIn = function (needle, haystack) {
-        return haystack.indexOf(needle) > -1;
     };
     /**
      * Checks if an element is in an array using a custom compare function
@@ -234,15 +204,27 @@ var Util = (function () {
             "August", "September", "October",
             "November", "December"
         ];
-        var day = date.getDate().toString().slice(-1);
-        var daySuffix = 'th';
-        if (day == '1')
-            daySuffix = 'st';
-        if (day == '2')
-            daySuffix = 'nd';
-        if (day == '3')
-            daySuffix = 'rd';
-        return months[date.getMonth()] + ' ' + date.getDate() + daySuffix + ', ' + date.getFullYear();
+        return months[date.getMonth()] + ' ' + Util.ordinalSuffix(date.getDate()) + ', ' + date.getFullYear();
+    };
+    /**
+     * Returns the number with an ordinal suffix
+     *
+     * @param i
+     * @returns {string}
+     * @since 0.2.3
+     */
+    Util.ordinalSuffix = function (i) {
+        var j = i % 10, k = i % 100;
+        if (j == 1 && k != 11) {
+            return i + "st";
+        }
+        if (j == 2 && k != 12) {
+            return i + "nd";
+        }
+        if (j == 3 && k != 13) {
+            return i + "rd";
+        }
+        return i + "th";
     };
     /**
      * Formats JS Date to the following format:
