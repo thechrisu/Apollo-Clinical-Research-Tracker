@@ -122,7 +122,12 @@ var DataField = (function () {
         return this.value.text();
     };
     DataField.prototype.renderPlain = function (target) {
-        target.text(this.value.text());
+        if (this.value.prop("tagName").toLowerCase() == 'strong') {
+            target.text(this.value.text());
+        }
+        else {
+            target.append(this.value);
+        }
     };
     return DataField;
 }());

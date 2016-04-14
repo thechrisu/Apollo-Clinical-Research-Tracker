@@ -151,7 +151,11 @@ abstract class DataField implements Renderable {
     }
 
     public renderPlain(target:JQuery) {
-        target.text(this.value.text());
+        if((<string>this.value.prop("tagName")).toLowerCase() == 'strong') {
+            target.text(this.value.text());
+        } else {
+            target.append(this.value);
+        }
     }
 }
 
