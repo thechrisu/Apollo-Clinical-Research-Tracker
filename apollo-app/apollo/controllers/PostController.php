@@ -62,6 +62,7 @@ class PostController extends GenericController
     /**
      * Action parsing operations on records, such as hiding, adding, duplicating
      * @todo: Extract till you drop!!!!!
+     * @todo: ^ Well that didn't work
      * @since 0.0.2 Parses
      * @since 0.0.1
      */
@@ -76,8 +77,7 @@ class PostController extends GenericController
         $response['error'] = null;
         if ($action == 'create') {
             $data = $this->parseRequest(['given_name' => null, 'middle_name' => null, 'last_name' => null, 'record_name' => null, 'start_date' => null, 'end_date' => null]);
-            $empty = $this->areFieldsEmpty($data);
-            if (!$empty) {
+            if (!empty($data['given_name']) && !empty($data['last_name']) && !empty($data['record_name']) && !empty($data['start_date']) && !empty($data['end_date'])) {
                 $user = Apollo::getInstance()->getUser();
                 $person = new PersonEntity();
                 $person->setOrganisation($user->getOrganisation());
@@ -201,7 +201,6 @@ class PostController extends GenericController
     /**
      * Parses the data/field info and saves it into database
      *
-     * @todo Tim: Fix dates, Extract!!!!!!!!!
      * @todo: Update records updated_by
      *
      * @since 0.0.4
@@ -389,14 +388,18 @@ class PostController extends GenericController
                 $error['description'] = 'Missing post request parameters.';
             }
         } elseif($action == 'hide') {
-            //@todo: Check if essential
             $data = $this->parseRequest(['id' => 0]);
             $fieldsRepo = Field::getRepository();
             /** @var FieldEntity $field */
             $field = $fieldsRepo->findOneBy(['id' => $data['id'], 'organisation' => Apollo::getInstance()->getUser()->getOrganisation()]);
             if($field != null) {
-                $field->setIsHidden(true);
-                DB::getEntityManager()->flush();
+                if(!$field->isEssential()) {
+                    $field->setIsHidden(true);
+                    DB::getEntityManager()->flush();
+                } else {
+                    $error['id'] = 0;
+                    $error['description'] = 'Field is marked as essential and hence cannot be hidden.';
+                }
             } else {
                 $error['id'] = 0;
                 $error['description'] = 'Invalid ID.';
@@ -466,7 +469,6 @@ class PostController extends GenericController
         } else {
             $response['error'] = $this->getJSONError(1, 'Some of the fields are empty');
         }
-        //$response['bonus'] = $bonus;
         return $response;
     }
 
