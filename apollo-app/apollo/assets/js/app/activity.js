@@ -4,6 +4,7 @@
 ///<reference path="inputs.ts"/>
 ///<reference path="../typings/bootbox.d.ts"/>
 ///<reference path="../typings/typeahead.d.ts"/>
+var ac_id = NaN;
 /**
  * Class to store the token field (the field to add/remove users from a activity)
  * @todo Make this more general: Make a sort-of wrapper for typescript with the added/removed arrays
@@ -23,8 +24,7 @@ var PeopleField = (function () {
      * Initialises the object to the required state
      * @param activity_id
      */
-    PeopleField.prototype.load = function (activity_id) {
-        this.activity_id = activity_id;
+    PeopleField.prototype.load = function () {
         this.search = '';
         this.resetAdded();
         this.resetBloodhound();
@@ -97,7 +97,7 @@ var PeopleField = (function () {
             },
             sorter: cmpNames,
             remote: {
-                url: Util.url('get/activitypeople') + '?activity_id=' + that.activity_id + that.formatTemporarily_added() + '&search=' + that.search,
+                url: Util.url('get/activitypeople') + '?activity_id=' + ac_id + that.formatTemporarily_added() + '&search=' + that.search,
                 filter: function (data) {
                     if (data) {
                         return that.processNewSuggestionData(data.data);
@@ -175,11 +175,8 @@ var PeopleField = (function () {
         }
         return query;
     };
-    PeopleField.prototype.setId = function (id) {
-        this.activity_id = id;
-    };
     return PeopleField;
-}());
+})();
 /**
  * Defines the menu/table on the left of the view. Also responsible for all the buttons and their functions
  * @version 0.0.7
@@ -314,7 +311,7 @@ var ActivityTable = (function () {
                         var name = modal.find('#add-name').val();
                         var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
                         var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
-                        ActivityTable.newActivity(name, startDate, endDate, e.data.id);
+                        ActivityTable.newActivity(name, startDate, endDate, ac_id);
                     }
                 }
             }
@@ -344,6 +341,7 @@ var ActivityTable = (function () {
      */
     ActivityTable.prototype.setUpPagination = function () {
         var that = this;
+        this.pagination.unbind('click');
         this.pagination.pagination({
             items: 0,
             itemsOnPage: 10,
@@ -362,16 +360,18 @@ var ActivityTable = (function () {
      */
     ActivityTable.prototype.setUpButtons = function () {
         var that = this;
-        var active = this.content.getId();
         this.saveButton = $('#save-activity');
         this.addButton = $('#add-activity');
         this.duplicateButton = $('#duplicate-activity');
         this.hideButton = $('#hide-activity');
         this.targetGroupButton = $("#target-button");
+        this.addButton.unbind('click');
+        this.duplicateButton.unbind('click');
+        this.hideButton.unbind('click');
         this.addButton.click(this.addActivity);
-        this.duplicateButton.click({ id: active }, this.duplicateActivity);
+        this.duplicateButton.click({ id: ac_id }, this.duplicateActivity);
         this.hideButton.click(function () {
-            that.hideActivity.call(null, active);
+            that.hideActivity.call(null, ac_id);
         });
     };
     /**
@@ -406,13 +406,12 @@ var ActivityTable = (function () {
      * @param data
      */
     ActivityTable.prototype.addDataToTable = function (data) {
-        var activeId = this.content.getId();
-        if (isNaN(activeId)) {
-            activeId = parseInt(data.activities[0].id);
+        if (isNaN(ac_id)) {
+            ac_id = parseInt(data.activities[0].id);
         }
         for (var i = 0; i < data.activities.length; i++) {
             var item = data.activities[i];
-            this.addRowToTable(item, parseInt(item.id) == activeId);
+            this.addRowToTable(item, parseInt(item.id) == ac_id);
         }
     };
     /**
@@ -422,6 +421,7 @@ var ActivityTable = (function () {
      * @param active
      */
     ActivityTable.prototype.addRowToTable = function (data, active) {
+        var that = this;
         var row;
         var startD;
         var endD;
@@ -435,7 +435,10 @@ var ActivityTable = (function () {
         date.append($('<small></small>').text(startD + ' - ' + endD));
         row.append(date);
         row.click(function () {
-            Util.to('activity/view/' + data.id);
+            that.content.load(parseInt(data.id), that.content.existingPeople);
+            that.load(that.content, that.page);
+            ac_id = parseInt(data.id);
+            window.history.pushState("", "", Util.url('activity/view/' + data.id));
         });
         row.addClass('selectionItem');
         row.addClass('clickable');
@@ -446,7 +449,7 @@ var ActivityTable = (function () {
         this.table.append(row);
     };
     return ActivityTable;
-}());
+})();
 /**
  * Carries out all the tasks related to displaying the actual information of one activity on the right of the view
  * @since 0.0.6
@@ -480,9 +483,10 @@ var ActivityInformation = (function () {
             that.existingPeople = existingPeople;
             that.peopleTable = $('#existingPeople');
             that.id = id;
+            ac_id = id;
             that.activeTargetGroup = null;
             that.setUp();
-            that.existingPeople.load(id);
+            that.existingPeople.load();
             that.existingPeople.resetBloodhound();
             that.makeLinkWithSuggestions();
         });
@@ -612,6 +616,7 @@ var ActivityInformation = (function () {
      */
     ActivityInformation.prototype.displayTitle = function (title) {
         this.title = $('#activity-title');
+        this.title.empty();
         this.title.val(title);
         var timer;
         var that = this;
@@ -643,7 +648,9 @@ var ActivityInformation = (function () {
     ActivityInformation.prototype.displayTargetGroup = function (options) {
         var that = this;
         var dropD = $('#target-dropdown');
+        dropD.empty();
         var bt = $('#target-button');
+        bt.empty();
         dropD.append('<li class="dropdown-header">Choose a target group:</li>');
         bt.text(this.activeTargetGroup.name);
         bt.append('<span class="caret"></span>');
@@ -657,8 +664,8 @@ var ActivityInformation = (function () {
             }
             else {
                 option.click(function () {
-                    that.activeTargetGroup.id = $(this).data('name');
-                    that.activeTargetGroup.name = $(this).data('id');
+                    that.activeTargetGroup.id = $(this).data('id');
+                    that.activeTargetGroup.name = $(this).data('name');
                     dropD.empty();
                     bt.empty();
                     that.displayTargetGroup(options);
@@ -678,6 +685,7 @@ var ActivityInformation = (function () {
         var timer;
         var that = this;
         this.targetComment = $('#target-comment');
+        this.targetComment.empty();
         this.targetComment.val(initialData);
         this.targetComment.on('input propertychange change', function () {
             clearTimeout(timer);
@@ -694,6 +702,7 @@ var ActivityInformation = (function () {
         var timer;
         var that = this;
         var startD = Util.formatNumberDate(Util.parseSQLDate(sqlDate));
+        $('#start-date').empty();
         this.startDate = Util.getDatePicker(startD, "start-date-picker");
         $('#start-date').append(this.startDate);
         this.startDate = $('#start-date-picker'); //otherwise it would not work properly
@@ -711,6 +720,7 @@ var ActivityInformation = (function () {
     ActivityInformation.prototype.displayEndDate = function (sqldate) {
         var timer;
         var that = this;
+        $('#end-date').empty();
         var endD = Util.formatNumberDate(Util.parseSQLDate(sqldate));
         this.endDate = Util.getDatePicker(endD, "end-date-picker");
         $('#end-date').append(this.endDate);
@@ -799,7 +809,7 @@ var ActivityInformation = (function () {
         });
     };
     return ActivityInformation;
-}());
+})();
 /**
  * Compare function for property name
  * @param a:Object
@@ -854,6 +864,7 @@ $(document).ready(function () {
         var fullLink = breadcrumbs.find('li:nth-child(2)').find("a").attr("href");
         id = Util.extractId(fullLink);
     }
+    ac_id = id;
     var activity = new ActivityInformation();
     var existingPeopleField = new PeopleField();
     activity.load(id, existingPeopleField);

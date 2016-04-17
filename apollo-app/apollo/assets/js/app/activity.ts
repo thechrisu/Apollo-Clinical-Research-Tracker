@@ -47,6 +47,7 @@ interface DetailActivityData {
     participants:ParticipantData[]
 }
 
+var ac_id:number = NaN;
 /**
  * Class to store the token field (the field to add/remove users from a activity)
  * @todo Make this more general: Make a sort-of wrapper for typescript with the added/removed arrays
@@ -57,7 +58,6 @@ interface DetailActivityData {
  * @version 0.0.8
  */
 class PeopleField {
-    private activity_id:number;
     private search:string;
     private bh:Bloodhound; //this is unfixable (
     private people:ParticipantData[] = [];
@@ -68,8 +68,7 @@ class PeopleField {
      * Initialises the object to the required state
      * @param activity_id
      */
-    public load(activity_id:number) {
-        this.activity_id = activity_id;
+    public load() {
         this.search = '';
         this.resetAdded();
         this.resetBloodhound();
@@ -146,7 +145,7 @@ class PeopleField {
             },
             sorter: cmpNames,
             remote: {
-                url: Util.url('get/activitypeople') + '?activity_id=' + that.activity_id + that.formatTemporarily_added() + '&search=' + that.search,
+                url: Util.url('get/activitypeople') + '?activity_id=' + ac_id + that.formatTemporarily_added() + '&search=' + that.search,
                 filter: function (data) {
                     if (data) {
                         return that.processNewSuggestionData(data.data);
@@ -219,10 +218,6 @@ class PeopleField {
             query += encodeURIComponent('&temporarily_added[]=' + pa.p_id);
         }
         return query;
-    }
-
-    public setId(id:number) {
-        this.activity_id = id;
     }
 }
 
@@ -377,7 +372,7 @@ class ActivityTable {
                             var name = modal.find('#add-name').val();
                             var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
                             var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
-                            ActivityTable.newActivity(name, startDate, endDate, e.data.id);
+                            ActivityTable.newActivity(name, startDate, endDate, ac_id);
                         }
                     }
                 }
@@ -410,6 +405,7 @@ class ActivityTable {
      */
     private setUpPagination() {
         var that = this;
+        this.pagination.unbind('click');
         this.pagination.pagination({
             items: 0,
             itemsOnPage: 10,
@@ -430,16 +426,18 @@ class ActivityTable {
      */
     private setUpButtons() {
         var that = this;
-        var active = this.content.getId();
         this.saveButton = $('#save-activity');
         this.addButton = $('#add-activity');
         this.duplicateButton = $('#duplicate-activity');
         this.hideButton = $('#hide-activity');
         this.targetGroupButton = $("#target-button");
+        this.addButton.unbind('click');
+        this.duplicateButton.unbind('click');
+        this.hideButton.unbind('click');
         this.addButton.click(this.addActivity);
-        this.duplicateButton.click({id: active}, this.duplicateActivity);
+        this.duplicateButton.click({id: ac_id}, this.duplicateActivity);
         this.hideButton.click(function () {
-            that.hideActivity.call(null, active)
+            that.hideActivity.call(null, ac_id)
         });
     }
 
@@ -476,13 +474,12 @@ class ActivityTable {
      * @param data
      */
     private addDataToTable(data:MenuData) {
-        var activeId = this.content.getId();
-        if (isNaN(activeId)) {
-            activeId = parseInt(data.activities[0].id);
+        if (isNaN(ac_id)) {
+            ac_id = parseInt(data.activities[0].id);
         }
         for (var i = 0; i < data.activities.length; i++) {
             var item:ShortActivityData = data.activities[i];
-            this.addRowToTable(item, parseInt(item.id) == activeId);
+            this.addRowToTable(item, parseInt(item.id) == ac_id);
         }
     }
 
@@ -493,6 +490,7 @@ class ActivityTable {
      * @param active
      */
     private addRowToTable(data:ShortActivityData, active:boolean) {
+        var that = this;
         var row:JQuery;
         var startD;
         var endD;
@@ -506,7 +504,10 @@ class ActivityTable {
         date.append($('<small></small>').text(startD + ' - ' + endD));
         row.append(date);
         row.click(function () {
-            Util.to('activity/view/' + data.id);
+            that.content.load(parseInt(data.id), that.content.existingPeople);
+            that.load(that.content, that.page);
+            ac_id = parseInt(data.id);
+            window.history.pushState("", "", Util.url('activity/view/' + data.id));
         });
         row.addClass('selectionItem');
         row.addClass('clickable');
@@ -529,7 +530,7 @@ class ActivityInformation {
     private targetComment:JQuery; //the comment for the target group of the activity
     private startDate:JQuery; //the activity start date
     private endDate:JQuery; //the activity end date
-    private existingPeople:PeopleField; //the object for Twitter Typeahead to suggest people to add to the activity
+    public existingPeople:PeopleField; //the object for Twitter Typeahead to suggest people to add to the activity
     private activeTargetGroup:TargetGroupData; //the current target group selection
     private people:ParticipantData[]; //the people in the activity
     private addedPeople:ParticipantData[] = []; //the people that have been added to the activity since page was loaded
@@ -563,9 +564,10 @@ class ActivityInformation {
             that.existingPeople = existingPeople;
             that.peopleTable = $('#existingPeople');
             that.id = id;
+            ac_id = id;
             that.activeTargetGroup = null;
             that.setUp();
-            that.existingPeople.load(id);
+            that.existingPeople.load();
             that.existingPeople.resetBloodhound();
             that.makeLinkWithSuggestions();
         });
@@ -699,6 +701,7 @@ class ActivityInformation {
      */
     private displayTitle(title:string) {
         this.title = $('#activity-title');
+        this.title.empty();
         this.title.val(title);
         var timer;
         var that = this;
@@ -732,7 +735,9 @@ class ActivityInformation {
     private displayTargetGroup(options:TargetGroupData[]) {
         var that = this;
         var dropD = $('#target-dropdown');
+        dropD.empty();
         var bt = $('#target-button');
+        bt.empty();
         dropD.append('<li class="dropdown-header">Choose a target group:</li>');
         bt.text(this.activeTargetGroup.name);
         bt.append('<span class="caret"></span>');
@@ -745,8 +750,8 @@ class ActivityInformation {
                 option.addClass('disabled');
             } else {
                 option.click(function () {
-                    that.activeTargetGroup.id = $(this).data('name');
-                    that.activeTargetGroup.name = $(this).data('id');
+                    that.activeTargetGroup.id = $(this).data('id');
+                    that.activeTargetGroup.name = $(this).data('name');
                     dropD.empty();
                     bt.empty();
                     that.displayTargetGroup(options);
@@ -767,6 +772,7 @@ class ActivityInformation {
         var timer;
         var that = this;
         this.targetComment = $('#target-comment');
+        this.targetComment.empty();
         this.targetComment.val(initialData);
         this.targetComment.on('input propertychange change', function () {
             clearTimeout(timer);
@@ -785,6 +791,7 @@ class ActivityInformation {
         var timer;
         var that = this;
         var startD:string = Util.formatNumberDate(Util.parseSQLDate(<string> sqlDate));
+        $('#start-date').empty();
         this.startDate = Util.getDatePicker(startD, "start-date-picker");
         $('#start-date').append(this.startDate);
         this.startDate = $('#start-date-picker'); //otherwise it would not work properly
@@ -803,6 +810,7 @@ class ActivityInformation {
     private displayEndDate(sqldate:string) {
         var timer;
         var that = this;
+        $('#end-date').empty();
         var endD:string = Util.formatNumberDate(Util.parseSQLDate(<string> sqldate));
         this.endDate = Util.getDatePicker(endD, "end-date-picker");
         $('#end-date').append(this.endDate);
@@ -955,6 +963,7 @@ $(document).ready(function () {
         var fullLink = breadcrumbs.find('li:nth-child(2)').find("a").attr("href");
         id = Util.extractId(fullLink);
     }
+    ac_id = id;
     var activity:ActivityInformation = new ActivityInformation();
     var existingPeopleField:PeopleField = new PeopleField();
     activity.load(id, existingPeopleField);
