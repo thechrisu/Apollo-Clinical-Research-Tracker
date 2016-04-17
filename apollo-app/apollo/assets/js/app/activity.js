@@ -4,6 +4,7 @@
 ///<reference path="inputs.ts"/>
 ///<reference path="../typings/bootbox.d.ts"/>
 ///<reference path="../typings/typeahead.d.ts"/>
+///<reference path="columns.ts"/>
 var ac_id = NaN;
 /**
  * Class to store the token field (the field to add/remove users from a activity)
@@ -108,7 +109,6 @@ var PeopleField = (function () {
                 }
             }
         });
-        //console.log(Object.getPrototypeOf(this.bh));
     };
     /**
      * Removes an item from the suggestions: This means it will no longer be suggested. It also assumes,
@@ -176,7 +176,7 @@ var PeopleField = (function () {
         return query;
     };
     return PeopleField;
-})();
+}());
 /**
  * Defines the menu/table on the left of the view. Also responsible for all the buttons and their functions
  * @version 0.0.7
@@ -423,16 +423,18 @@ var ActivityTable = (function () {
     ActivityTable.prototype.addRowToTable = function (data, active) {
         var that = this;
         var row;
-        var startD;
-        var endD;
         var name = $('<td></td>');
-        var date = $('<td class="undefined text-right"></td>');
-        startD = Util.formatShortDate(Util.parseSQLDate(data.start_date));
-        endD = Util.formatShortDate(Util.parseSQLDate(data.end_date));
         row = $('<tr></tr>');
         name.text(Util.shortify(data.name, 22));
         row.append(name);
-        date.append($('<small></small>').text(startD + ' - ' + endD));
+        var date = $('<td class="undefined text-right"></td>');
+        var field = new DataDateRange({
+            startDate: data.start_date,
+            endDate: data.end_date
+        });
+        var small = $('<small></small>');
+        field.renderPlain(small);
+        date.append(small);
         row.append(date);
         row.click(function () {
             that.content.load(parseInt(data.id), that.content.existingPeople);
@@ -449,7 +451,7 @@ var ActivityTable = (function () {
         this.table.append(row);
     };
     return ActivityTable;
-})();
+}());
 /**
  * Carries out all the tasks related to displaying the actual information of one activity on the right of the view
  * @since 0.0.6
@@ -465,13 +467,6 @@ var ActivityInformation = (function () {
      */
     ActivityInformation.prototype.getId = function () {
         return this.id;
-    };
-    /**
-     * Similar to getId()
-     * @returns {number}
-     */
-    ActivityInformation.prototype.getPage = function () {
-        return this.onPage;
     };
     /**
      * Loads up all of the information and sets up the instance variables
@@ -669,7 +664,6 @@ var ActivityInformation = (function () {
                     dropD.empty();
                     bt.empty();
                     that.displayTargetGroup(options);
-                    //@todo Timer here didn't have the timeout specified, hence was redundant - why is this a @todo TODO?
                     that.save();
                 });
                 option.addClass('noselect');
@@ -809,7 +803,7 @@ var ActivityInformation = (function () {
         });
     };
     return ActivityInformation;
-})();
+}());
 /**
  * Compare function for property name
  * @param a:Object

@@ -17,19 +17,24 @@ use Apollo\Helpers\URLHelper;
         <li role="presentation" class="sort-tab" data-sort="2"><a href="#">Recently added</a></li>
         <li role="presentation" class="sort-tab" data-sort="3"><a href="#">Recently updated</a></li>
     </ul>
-    <div class="table-responsive loader-ready filter top-buffer">
-        <table class="table table-striped table-hover">
-            <thead>
-            <tr>
-                <th>Field</th>
-                <th>Relation</th>
-                <th>Value</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody id="filter-table">
-            </tbody>
-        </table>
+    <div class="panel panel-default top-buffer">
+        <div class="panel-heading">Filters</div>
+        <div class="panel-body">
+            <div class="table-responsive loader-ready filter">
+                <table class="table table-striped table-hover table-no-margin">
+                    <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Relation</th>
+                        <th>Value</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="filter-table">
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     <div class="table-responsive top-buffer loader-ready record">
         <table class="table table-striped table-hover">

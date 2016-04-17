@@ -1,0 +1,126 @@
+<?php
+/**
+ * @author Desislava Koleva <desy.koleva96@gmail.com>
+ * @copyright 2016
+ * @license https://opensource.org/licenses/mit-license.php MIT License
+ * @version 0.0.1
+ */
+use Apollo\Helpers\AssetHelper;
+use Apollo\Helpers\URLHelper;
+
+?>
+@extends('layouts.extended')
+@section('content')
+        <!-- Bootstrap start -->
+
+<form class="form-inline">
+    <div class="form-group">
+        <label class="sr-only" for="problem">Problem.</label>
+        <div class="input-group">
+            <div class="input-group-addon"><span class="glyphicon glyphicon-search"></span></div>
+            <input disabled type="text" class="form-control" id="problem" placeholder="Search for a problem...">
+        </div>
+    </div>
+</form>
+
+<ul class="nav nav-tabs top-buffer" id="sort-tabs">
+    <li role="presentation" class="sort-tab active" data-section="records"><a href="#">Records</a></li>
+    <li role="presentation" class="sort-tab" data-section="activities"><a href="#">Activities</a></li>
+    <li role="presentation" class="sort-tab" data-section="fields"><a href="#">Fields</a></li>
+    <li role="presentation" class="sort-tab" data-section="users"><a href="#">Users</a></li>
+    <li role="presentation" class="sort-tab" data-section="access"><a href="#">Access and Security</a></li>
+    <li role="presentation" class="sort-tab" data-section="faq"><a href="#">FAQ</a></li>
+    <li role="presentation" class="sort-tab" data-section="contact"><a href="#">Contact IT Support</a></li>
+</ul>
+
+<style>
+
+    .data {
+        display: none;
+    }
+
+</style>
+
+<div class="data records">
+    <h1>Records</h1>
+    <h2>How can I add a new record?</h2>
+    <p>
+        To add a blank record to the database, first navigate to ‘Records’ on the top of the Apollo app. Then click on the ‘Add a record’ button. You will first be asked to specify the name, record name and time period covered by the record. The record with the latest end date specified will be displayed as the default record for a person. Click ‘Add’. You will then be directed to another page to fill in the remaining features. The changes are updated in real time and saved automatically.
+    </p>
+    <h2>How can I edit an existing record?</h2>
+    <p>
+        To edit an already existing record in the database, first navigate to ‘Records’ on the top bar of the Apollo app. Select the particular record you want to edit. Once you open the record, go to ‘Record actions:’ and click on the ‘Edit’ button. You will then be directed to the page where you can make the appropriate changes. The changes are updated in real time and saved automatically.
+    </p>
+    <h2>How can I remove a record?</h2>
+    <p>
+        You cannot. Data cannot be deleted in the Apollo app as such a functionality would contradict its original purpose.
+    </p>
+    <h2>Can I hide an existing record from the database?</h2>
+    <p>
+        Yes. Navigate to ‘Records’ on the top of the Apollo app. Find and open the particular record you want to make a copy of. Go to ‘Record actions:’ and click the ‘Hide’ button. A pop up will appear asking you for confirmation. Click ‘OK’.
+    </p>
+    <h2>Can I add a new record to an existing person?</h2>
+    <p>
+        Yes. Navigate to ‘Records’ on the top of the Apollo app. Find and select an existing record belonging to the person you want to add a new record to. Once you open the record, go to ‘Records actions’ and click on the ‘Add a record’ button. A prompt will appear asking you to give the new record a name and time period. Confirm by clicking ‘Add’. You will then be directed to the page where you can fill in the remaining features.
+    </p>
+    <h2>Can I make a copy of an existing record?</h2>
+    <p>
+        Yes. Navigate to ‘Records’ on the top of the Apollo app. Find and open the particular record you want to make a copy of. Go to ‘Record actions:’ and click the ‘Duplicate record’ button. A prompt will appear asking you to give the record copy a name and time period. Confirm by clicking ‘Add’. You will then be directed to the new record where you can edit and add changes. In other words, duplicating the record will create copies of all the data from the original but allow you to enter a new name and time period. To return to the original record, go to ‘Current record:’, open the dropdown list and select the respective record name.
+    </p>
+    <h2>How can I find a particular existing record?</h2>
+    <p>
+        There are several ways to browse through records and navigate to a specific existing one. Navigate to ‘Records’ on the top of the Apollo app. Make sure you have selected the ‘All records’ tab. You can choose to browse through the list of records until you find the required one. Alternatively, you can type in the name/surname in the search bar. Once you finish typing, the search will update automatically and the required record will be displayed below. In the case that the specific record you are looking for was added recently you can choose to select the ‘Recently added’ tab where the records are sorted by the date they were added. You can then find the record from there.  In the case that it was updated recently you can choose to select the ‘Recently updated’ tab where they are sorted by the date they were updated and find it from there.
+    </p>
+    <h2>What is ‘Advanced Search’?</h2>
+</div>
+<div class="data activities">
+    <h1>Activities</h1>
+</div>
+<div class="data fields">
+    <h1>Fields</h1>
+</div>
+<div class="data users">
+    <h1>Users</h1>
+</div>
+<div class="data access">
+    <h1>Access</h1>
+</div>
+<div class="data faq">
+    <h1>FAQ</h1>
+    <h2>Are there any shortcuts/hotkeys I should be aware of?</h2>
+    <p>
+        Yes. You can use the Enter/Backspace hotkeys. These can be used when editing a multiple text field. Once you have filled in the first field, you can move to the next one by pressing Enter. Similarly, you can remove an empty field by pressing Backspace.
+    </p>
+</div>
+<div class="data contact">
+    <h1>Contact</h1>
+</div>
+
+<!-- Bootstrap end -->
+@stop
+@section('scripts')
+    @parent
+    <script>
+        $(document).ready(function () {
+
+            $('.records').slideDown(200);
+
+            var allTabs = $('.sort-tab');
+
+            allTabs.click(function (event) {
+                event.preventDefault();
+                allTabs.removeClass('active');
+
+                var button = $(this);
+                button.addClass('active');
+                var section = button.data('section');
+                $('.data').slideUp(200);
+                setTimeout(function() {
+                    $('.' + section).slideDown(200);
+                }, 200)
+
+            });
+
+        });
+    </script>
+@stop

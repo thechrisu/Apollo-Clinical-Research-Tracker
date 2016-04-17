@@ -79,6 +79,9 @@ body {
   position: relative; }
 
 /* Bootstrap fixes */
+.table-no-margin {
+  margin-bottom: 0; }
+
 .fields-buttons, .search-buttons {
   margin: 0; }
   .fields-buttons .col-md-7, .search-buttons .col-md-7 {
