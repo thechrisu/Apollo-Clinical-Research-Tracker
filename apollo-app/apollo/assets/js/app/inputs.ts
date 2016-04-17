@@ -6,7 +6,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.8
+ * @version 0.0.9
  */
 
 /**
@@ -79,6 +79,35 @@ class InputNumber extends InputField {
                 that.callbackWrapper(that.callback.bind(null, that.id, that.input.val()));
             }
         });
+    }
+}
+
+/**
+ * Disabled input
+ *
+ * @since 0.0.9
+ */
+class InputDisabled extends InputField {
+
+    private attributes:Attributes;
+    public input:JQuery;
+
+    public constructor(id:number, callback:(id:number, value:string) => void, attributes:Attributes, value:string = null) {
+        super(id, callback);
+        this.attributes = <Attributes> Util.mergeObjects(attributes, {
+            'data-id': this.id.toString(),
+            'id': 'input-text-' + this.id,
+            'class': 'form-control input-sm',
+            'disabled': 'disabled',
+            'type': 'text',
+            'value': (value == null ? '' : value)
+        });
+        this.prepareNode();
+    }
+
+    private prepareNode() {
+        this.input = Util.buildNode('input', this.attributes, null, true);
+        this.parentNode.append(this.input);
     }
 }
 

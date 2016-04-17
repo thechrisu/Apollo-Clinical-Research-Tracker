@@ -24,6 +24,7 @@ use Apollo\Entities\FieldEntity;
 use Apollo\Entities\PersonEntity;
 use Apollo\Entities\RecordEntity;
 use DateTime;
+use Doctrine\ORM\QueryBuilder;
 use Exception;
 
 
@@ -35,7 +36,7 @@ use Exception;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.1.1
+ * @version 0.1.2
  */
 class PostController extends GenericController
 {
@@ -411,6 +412,310 @@ class PostController extends GenericController
         }
         echo json_encode($response);
     }
+
+    /**
+     * Parses filters for advanced search requests
+     *
+     * @since 0.1.2
+     */
+    public function actionSearch() {
+        $data = $this->parseRequest(['page' => 1, 'sort' => 1, 'states' => null]);
+        $page = $data['page'] > 0 ? $data['page'] : 1;
+
+        $peopleQB = $this->createQueryForRecordsRequest($data);
+        $peopleQuery = $peopleQB->getQuery();
+        $people = $peopleQuery->getResult();
+        $people = $this->applyFilters($people, $data['states']);
+        $response = $this->getFormattedRecordsOfPeople($people, $page);
+        echo json_encode($response);
+    }
+
+    /**
+     * @param $request
+     * @return QueryBuilder|mixed
+     */
+    private function createQueryForRecordsRequest($request)
+    {
+        $em = DB::getEntityManager();
+        $peopleRepo = $em->getRepository(Person::getEntityNamespace());
+        $peopleQB = $peopleRepo->createQueryBuilder('person');
+        $peopleQB->innerJoin('person.records', 'record');
+        $peopleQB->where('person.organisation = ' . Apollo::getInstance()->getUser()->getOrganisationId());
+        $peopleQB->andWhere('person.is_hidden = 0');
+        $peopleQB = $this->orderRecords($peopleQB, $request['sort']);
+        return $peopleQB;
+    }
+
+    /**
+     * Given a query bulider for records and an ordering, set up the ordering depending on how it is requested
+     * @param QueryBuilder $queryBuilder
+     * @param int $ordering
+     * @return mixed
+     */
+    private function orderRecords($queryBuilder, $ordering)
+    {
+        switch ($ordering) {
+            // Recently added
+            case 2:
+                $queryBuilder->orderBy('record.created_on', 'DESC');
+                break;
+            // Recently updated
+            case 3:
+                $queryBuilder->orderBy('record.updated_on', 'DESC');
+                break;
+            // All records
+            default:
+                $queryBuilder->orderBy('person.given_name', 'ASC');
+                $queryBuilder->addOrderBy('person.middle_name', 'ASC');
+                $queryBuilder->addOrderBy('person.last_name', 'ASC');
+        }
+        return $queryBuilder;
+    }
+
+
+    /**
+     * Parses filters and applies them to the return values
+     *
+     * @todo: Include non-recent records too
+     *
+     * @param PersonEntity[] $people
+     * @param $states
+     * @return mixed[]
+     */
+    private function applyFilters($people, $states = null)
+    {
+        $filteredPeople = [];
+        $fieldRepository = Field::getRepository();
+        if($states == null) {
+            $filteredPeople = $people;
+        } else {
+            for($i = 0; $i < count($people); $i++) {
+                $add = false;
+                $person = $people[$i];
+                $record = Person::getMostRecentRecord($person);
+                for($k = 0; $k < count($states); $k++) {
+                    $state = $states[$k];
+                    /** @var FieldEntity $field */
+                    $fieldID = intval($state['field']);
+                    $field = $fieldRepository->find($fieldID);
+                    $relation = intval($state['relation']);
+                    switch($field->getType()) {
+                        case 2:
+                            $value = !empty($state['value']) ? $state['value'] : '';
+                            if($field->hasDefault()) {
+                                if($field->isAllowOther()) {
+                                    $data = $record->findOrCreateData($fieldID);
+                                    if($relation != 2 && $data->isDefault()) {
+                                        $value = intval($value);
+                                        $recordValue = $record->findInt($fieldID);
+                                        switch ($relation) {
+                                            case 1:
+                                                $add = $recordValue != $value;
+                                                break;
+                                            default:
+                                                $add = $recordValue == $value;
+                                        }
+                                    } elseif($relation == 2 && !$data->isDefault()) {
+                                        $recordValue = $data->getVarchar();
+                                        $add = empty($value) || strpos(strtolower($recordValue), strtolower($value)) !== false;
+                                    } else {
+                                        $add = false;
+                                    }
+                                } elseif($field->isMultiple()) {
+                                    $value = intval($value);
+                                    $recordValues = $record->findMultiple($fieldID);
+                                    switch ($relation) {
+                                        case 1:
+                                            $add = !in_array($value, $recordValues);
+                                            break;
+                                        default:
+                                            $add = in_array($value, $recordValues);
+                                    }
+                                } else {
+                                    $value = intval($value);
+                                    $recordValue = $record->findInt($fieldID);
+                                    switch ($relation) {
+                                        case 1:
+                                            $add = $recordValue != $value;
+                                            break;
+                                        default:
+                                            $add = $recordValue == $value;
+                                    }
+                                }
+                            } elseif($field->isMultiple()) {
+                                $recordValues = $record->findMultiple($fieldID);
+                                switch ($relation) {
+                                    case 1:
+                                        $contains = false;
+                                        foreach($recordValues as $recordValue) {
+                                            if(empty($value) || strpos(strtolower($recordValue), strtolower($value)) !== false) {
+                                                $contains = true;
+                                                break;
+                                            }
+                                        }
+                                        $add = !(empty($value) || $contains);
+                                        break;
+                                    case 2:
+                                        $empty = true;
+                                        foreach($recordValues as $recordValue) {
+                                            if(!empty($recordValue)) {
+                                                $empty = false;
+                                                break;
+                                            }
+                                        }
+                                        $add = $empty;
+                                        break;
+                                    case 3:
+                                        $empty = true;
+                                        foreach($recordValues as $recordValue) {
+                                            if(!empty($recordValue)) {
+                                                $empty = false;
+                                                break;
+                                            }
+                                        }
+                                        $add = !$empty;
+                                        break;
+                                    default:
+                                        $contains = false;
+                                        foreach($recordValues as $recordValue) {
+                                            if(empty($value) || strpos(strtolower($recordValue), strtolower($value)) !== false) {
+                                                $contains = true;
+                                                break;
+                                            }
+                                        }
+                                        $add = empty($value) || $contains;
+                                }
+                            } else {
+                                $recordValue = $record->findVarchar($fieldID);
+                                switch ($relation) {
+                                    case 1:
+                                        $add = !(empty($value) || strpos(strtolower($recordValue), strtolower($value)) !== false);
+                                        break;
+                                    case 2:
+                                        $add = $recordValue == $value;
+                                        break;
+                                    case 3:
+                                        $add = $recordValue != $value;
+                                        break;
+                                    case 4:
+                                        $add = empty($recordValue);
+                                        break;
+                                    case 5:
+                                        $add = !empty($recordValue);
+                                        break;
+                                    default:
+                                        $add = empty($value) || strpos(strtolower($recordValue), strtolower($value)) !== false;
+                                }
+                            }
+                            break;
+                        case 3:
+                            $value = new DateTime($state['value']);
+                            $recordValue = $record->findDateTime($fieldID);
+                            switch ($relation) {
+                                case 1:
+                                    $add = $recordValue != $value;
+                                    break;
+                                case 2:
+                                    $add = $recordValue < $value;
+                                    break;
+                                case 3:
+                                    $add = $recordValue > $value;
+                                    break;
+                                default:
+                                    $add = $recordValue == $value;
+                            }
+                            break;
+                        case 4:
+                            $value = $state['value'];
+                            $recordValue = $record->findLongText($fieldID);
+                            switch ($relation) {
+                                case 1:
+                                    $add = !(empty($value) || strpos(strtolower($recordValue), strtolower($value)) !== false);
+                                    break;
+                                case 2:
+                                    $add = empty($recordValue);
+                                    break;
+                                case 3:
+                                    $add = !empty($recordValue);
+                                    break;
+                                default:
+                                    $add = empty($value) || strpos(strtolower($recordValue), strtolower($value)) !== false;
+                            }
+                            break;
+                        default:
+                            $value = intval($state['value']);
+                            $recordValue = $record->findInt($fieldID);
+                            switch ($relation) {
+                                case 1:
+                                    $add = $recordValue != $value;
+                                    break;
+                                case 2:
+                                    $add = $recordValue < $value;
+                                    break;
+                                case 3:
+                                    $add = $recordValue > $value;
+                                    break;
+                                default:
+                                    $add = $recordValue == $value;
+                            }
+                    }
+                    if(!$add) {
+                        break;
+                    }
+                }
+                if($add) {
+                    $filteredPeople[] = $person;
+                }
+            }
+        }
+        return $filteredPeople;
+    }
+
+    /**
+     * For a given number of people, return a formatted object of the people's record data
+     * @todo: Put this somewhere else, this is a controller
+     * @param $people
+     * @param $page
+     * @return mixed
+     */
+    private function getFormattedRecordsOfPeople($people, $page)
+    {
+        $response['error'] = null;
+        $response['count'] = count($people);
+        /**
+         * @var PersonEntity $person
+         */
+        for ($i = 10 * ($page - 1); $i < min($response['count'], $page * 10); $i++) {
+            $person = $people[$i];
+            $personRecords = $person->getRecords();
+            if (count($personRecords) < 1) {
+                $response['error'] = ['id' => 1, 'description' => 'Person #' . $person->getId() . ' has 0 records!'];
+            } else {
+                $response['data'][] = $this->getFormattedPersonData($person);
+            }
+        }
+        return $response;
+    }
+
+    /**
+     * Given a person (retrieved from the data base), returns an object containing all the data of the person
+     * @todo: Put this function somewhere else, this is a controller
+     * @param PersonEntity $person
+     * @return mixed
+     */
+    private function getFormattedPersonData($person)
+    {
+        $responsePerson = [];
+        /** @var RecordEntity $recentRecord */
+        $recentRecord = Person::getMostRecentRecord($person->getId());
+        $responsePerson['id'] = $recentRecord->getId();
+        $responsePerson['given_name'] = $person->getGivenName();
+        $responsePerson['last_name'] = $person->getLastName();
+        $responsePerson['phone'] = $recentRecord->findVarchar(FIELD_PHONE);
+        $responsePerson['email'] = $recentRecord->findVarchar(FIELD_EMAIL);
+        return $responsePerson;
+    }
+
 
     /**
      * @since 0.0.6

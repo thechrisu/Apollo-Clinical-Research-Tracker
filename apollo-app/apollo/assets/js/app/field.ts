@@ -35,12 +35,7 @@ class FieldTable {
     public load() {
         this.table = $('#table-body');
         this.loader = LoaderManager.createLoader($('.table-responsive.loader-ready'));
-        this.setup();
         this.updateTable();
-    }
-
-    private setup() {
-        var that = this;
     }
 
     private updateTable() {
@@ -62,7 +57,6 @@ class FieldTable {
     }
 
     private updateCallback(type:string, id:number, value:string|string[], button:JQuery) {
-        var that = this;
         button.removeClass('btn-danger');
         button.removeClass('btn-success');
         button.addClass('btn-warning');
@@ -89,7 +83,7 @@ class FieldTable {
         var tr = $('<tr class="record-tr' + (data.essential ? ' active' : '') +'" id="field-' + data.id + '" data-id="' + data.id + '"></tr>');
         var td = $('<td width="25%"></td>');
         var addButton = $('<button class="btn btn-block btn-sm btn-success disabled"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span>No changes.</button>');
-        var removeButton = $('<button class="btn btn-block btn-sm btn-danger' + (data.essential ? ' disabled' : '') +'"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Hide</a></button>');
+        var removeButton = $('<button class="btn btn-block btn-sm btn-danger' + (data.essential ? ' disabled' : '') +'"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Hide</button>');
         if(!data.essential) {
             removeButton.on({
                 click: function (e) {

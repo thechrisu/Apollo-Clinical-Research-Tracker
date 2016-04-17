@@ -24,13 +24,23 @@
 /* Bootstrap fixes
 
 // Fields buttons margin fix
-.fields-buttons
+.fields-buttons, .search-buttons
   margin: 0
   .col-md-7
     padding-left: 0
   .col-md-5
     padding-right: 0
     padding-left: 0
+  .col-md-6
+    padding-left: 0
+    &:last-child
+      padding-right: 0
+
+// Advanced search
+#filter-table
+  .input-sm
+    padding-bottom: 0
+    padding-top: 0
 
 // Do not display the top border on some tables
 .table.no-border-top

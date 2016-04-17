@@ -167,7 +167,7 @@ class GetController extends GenericController
      * @todo: Put this somewhere else, this is a controller
      * @param $people
      * @param $page
-     * @return $response
+     * @return mixed
      */
     private function getFormattedRecordsOfPeople($people, $page)
     {

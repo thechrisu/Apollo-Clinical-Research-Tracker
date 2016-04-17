@@ -6,7 +6,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.8
+ * @version 0.0.9
  */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -72,6 +72,32 @@ var InputNumber = (function (_super) {
         });
     };
     return InputNumber;
+}(InputField));
+/**
+ * Disabled input
+ *
+ * @since 0.0.9
+ */
+var InputDisabled = (function (_super) {
+    __extends(InputDisabled, _super);
+    function InputDisabled(id, callback, attributes, value) {
+        if (value === void 0) { value = null; }
+        _super.call(this, id, callback);
+        this.attributes = Util.mergeObjects(attributes, {
+            'data-id': this.id.toString(),
+            'id': 'input-text-' + this.id,
+            'class': 'form-control input-sm',
+            'disabled': 'disabled',
+            'type': 'text',
+            'value': (value == null ? '' : value)
+        });
+        this.prepareNode();
+    }
+    InputDisabled.prototype.prepareNode = function () {
+        this.input = Util.buildNode('input', this.attributes, null, true);
+        this.parentNode.append(this.input);
+    };
+    return InputDisabled;
 }(InputField));
 /**
  * Input expecting text, i.e. <input type="text" ... />

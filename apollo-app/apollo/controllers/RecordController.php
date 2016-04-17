@@ -85,12 +85,14 @@ class RecordController extends GenericController
     /**
      * Action to deal with advanced search
      *
-     * TODO: Complete this
-     *
      * @since 0.0.8
      */
     public function actionSearch()
     {
-
+        $breadcrumbs = [
+            ['Records', URLHelper::url('record'), true],
+            ['Advanced Search', null, true]
+        ];
+        View::render('record.search', 'Advanced Search', $breadcrumbs);
     }
 }
