@@ -357,12 +357,8 @@ class GetController extends GenericController
             $response['error'] = ['id' => 3, 'description' => "Unable to get data from database, server issue? (error in query): " . $e->getMessage()];
             echo json_encode($response);
         } finally {
-            if (!empty($activities)) {
-                $response = $this->getFormattedActivities($activities, $page);
-                echo json_encode($response);
-            } else {
-                $response['error'] = ['id' => 4, 'description' => "Unable to get data from database, server issue? (error in fetching)"];
-            }
+            $response = $this->getFormattedActivities($activities, $page);
+            echo json_encode($response);
         }
 
     }

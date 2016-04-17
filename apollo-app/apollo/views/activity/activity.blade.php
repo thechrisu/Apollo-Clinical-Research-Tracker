@@ -82,7 +82,7 @@ $page = Activity::getNumSmallerIds($id)/10 + 1;
         <div class="panel-body">
             <div id="activity-wrapper" class="row">
                 <div class="col-lg-4 table-responsive menu-loader-ready" id="activityTable">
-                    <table class="table table-hover small-table table-condensed no-border-top table-striped">
+                    <table class="table table-hover small-table table-condensed no-border-top">
                         <tbody id="table-body">
                         </tbody>
                     </table>

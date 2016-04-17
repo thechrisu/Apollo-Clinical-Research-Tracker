@@ -359,7 +359,7 @@ var Util = (function () {
         return '<strong>' + value + '</strong>';
     };
     return Util;
-}());
+})();
 /**
  * Deals with loaders
  * @since 0.0.9 Added documentation
@@ -435,7 +435,7 @@ var LoaderManager = (function () {
     LoaderManager.loaders = {};
     LoaderManager.counter = 0;
     return LoaderManager;
-}());
+})();
 /**
  * Sets the base url
  * @since 0.0.1
