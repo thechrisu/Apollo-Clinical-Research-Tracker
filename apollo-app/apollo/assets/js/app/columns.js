@@ -118,8 +118,16 @@ var DataField = (function () {
     DataField.prototype.render = function (target) {
         target.append(this.parentNode);
     };
-    DataField.prototype.getValue = function () {
-        return this.value;
+    DataField.prototype.getPlain = function () {
+        return this.value.text();
+    };
+    DataField.prototype.renderPlain = function (target) {
+        if (this.value.prop("tagName").toLowerCase() == 'strong') {
+            target.text(this.value.text());
+        }
+        else {
+            target.append(this.value);
+        }
     };
     return DataField;
 })();
@@ -180,6 +188,18 @@ var DataDateShort = (function (_super) {
         return Util.buildNode('strong').text(Util.formatShortDate(value));
     };
     return DataDateShort;
+})(DataField);
+var DataDateRange = (function (_super) {
+    __extends(DataDateRange, _super);
+    function DataDateRange(value) {
+        _super.call(this, value);
+    }
+    DataDateRange.prototype.decorate = function (data) {
+        var startDate = new DataDateShort(data.startDate).getPlain();
+        var endDate = new DataDateShort(data.endDate).getPlain();
+        return Util.buildNode('strong').text(startDate + ' - ' + endDate);
+    };
+    return DataDateRange;
 })(DataField);
 var DataLongText = (function (_super) {
     __extends(DataLongText, _super);

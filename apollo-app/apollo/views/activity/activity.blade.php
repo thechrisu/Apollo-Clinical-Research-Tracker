@@ -143,5 +143,6 @@ $page = Activity::getNumSmallerIds($id)/10 + 1;
 @stop
 @section('scripts')
 @parent
+    <script src="{{ AssetHelper::js('app/columns') }}"></script>
     <script src="{{ AssetHelper::js('app/activity') }}"></script>
 @stop

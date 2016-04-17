@@ -6,7 +6,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.2.2
+ * @version 0.2.3
  */
 
 /**
@@ -15,25 +15,25 @@
  * @since 0.1.9 Added AJAX_LAZY_DELAY for cases when instant updates are not required
  * @since 0.1.4
  */
-const AJAX_DELAY: number = 600;
-const AJAX_LAZY_DELAY: number = 1000;
+const AJAX_DELAY:number = 600;
+const AJAX_LAZY_DELAY:number = 1000;
 
 /**
  * Constants specifying the IDs of the fields recognised by the backend
  * @since 0.2.1 Added awards and publications
  * @since 0.1.6
  */
-const FIELD_GIVEN_NAME: number = -1;
-const FIELD_MIDDLE_NAME: number = -2;
-const FIELD_LAST_NAME: number = -3;
-const FIELD_RECORD_NAME: number = 1;
-const FIELD_START_DATE: number = 2;
-const FIELD_END_DATE: number = 3;
-const FIELD_EMAIL: number = 4;
-const FIELD_PHONE: number = 5;
-const FIELD_ADDRESS: number = 6;
-const FIELD_AWARDS: number = 7;
-const FIELD_PUBLICATIONS: number = 8;
+const FIELD_GIVEN_NAME:number = -1;
+const FIELD_MIDDLE_NAME:number = -2;
+const FIELD_LAST_NAME:number = -3;
+const FIELD_RECORD_NAME:number = 1;
+const FIELD_START_DATE:number = 2;
+const FIELD_END_DATE:number = 3;
+const FIELD_EMAIL:number = 4;
+const FIELD_PHONE:number = 5;
+const FIELD_ADDRESS:number = 6;
+const FIELD_AWARDS:number = 7;
+const FIELD_PUBLICATIONS:number = 8;
 
 /**
  * Record essential data interface
@@ -96,9 +96,10 @@ interface Attributes {
  */
 class Util {
 
-    public static getOuterHTML(elem:JQuery){
+    public static getOuterHTML(elem:JQuery) {
         return $('<div />').append(elem.eq(0).clone()).html();
     }
+
     /**
      * Returns the full URL to resource
      *
@@ -147,35 +148,10 @@ class Util {
      * @param subtractedBy
      * @returns any[]
      */
-    public static arraySubtract(toSubtractFrom:any[], subtractedBy:any[])
-    {
-        return toSubtractFrom.filter(function(item){
+    public static arraySubtract(toSubtractFrom:any[], subtractedBy:any[]) {
+        return toSubtractFrom.filter(function (item) {
             return subtractedBy.indexOf(item) === -1;
         });
-    }
-
-    /**
-     * Removes all instances of an item in an array from another array. Comparison is done with a custom compare function
-     * @param toSubtractFrom
-     * @param subtractedBy
-     * @param compareFunction
-     */
-    public static arraySubtractCmp(toSubtractFrom:any[], subtractedBy:any[], compareFunction)
-    {
-        for(var i = 0; i < subtractedBy.length; i++){
-            this.removeFromArrayCmp(subtractedBy[i], toSubtractFrom, compareFunction);
-        }
-    }
-
-    /**
-     * Removes all instances of an item from an array
-     * @param needle
-     * @param haystack
-     */
-    public static removeFromArray(needle:any, haystack:any[]) {
-        var index = haystack.indexOf(needle);
-        if(index > -1)
-            haystack.splice(index, 1);
     }
 
     /**
@@ -185,22 +161,12 @@ class Util {
      * @param compareFunction
      */
     public static removeFromArrayCmp(needle:any, haystack:any[], compareFunction) {
-        for(var i = 0; i < haystack.length; i++){
-            if(compareFunction(haystack[i], needle) == 0) {
+        for (var i = 0; i < haystack.length; i++) {
+            if (compareFunction(haystack[i], needle) == 0) {
                 haystack.splice(i, 1);
                 i--; //decrement since the array indices will move up
             }
         }
-    }
-
-    /**
-     * Checks if an element is in an array
-     * @param needle
-     * @param haystack
-     * @returns {boolean}
-     */
-    public static isIn(needle:any, haystack:any[]) {
-        return haystack.indexOf(needle) > -1;
     }
 
     /**
@@ -211,10 +177,9 @@ class Util {
      * @returns {boolean}
      */
     public static isInCmp(needle:any, haystack:any[], compareFunction) {
-        for(var i = 0; i < haystack.length; i++)
-        {
+        for (var i = 0; i < haystack.length; i++) {
             var item = haystack[i];
-            if(compareFunction(needle, item) == 0) {
+            if (compareFunction(needle, item) == 0) {
                 return true;
             }
         }
@@ -230,10 +195,10 @@ class Util {
     public static shortify(str:string, maxLength:number) {
         var res:string = str;
         str = <string> str;
-        if(str.length > maxLength) {
+        if (str.length > maxLength) {
             var spliceLocation = maxLength - 3;
             res = str.substring(0, spliceLocation);
-            res = res.slice(0, spliceLocation) + '...' ;
+            res = res.slice(0, spliceLocation) + '...';
         }
         return res;
     }
@@ -302,12 +267,29 @@ class Util {
             "August", "September", "October",
             "November", "December"
         ];
-        var day = date.getDate().toString().slice(-1);
-        var daySuffix = 'th';
-        if (day == '1') daySuffix = 'st';
-        if (day == '2') daySuffix = 'nd';
-        if (day == '3') daySuffix = 'rd';
-        return months[date.getMonth()] + ' ' + date.getDate() + daySuffix + ', ' + date.getFullYear();
+        return months[date.getMonth()] + ' ' + Util.ordinalSuffix(date.getDate()) + ', ' + date.getFullYear();
+    }
+
+    /**
+     * Returns the number with an ordinal suffix
+     *
+     * @param i
+     * @returns {string}
+     * @since 0.2.3
+     */
+    private static ordinalSuffix(i) {
+        var j = i % 10,
+            k = i % 100;
+        if (j == 1 && k != 11) {
+            return i + "st";
+        }
+        if (j == 2 && k != 12) {
+            return i + "nd";
+        }
+        if (j == 3 && k != 13) {
+            return i + "rd";
+        }
+        return i + "th";
     }
 
     /**
