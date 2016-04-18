@@ -68,7 +68,7 @@ class Record extends DBComponent
      */
     public static function getValidRecordWithId($record_id) {
         try{
-            $record = Record::getRepository()->findBy(['is_hidden' => false, 'id' => $record_id])[0];
+            $record = Record::getRepository()->findOneBy(['is_hidden' => false, 'id' => $record_id]);
             if(!empty($record))
                 return $record;
             else

@@ -206,7 +206,7 @@ class PostController extends GenericController
         $data = $this->parseRequest(['record_id' => 0, 'field_id' => 0, 'value' => null, 'is_default' => null]);
         $response['error'] = null;
         /** @var RecordEntity $record */
-        if ($data['record_id'] > 0 && ($record = Record::getValidRecordWithId($data['record_id']) != null)) {
+        if ($data['record_id'] > 0 && ($record = Record::getValidRecordWithId($data['record_id'])) != null) {
             if (in_array($data['field_id'], [FIELD_GIVEN_NAME, FIELD_MIDDLE_NAME, FIELD_LAST_NAME])) {
                 if ($data['value'] !== null) {
                     if ($data['field_id'] == FIELD_GIVEN_NAME) {

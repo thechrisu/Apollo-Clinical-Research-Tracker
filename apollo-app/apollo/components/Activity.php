@@ -41,6 +41,7 @@ class Activity extends DBComponent
         $query = $qb->getQuery()
         ->setFirstResult(0)
         ->setMaxResults(1);
+        /** @var ActivityEntity[] $result */
         $result = $query->getResult();
         $item = $result[0]->getId();
         /*    ->setFirstResult(0)
