@@ -50,6 +50,7 @@ class Activity extends DBComponent
     }
 
     /**
+     * Given an id, this returns the number of activities with ids smaller than that
      * @param $id
      * @return int
      */
@@ -69,12 +70,65 @@ class Activity extends DBComponent
     }
 
     /**
+     * Given an id, this should return a valid ActivityEntity (that has that id).
      * @param $id
      * @return ActivityEntity
      */
-    public static function getValidActivity($id)
+    public static function getValidActivityWithId($id)
     {
         $org = Apollo::getInstance()->getUser()->getOrganisationId();
         return self::getRepository()->findBy(['id' => $id, 'is_hidden' => false, 'organisation' => $org])[0];
+    }
+
+    /**
+     * @param ActivityEntity[] $activities
+     * @param $page
+     * @return mixed
+     */
+    public static function getFormattedActivities($activities, $page)
+    {
+        $response['error'] = null;
+        $response['count'] = count($activities);
+        for ($i = 10 * ($page - 1); $i < min($response['count'], $page * 10); $i++) {
+            $activity = $activities[$i];
+            $response['activities'][] = Activity::getFormattedShortData($activity);
+        }
+        return $response;
+    }
+
+    /**
+     * @param ActivityEntity $activity
+     * @return array
+     */
+    public static function getFormattedShortData($activity)
+    {
+        $responseActivity = [
+            'id' => $activity->getId(),
+            'name' => $activity->getName(),
+            'start_date' => $activity->getStartDate()->format('Y-m-d H:i:s'),
+            'end_date' => $activity->getEndDate()->format('Y-m-d H:i:s')
+        ];
+        return $responseActivity;
+    }
+
+    /**
+     * Formats an activity as a valid JSON object (with all the information about the activity)
+     * @param ActivityEntity $activity
+     * @return array
+     */
+    public static function getFormattedData(ActivityEntity $activity)
+    {
+        $people = Person::getFormattedPeopleShortWithRecords($activity->getPeople());
+        $activityInfo = [
+            'error' => null,
+            'id' => $activity->getId(),
+            'name' => $activity->getName(),
+            'target_groups' => TargetGroup::getFormattedTargetGroups($activity->getTargetGroup()),
+            'target_group_comment' => $activity->getTargetGroupComment(),
+            'start_date' => $activity->getStartDate()->format('Y-m-d H:i:s'),
+            'end_date' => $activity->getEndDate()->format('Y-m-d H:i:s'),
+            'participants' => $people
+        ];
+        return $activityInfo;
     }
 }

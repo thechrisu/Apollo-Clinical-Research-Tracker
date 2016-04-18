@@ -14,15 +14,11 @@ use Apollo\Components\Activity;
 use Apollo\Components\DB;
 use Apollo\Components\Data;
 use Apollo\Components\ExcelExporter;
-use Apollo\Components\TargetGroup;
 use Apollo\Components\Field;
 use Apollo\Components\Person;
 use Apollo\Components\Record;
-use Apollo\Entities\ActivityEntity;
 use Apollo\Entities\FieldEntity;
-use Apollo\Entities\PersonEntity;
 use Apollo\Entities\RecordEntity;
-use Apollo\Entities\TargetGroupEntity;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine;
 use Exception;
@@ -32,11 +28,11 @@ use Exception;
  * Class GetController
  *
  * Deals with get request to the API
- *
+ * @todo: Extract queries to other components
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.1.3
+ * @version 0.1.4
  */
 class GetController extends GenericController
 {
@@ -77,7 +73,7 @@ class GetController extends GenericController
         $peopleQB = $this->createQueryForRecordsRequest($data);
         $peopleQuery = $peopleQB->getQuery();
         $people = $peopleQuery->getResult();
-        $response = $this->getFormattedRecordsOfPeople($people, $page);
+        $response = Person::getFormattedRecordsOfPeople($people, $page);
         echo json_encode($response);
     }
 
@@ -128,10 +124,10 @@ class GetController extends GenericController
 
 
     /**
-     * @todo: Add description for function
+     * Adds the search of a person to a given query
      *
      * @param QueryBuilder $queryBuilder
-     * @param $search
+     * @param string $search
      */
     private function addPersonSearch($queryBuilder, $search)
     {
@@ -141,106 +137,6 @@ class GetController extends GenericController
             $queryBuilder->expr()->like('person.last_name', ':search')
         ));
         $queryBuilder->setParameter('search', '%' . $search . '%');
-    }
-
-    /**
-     * Given a person (retrieved from the data base), returns an object containing all the data of the person
-     * @todo: Put this function somewhere else, this is a controller
-     * @param PersonEntity $person
-     * @return mixed
-     */
-    private function getFormattedPersonData($person)
-    {
-        $responsePerson = [];
-        /** @var RecordEntity $recentRecord */
-        $recentRecord = Person::getMostRecentRecord($person->getId());
-        $responsePerson['id'] = $recentRecord->getId();
-        $responsePerson['given_name'] = $person->getGivenName();
-        $responsePerson['last_name'] = $person->getLastName();
-        $responsePerson['phone'] = $recentRecord->findVarchar(FIELD_PHONE);
-        $responsePerson['email'] = $recentRecord->findVarchar(FIELD_EMAIL);
-        return $responsePerson;
-    }
-
-    /**
-     * For a given number of people, return a formatted object of the people's record data
-     * @todo: Put this somewhere else, this is a controller
-     * @param $people
-     * @param $page
-     * @return mixed
-     */
-    private function getFormattedRecordsOfPeople($people, $page)
-    {
-        $response['error'] = null;
-        $response['count'] = count($people);
-        /**
-         * @var PersonEntity $person
-         */
-        for ($i = 10 * ($page - 1); $i < min($response['count'], $page * 10); $i++) {
-            $person = $people[$i];
-            $personRecords = $person->getRecords();
-            if (count($personRecords) < 1) {
-                $response['error'] = ['id' => 1, 'description' => 'Person #' . $person->getId() . ' has 0 records!'];
-            } else {
-                $response['data'][] = $this->getFormattedPersonData($person);
-            }
-        }
-        return $response;
-    }
-
-    /**
-     * Returns an object containing the essential information of a person
-     *
-     * @param RecordEntity $record
-     * @return array
-     * @since 0.0.9
-     */
-    private function getInfoRecord($record)
-    {
-        /**
-         * @var RecordEntity[] $other_records
-         */
-        $person = $record->getPerson();
-        $other_records = Record::getRepository()->findBy(['person' => $person->getId(), 'is_hidden' => 0]);
-
-        $id_array = [];
-        $name_array = [];
-        foreach ($other_records as $other_record) {
-            if ($other_record->getId() != intval($_GET['id'])) {
-                $id_array[] = $other_record->getId();
-                $name_array[] = $other_record->findVarchar(FIELD_RECORD_NAME);
-            }
-        }
-        return [
-            "given_name" => $person->getGivenName(),
-            "middle_name" => $person->getMiddleName(),
-            "last_name" => $person->getLastName(),
-            "email" => $record->findVarchar(FIELD_EMAIL),
-            "address" => $record->findMultiple(FIELD_ADDRESS),
-            "phone" => $record->findVarchar(FIELD_PHONE),
-            "awards" => $record->findMultiple(FIELD_AWARDS),
-            "publications" => $record->findMultiple(FIELD_PUBLICATIONS),
-            "start_date" => $record->findDateTime(FIELD_START_DATE)->format('Y-m-d H:i:s'),
-            "end_date" => $record->findDateTime(FIELD_END_DATE)->format('Y-m-d H:i:s'),
-            "person_id" => $person->getId(),
-            "record_id" => $record->getId(),
-            "record_name" => $record->findVarchar(FIELD_RECORD_NAME),
-            "record_ids" => $id_array,
-            "record_names" => $name_array,
-            "activities" => $this->getFormattedActivitiesOfPerson($person)
-        ];
-    }
-
-    private function getFormattedActivitiesOfPerson($person)
-    {
-        /** @var PersonEntity $person */
-        $activities = $person->getActivities();
-        $ret = [];
-        foreach($activities as $activity){
-            if(!$activity->isHidden())
-                $ret[] = $this->getFormattedShortActivityData($activity);
-        }
-        return $ret;
     }
 
     /**
@@ -255,9 +151,9 @@ class GetController extends GenericController
         /**
          * @var RecordEntity $record
          */
-        if ($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
+        if ($data['id'] > 0 && ($record = Record::getValidRecordWithId($data['id'])) != null) {
             Record::prepare($record);
-            $response['essential'] = $this->getInfoRecord($record);
+            $response['essential'] = Record::getFormattedData($record);
             $fieldsViewData = Record::getFormattedFields($record, false);
             $response['data'] = $fieldsViewData;
         } else {
@@ -279,7 +175,7 @@ class GetController extends GenericController
 
     /**
      * Returns JSON containing information used to build the edit view for a record
-     *
+     * @todo: Put all of the field formatting in the field component
      * @since 0.0.9
      */
     public function actionRecordEdit()
@@ -289,15 +185,14 @@ class GetController extends GenericController
         /**
          * @var RecordEntity $record
          */
-        if ($data['id'] > 0 && ($record = Record::getRepository()->find($data['id'])) != null) {
+        if ($data['id'] > 0 && ($record = Record::getValidRecordWithId($data['id']))) {
             Record::prepare($record);
-            $response['essential'] = $this->getInfoRecord($record);
+            $response['essential'] = Record::getFormattedData($record);
             $fieldsEditData = [];
-            $fieldRepo = Field::getRepository();
             /**
              * @var FieldEntity[] $fields
              */
-            $fields = $fieldRepo->findBy(['is_essential' => false, 'is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
+            $fields = Field::getValidFields();
             foreach ($fields as $field) {
                 $fieldEditData['id'] = $field->getId();
                 $fieldEditData['name'] = $field->getName();
@@ -357,7 +252,7 @@ class GetController extends GenericController
             $response['error'] = ['id' => 3, 'description' => "Unable to get data from database, server issue? (error in query): " . $e->getMessage()];
             echo json_encode($response);
         } finally {
-            $response = $this->getFormattedActivities($activities, $page);
+            $response = Activity::getFormattedActivities($activities, $page);
             echo json_encode($response);
         }
 
@@ -391,114 +286,21 @@ class GetController extends GenericController
     }
 
     /**
-     * @todo: Put this somewhere else, this is a controller
-     * @param ActivityEntity[] $activities
-     * @param $page
-     * @return mixed
-     */
-    private function getFormattedActivities($activities, $page)
-    {
-        $response['error'] = null;
-        $response['count'] = count($activities);
-        for ($i = 10 * ($page - 1); $i < min($response['count'], $page * 10); $i++) {
-            $activity = $activities[$i];
-            $response['activities'][] = $this->getFormattedShortActivityData($activity);
-        }
-        return $response;
-    }
-
-    /**
-     * @todo: Put this somewhere else, this is a controller
-     * @param ActivityEntity $activity
-     * @return array
-     */
-    private function getFormattedShortActivityData($activity)
-    {
-        $responseActivity = [
-            'id' => $activity->getId(),
-            'name' => $activity->getName(),
-            'start_date' => $activity->getStartDate()->format('Y-m-d H:i:s'),
-            'end_date' => $activity->getEndDate()->format('Y-m-d H:i:s')
-        ];
-        return $responseActivity;
-    }
-
-    /**
      * Returns detailed information on one activity
      * @since 0.0.6
      */
     public function actionActivity()
     {
         $data = $this->parseRequest(['id' => 0]);
-        $activity = Activity::getValidActivity($data['id']);
+        $activity = Activity::getValidActivityWithId($data['id']);
 
         if ($data['id'] > 0 && $activity != null) {
-            $activityInfo = $this->getInfoActivity($activity);
-            //@todo: Check if there is more than one activity. If so, then report that as invalid
+            $activityInfo = Activity::getFormattedData($activity);
             $response = $activityInfo;
         } else {
             $response['error'] = $this->getJSONError(1, 'The supplied id is invalid!');
         }
         echo json_encode($response);
-    }
-
-    /**
-     * @todo: Put this somewhere else, this is a controller
-     * Formats an activity as a valid JSON object (with all the information about the activity)
-     * @param ActivityEntity $activity
-     * @return array
-     */
-    private function getInfoActivity(ActivityEntity $activity)
-    {
-        $people = $this->formatPeopleShortWithRecords($activity->getPeople());
-        $activityInfo = [
-            'error' => null,
-            'id' => $activity->getId(),
-            'name' => $activity->getName(),
-            'target_groups' => $this->getFormattedTargetGroups($activity->getTargetGroup()),
-            'target_group_comment' => $activity->getTargetGroupComment(),
-            'start_date' => $activity->getStartDate()->format('Y-m-d H:i:s'),
-            'end_date' => $activity->getEndDate()->format('Y-m-d H:i:s'),
-            'participants' => $people
-        ];
-        return $activityInfo;
-    }
-
-    /**
-     * @todo: Put this somewhere else, this is a controller
-     * @param TargetGroupEntity $activity_activeTarget
-     * @return array
-     */
-    private function getFormattedTargetGroups($activity_activeTarget)
-    {
-        $targetGroups = TargetGroup::getValidTargetGroups();
-        $arr = [];
-        foreach ($targetGroups as $targetGroup) {
-            $tg = $this->getFormattedTargetGroup($targetGroup);
-            if(!empty($tg))
-                $arr[] = $tg;
-        }
-        $ret['data'] = $arr;
-        $ret['active'] = $this->getFormattedTargetGroup($activity_activeTarget);
-        return $ret;
-    }
-
-    /**
-     * @todo: Put this somewhere else, this is a controller
-     * @param TargetGroupEntity $targetGroup
-     * @return array
-     */
-    private function getFormattedTargetGroup($targetGroup)
-    {
-        if(!empty($targetGroup)) {
-            $tg = [
-                'id' => $targetGroup->getId(),
-                'name' => $targetGroup->getName()
-            ];
-        } else {
-            return null;
-        }
-        return $tg;
     }
 
     /**
@@ -509,39 +311,19 @@ class GetController extends GenericController
         $data = $this->parseRequest(['activity_id' => null, 'temporarily_added' => null, 'search' => null]);
         $people = null;
         $pqb = $this->getQueryForPeopleNotInProgramme($data);
-        if ((empty(Activity::getValidActivity($data['activity_id'])))) {
+        if ((empty(Activity::getValidActivityWithId($data['activity_id'])))) {
             $response['error'] = $this->getJSONError(2, "Activity hidden.");
         } else {
             try {
                 $response['error'] = null;
                 $query = $pqb->getQuery();
                 $result = $query->getResult();
-                $response['data'] = $this->formatPeopleShortWithRecords($result);
+                $response['data'] = Person::getFormattedPeopleShortWithRecords($result);
             } catch (Exception $e) {
                 $response['error'] = $this->getJSONError(1, "Query failed with exception " . $e->getMessage());
             }
         }
         echo json_encode($response);
-    }
-
-    /**
-     * @todo: Put this somewhere else, this is a controller
-     * @param PersonEntity[] $people
-     * @return array
-     */
-    private function formatPeopleShortWithRecords($people)
-    {
-        $people_obj = [];
-        foreach ($people as $person) {
-            $p_id = $person->getId();
-            $person_obj = [
-                'p_id' => $p_id,
-                'r_id' => Person::getMostRecentRecord($p_id)->getId(),
-                'name' => implode(' ', [$person->getGivenName(), $person->getMiddleName(), $person->getLastName()])
-            ];
-            $people_obj[] = $person_obj;
-        }
-        return $people_obj;
     }
 
     /**
@@ -680,14 +462,6 @@ class GetController extends GenericController
         return $pqb;
     }
 
-    private function getJSONError($id, $description)
-    {
-        return [
-            'id' => $id,
-            'description' => $description
-        ];
-    }
-
     /**
      * Returns a list of all fields belonging to user's organisation
      *
@@ -737,5 +511,20 @@ class GetController extends GenericController
         }
         $response['data'] = array_reverse($data);
         echo json_encode($response);
+    }
+
+    /**
+     * Just generates an error. Used for encapsulating an error
+     * @todo: Generate controller for all api-stuff, put this in there
+     * @param $id
+     * @param $description
+     * @return array
+     */
+    private function getJSONError($id, $description)
+    {
+        return [
+            'id' => $id,
+            'description' => $description
+        ];
     }
 }

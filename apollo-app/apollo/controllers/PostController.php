@@ -12,7 +12,6 @@ namespace Apollo\Controllers;
 use Apollo\Apollo;
 use Apollo\Components\DB;
 use Apollo\Entities\DefaultEntity;
-use Doctrine\ORM\EntityRepository;
 use Apollo\Components\Activity;
 use Apollo\Components\Field;
 use Apollo\Components\Person;
@@ -36,7 +35,9 @@ use Exception;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.1.2
+ * @todo: Extract queries to other components
+ * @todo: Extract functions for all of the fields
+ * @version 0.1.3
  */
 class PostController extends GenericController
 {
@@ -64,6 +65,7 @@ class PostController extends GenericController
      * Action parsing operations on records, such as hiding, adding, duplicating
      * @todo: Extract till you drop!!!!!
      * @todo: ^ Well that didn't work
+     * @todo change if to 'switch'
      * @since 0.0.2 Parses
      * @since 0.0.1
      */
@@ -120,12 +122,8 @@ class PostController extends GenericController
                         $record->setDateTime(FIELD_START_DATE, $start_date);
                         $record->setDateTime(FIELD_END_DATE, $end_date);
                         if ($data['id'] > 0) {
-                            if(($sourceRecord = Record::find($data['id'])) != null) {
-                                $fieldRepo = Field::getRepository();
-                                /**
-                                 * @var FieldEntity[] $fields
-                                 */
-                                $fields = $fieldRepo->findBy(['is_hidden' => false, 'organisation' => Apollo::getInstance()->getUser()->getOrganisationId()]);
+                            if(($sourceRecord = Record::getValidRecordWithId($data['id'])) != null) {
+                                $fields = Field::getValidFields();
                                 /**
                                  * @var FieldEntity $field
                                  */
@@ -157,16 +155,12 @@ class PostController extends GenericController
                 Apollo::getInstance()->getRequest()->error(400, 'Invalid ID specified.');
             };
             /**
-             * @var EntityRepository $record_repository
-             */
-            $record_repository = $em->getRepository(Record::getEntityNamespace());
-            /**
              * @var RecordEntity $record
              */
-            $record = $record_repository->findOneBy(['id' => $data['id'], 'is_hidden' => 0]);
+            $record = Record::getValidRecordWithId($data['id']);
             if ($record != null) {
                 $person = $record->getPerson();
-                if ($person->getOrganisation()->getId() == Apollo::getInstance()->getUser()->getOrganisationId()) {
+                if (!empty($person)) {
                     $records = $person->getRecords();
                     $count = 0;
                     foreach ($records as $current_record) {
@@ -201,7 +195,7 @@ class PostController extends GenericController
 
     /**
      * Parses the data/field info and saves it into database
-     *
+     * @todo: extract
      * @todo: Update records updated_by
      *
      * @since 0.0.4
@@ -211,9 +205,8 @@ class PostController extends GenericController
         $em = DB::getEntityManager();
         $data = $this->parseRequest(['record_id' => 0, 'field_id' => 0, 'value' => null, 'is_default' => null]);
         $response['error'] = null;
-        $organisation = Apollo::getInstance()->getUser()->getOrganisation();
         /** @var RecordEntity $record */
-        if ($data['record_id'] > 0 && ($record = Record::getRepository()->find($data['record_id'])) != null) {
+        if ($data['record_id'] > 0 && ($record = Record::getValidRecordWithId($data['record_id']) != null)) {
             if (in_array($data['field_id'], [FIELD_GIVEN_NAME, FIELD_MIDDLE_NAME, FIELD_LAST_NAME])) {
                 if ($data['value'] !== null) {
                     if ($data['field_id'] == FIELD_GIVEN_NAME) {
@@ -231,7 +224,7 @@ class PostController extends GenericController
                     ];
                 }
                 /** @var FieldEntity $field */
-            } elseif ($data['field_id'] > 0 && ($field = Field::getRepository()->findOneBy(['id' => $data['field_id'], 'organisation' => $organisation])) != null) {
+            } elseif ($data['field_id'] > 0 && ($field = Field::getValidFieldWithId($data['field_id'])) != null) {
                 if ($data['value'] !== null) {
                     $dataObject = $record->findOrCreateData($data['field_id']);
                     switch ($field->getType()) {
@@ -283,7 +276,7 @@ class PostController extends GenericController
 
     /**
      * Action responsible for handling requests related to fields
-     *
+     * @todo: extract.
      * @param string $action
      */
     public function actionField($action = null)
@@ -293,9 +286,8 @@ class PostController extends GenericController
             $data = $this->parseRequest(['type' => null, 'id' => 0, 'value' => null]);
             if(!empty($data['type']) && $data['id'] > 0 && !empty($data['value'])) {
                 if(in_array($data['type'], ['name', 'defaults'])) {
-                    $fieldsRepo = Field::getRepository();
                     /** @var FieldEntity $field */
-                    $field = $fieldsRepo->findOneBy(['id' => $data['id'], 'organisation' => Apollo::getInstance()->getUser()->getOrganisation()]);
+                    $field = Field::getValidFieldWithId($data['id']);
                     if($field != null) {
                         $em = DB::getEntityManager();
                         if($data['type'] == 'name') {
@@ -390,9 +382,7 @@ class PostController extends GenericController
             }
         } elseif($action == 'hide') {
             $data = $this->parseRequest(['id' => 0]);
-            $fieldsRepo = Field::getRepository();
-            /** @var FieldEntity $field */
-            $field = $fieldsRepo->findOneBy(['id' => $data['id'], 'organisation' => Apollo::getInstance()->getUser()->getOrganisation()]);
+            $field = Field::getValidFieldWithId($data['id']);
             if($field != null) {
                 if(!$field->isEssential()) {
                     $field->setIsHidden(true);
@@ -426,7 +416,7 @@ class PostController extends GenericController
         $peopleQuery = $peopleQB->getQuery();
         $people = $peopleQuery->getResult();
         $people = $this->applyFilters($people, $data['states']);
-        $response = $this->getFormattedRecordsOfPeople($people, $page);
+        $response = Person::getFormattedRecordsOfPeople($people, $page);
         echo json_encode($response);
     }
 
@@ -477,7 +467,7 @@ class PostController extends GenericController
      * Parses filters and applies them to the return values
      *
      * @todo: Include non-recent records too
-     *
+     * @todo: extract. extract. extract. (this function is ~190 lines long!)
      * @param PersonEntity[] $people
      * @param $states
      * @return mixed[]
@@ -672,52 +662,6 @@ class PostController extends GenericController
     }
 
     /**
-     * For a given number of people, return a formatted object of the people's record data
-     * @todo: Put this somewhere else, this is a controller
-     * @param $people
-     * @param $page
-     * @return mixed
-     */
-    private function getFormattedRecordsOfPeople($people, $page)
-    {
-        $response['error'] = null;
-        $response['count'] = count($people);
-        /**
-         * @var PersonEntity $person
-         */
-        for ($i = 10 * ($page - 1); $i < min($response['count'], $page * 10); $i++) {
-            $person = $people[$i];
-            $personRecords = $person->getRecords();
-            if (count($personRecords) < 1) {
-                $response['error'] = ['id' => 1, 'description' => 'Person #' . $person->getId() . ' has 0 records!'];
-            } else {
-                $response['data'][] = $this->getFormattedPersonData($person);
-            }
-        }
-        return $response;
-    }
-
-    /**
-     * Given a person (retrieved from the data base), returns an object containing all the data of the person
-     * @todo: Put this function somewhere else, this is a controller
-     * @param PersonEntity $person
-     * @return mixed
-     */
-    private function getFormattedPersonData($person)
-    {
-        $responsePerson = [];
-        /** @var RecordEntity $recentRecord */
-        $recentRecord = Person::getMostRecentRecord($person->getId());
-        $responsePerson['id'] = $recentRecord->getId();
-        $responsePerson['given_name'] = $person->getGivenName();
-        $responsePerson['last_name'] = $person->getLastName();
-        $responsePerson['phone'] = $recentRecord->findVarchar(FIELD_PHONE);
-        $responsePerson['email'] = $recentRecord->findVarchar(FIELD_EMAIL);
-        return $responsePerson;
-    }
-
-
-    /**
      * @since 0.0.6
      */
     public function actionActivity()
@@ -752,12 +696,11 @@ class PostController extends GenericController
     {
         $response['error'] = null;
         $data = $this->parseRequest(['id' => -1, 'activity_name' => null, 'start_date' => null, 'end_date' => null]);
-        $organisation = Apollo::getInstance()->getUser()->getOrganisation();
         $bonus = null;
         if ($data['id'] > 0) {
             try{
-                $sourceActivity = Activity::find($data['id']);
-                if ($sourceActivity != null && !$sourceActivity->isHidden() && $sourceActivity->getOrganisation() == $organisation) {
+                $sourceActivity = Activity::getValidActivityWithId($data['id']);
+                if ($sourceActivity != null) {
                     $bonus['target_group'] = $sourceActivity->getTargetGroup();
                     $bonus['target_group_comment'] = $sourceActivity->getTargetGroupComment();
                     $bonus['people'] = $sourceActivity->getPeople();
@@ -777,13 +720,17 @@ class PostController extends GenericController
         return $response;
     }
 
+    /**
+     * Handles the request for when an activity should be hidden
+     * @return mixed
+     */
     private function activityHide()
     {
         $response['error'] = null;
         $data = $this->parseRequest(['activity_id' => null]);
         $activity = null;
         try {
-            $activity = Activity::getRepository()->find($data['activity_id']);
+            $activity = Activity::getValidActivityWithId($data['activity_id']);
         } catch (Exception $e) {
             $response['error'] = $this->getJSONError(2, 'Error while querying database for activity, message: ' . $e->getMessage());
         } finally {
@@ -801,6 +748,10 @@ class PostController extends GenericController
         }
     }
 
+    /**
+     * @todo: make this better? put this in components? in any case, do something with it. This looks horrible
+     * @return mixed
+     */
     private function activityUpdate()
     {
         $response['error'] = null;
@@ -815,12 +766,12 @@ class PostController extends GenericController
             'removed_people' => null
         ]);
         try {
-            $activity = Activity::getValidActivity($data['activity_id']);
+            $activity = Activity::getValidActivityWithId($data['activity_id']);
             if ($data['activity_id'] > 0 && !empty($activity)) {
                 if (!empty($data['activity_name']))
                     $activity->setName($data['activity_name']);
                 if (!empty($data['target_group'])) {
-                    $tg = TargetGroup::getValidTargetGroup($data['target_group']);
+                    $tg = TargetGroup::getValidTargetGroupWithId($data['target_group']);
                     if (!empty($tg))
                         $activity->setTargetGroup($tg);
                 }
@@ -869,7 +820,7 @@ class PostController extends GenericController
         {
             if(intval($person['p_id']) > 0){
                 try{
-                    $pEntity = Person::getValidPerson($person['p_id']);
+                    $pEntity = Person::getValidPersonWithId($person['p_id']);
                     if(!empty($pEntity))
                     {
                         $arr[] = $pEntity;
@@ -933,16 +884,16 @@ class PostController extends GenericController
         $response['error'] = null;
         $data = $this->parseRequest(['activity_id' => null, 'toAdd' => null, 'toDelete' => null]);
         if (!$this->areFieldsEmpty($data)) {
-            $activity = Activity::getRepository()->find($data['activity_id']);
+            $activity = Activity::getValidActivityWithId($data['activity_id']);
             if($activity) {
                 foreach($data['toAdd'] as $person_id){
-                    $person = Person::getRepository()->find($person_id);
+                    $person = Person::getValidPersonWithId($person_id);
                     if($person) {
                         $activity->addPerson($person);
                     }
                 }
                 foreach($data['toDelete'] as $person_id){
-                    $person = Person::getRepository()->find($person_id);
+                    $person = Person::getValidPersonWithId($person_id);
                     if($person) {
                         $activity->removePerson($person);
                     }
@@ -1014,24 +965,16 @@ class PostController extends GenericController
     }
 
     /**
-     * @param int $id
-     * @param string $description
+     * Just generates an error. Used for encapsulating an error
+     * @param $id
+     * @param $description
      * @return array
      */
-    private function getJSONError($id, $description) {
-        return  [
+    private function getJSONError($id, $description)
+    {
+        return [
             'id' => $id,
             'description' => $description
         ];
-    }
-
-    /**
-     * Function meant to be used for debugging: Deliberately stops the active post request by creating an error
-     * @param $data
-     */
-    private function derail($data)
-    {
-        echo json_encode($this->getJSONError(0, json_encode($data)));
-        return;
     }
 }
