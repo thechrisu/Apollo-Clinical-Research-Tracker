@@ -16,7 +16,7 @@ use Apollo\Apollo;
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.2
+ * @version 0.0.3
  */
 class Field extends DBComponent
 {
@@ -25,6 +25,20 @@ class Field extends DBComponent
      * @var string
      */
     protected static $entityNamespace = 'Apollo\\Entities\\FieldEntity';
+
+    public static function getValidFieldWithId($id)
+    {
+        $repo = self::getRepository();
+        $org = Apollo::getInstance()->getUser()->getOrganisation();
+        return $repo->findOneBy(['id' => $id, 'organisation' => $org]);
+    }
+
+    public static function getValidFields()
+    {
+        $repo = self::getRepository();
+        $org_id = Apollo::getInstance()->getUser()->getOrganisationId();
+        return $repo->findBy(['is_essential' => false, 'is_hidden' => false, 'organisation' => $org_id]);
+    }
 
     public static function getFieldNames()
     {

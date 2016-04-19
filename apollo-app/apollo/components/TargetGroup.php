@@ -44,6 +44,7 @@ class TargetGroup extends DBComponent
     }
 
     /**
+     * Returns all valid target groups
      * @return TargetGroupEntity[]
      */
     public static function getValidTargetGroups()
@@ -53,12 +54,50 @@ class TargetGroup extends DBComponent
     }
 
     /**
+     * Given an id, returns a target group (hopefully)
      * @param $id
      * @return TargetGroupEntity
      */
-    public static function getValidTargetGroup($id)
+    public static function getValidTargetGroupWithId($id)
     {
         $org_id = Apollo::getInstance()->getUser()->getOrganisationId();
         return TargetGroup::getRepository()->findBy(['organisation' => $org_id, 'is_hidden' => false, 'id' => $id])[0];
+    }
+
+    /**
+     * Formats one TargetGroup correctly
+     * @param TargetGroupEntity $targetGroup
+     * @return array
+     */
+    private function getFormattedTargetGroup($targetGroup)
+    {
+        if(!empty($targetGroup)) {
+            $tg = [
+                'id' => $targetGroup->getId(),
+                'name' => $targetGroup->getName()
+            ];
+        } else {
+            return null;
+        }
+        return $tg;
+    }
+
+    /**
+     * Formats all of the target groups correctly
+     * @param TargetGroupEntity $activeTarget
+     * @return array
+     */
+    public static function getFormattedTargetGroups($activeTarget)
+    {
+        $targetGroups = self::getValidTargetGroups();
+        $arr = [];
+        foreach ($targetGroups as $targetGroup) {
+            $tg = self::getFormattedTargetGroup($targetGroup);
+            if(!empty($tg))
+                $arr[] = $tg;
+        }
+        $ret['data'] = $arr;
+        $ret['active'] = self::getFormattedTargetGroup($activeTarget);
+        return $ret;
     }
 }

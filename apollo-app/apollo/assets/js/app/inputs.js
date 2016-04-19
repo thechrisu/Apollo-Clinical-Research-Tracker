@@ -98,7 +98,7 @@ var InputDisabled = (function (_super) {
         this.parentNode.append(this.input);
     };
     return InputDisabled;
-}(InputField));
+})(InputField);
 /**
  * Input expecting text, i.e. <input type="text" ... />
  *

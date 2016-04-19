@@ -135,7 +135,7 @@ var RecordSearch = (function () {
         this.table.append(tr);
     };
     return RecordSearch;
-}());
+})();
 /*
 
  1 -> Int -> Equal, Not Equal, Less Than, Greater Than
@@ -349,7 +349,7 @@ var Filter = (function () {
         return this.parentNode;
     };
     return Filter;
-}());
+})();
 $(document).ready(function () {
     new RecordSearch().load();
 });

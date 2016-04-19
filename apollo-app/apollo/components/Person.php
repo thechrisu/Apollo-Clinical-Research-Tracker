@@ -1,6 +1,7 @@
 <?php
 /**
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
  */
@@ -17,7 +18,8 @@ use Apollo\Entities\RecordEntity;
  *
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.3
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @version 0.0.4
  */
 class Person extends DBComponent
 {
@@ -73,7 +75,7 @@ class Person extends DBComponent
      * @param $id
      * @return PersonEntity|null
      */
-    public static function getValidPerson($id)
+    public static function getValidPersonWithId($id)
     {
         $org = Apollo::getInstance()->getUser()->getOrganisation();
         $people = Person::getRepository();
@@ -83,6 +85,86 @@ class Person extends DBComponent
         } else {
             return null;
         }
+    }
+
+    /**
+     * Given a person (retrieved from the data base), returns an object containing all the data of the person
+     * @param PersonEntity $person
+     * @return mixed
+     */
+    public static function getFormattedData($person)
+    {
+        $responsePerson = [];
+        /** @var RecordEntity $recentRecord */
+        $recentRecord = self::getMostRecentRecord($person->getId());
+        $responsePerson['id'] = $recentRecord->getId();
+        $responsePerson['given_name'] = $person->getGivenName();
+        $responsePerson['last_name'] = $person->getLastName();
+        $responsePerson['phone'] = $recentRecord->findVarchar(FIELD_PHONE);
+        $responsePerson['email'] = $recentRecord->findVarchar(FIELD_EMAIL);
+        return $responsePerson;
+    }
+
+    /**
+     * Given a person, this returns formatted information about the activities of the person
+     * @param PersonEntity $person
+     * @return array
+     */
+    public static function getFormattedActivitiesOfPerson($person)
+    {
+        /** @var PersonEntity $person */
+        $activities = $person->getActivities();
+        $ret = [];
+        foreach($activities as $activity){
+            if(!$activity->isHidden())
+                $ret[] = Activity::getFormattedShortData($activity);
+        }
+        return $ret;
+    }
+
+    /**
+     * For a given number of people, return a formatted object of the people's record data
+     * @param PersonEntity[] $people
+     * @param $page
+     * @return mixed
+     */
+    public static function getFormattedRecordsOfPeople($people, $page)
+    {
+        $response['error'] = null;
+        $response['count'] = count($people);
+        /**
+         * @var PersonEntity $person
+         */
+        for ($i = 10 * ($page - 1); $i < min($response['count'], $page * 10); $i++) {
+            $person = $people[$i];
+            $personRecords = $person->getRecords();
+            if (count($personRecords) < 1) {
+                $response['error'] = ['id' => 1, 'description' => 'Person #' . $person->getId() . ' has 0 records!'];
+            } else {
+                $response['data'][] = self::getFormattedData($person);
+            }
+        }
+        return $response;
+    }
+
+    /**
+     * Returns people's id and their name together with their most recent record id
+     * @param PersonEntity[] $people
+     * @return array
+     */
+    public static function getFormattedPeopleShortWithRecords($people)
+    {
+        $people_obj = [];
+        foreach ($people as $person) {
+            $p_id = $person->getId();
+            $person_obj = [
+                'p_id' => $p_id,
+                'r_id' => self::getMostRecentRecord($p_id)->getId(),
+                'name' => implode(' ', [$person->getGivenName(), $person->getMiddleName(), $person->getLastName()])
+            ];
+            $people_obj[] = $person_obj;
+        }
+        return $people_obj;
     }
 
 }
