@@ -7,7 +7,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.4
+ * @version 0.1.5
  */
 
 /**
@@ -23,6 +23,13 @@ if(file_exists(__DIR__ . '/Config.php')) {
  * @since 0.0.9
  */
 define('APP_NAME', 'Apollo');
+
+/**
+ * Check if $_SERVER variables are set
+ * @since 0.1.5
+ */
+isset($_SERVER['HTTP_HOST']) || $_SERVER['HTTP_HOST'] = 'localhost';
+isset($_SERVER['REQUEST_URI']) || $_SERVER['REQUEST_URI'] = '/';
 
 /**
  * The base url of the website with a trailing slash "/".
