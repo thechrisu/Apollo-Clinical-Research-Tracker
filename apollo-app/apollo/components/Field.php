@@ -16,7 +16,7 @@ use Apollo\Apollo;
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  */
 class Field extends DBComponent
 {
@@ -43,7 +43,7 @@ class Field extends DBComponent
     public static function getFieldNames()
     {
         $organisation = Apollo::getInstance()->getUser()->getOrganisation();
-        $fields = self::getRepository()->findBy(['is_hidden' => '0', 'organisation' => $organisation]);
+        $fields = self::getRepository()->findBy(['is_hidden' => false, 'organisation' => $organisation]);
         $names = [];
         foreach($fields as $field)
             $names[] = $field->getName();

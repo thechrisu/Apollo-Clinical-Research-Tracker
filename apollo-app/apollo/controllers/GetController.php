@@ -32,7 +32,7 @@ use Exception;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.1.4
+ * @version 0.1.5
  */
 class GetController extends GenericController
 {
@@ -164,12 +164,12 @@ class GetController extends GenericController
 
     public function actionPeopleExcel()
     {
-        $data = $this->parseRequest(['ids' => null]);
+        //$data = $this->parseRequest(['ids' => null]);
         $ee = new ExcelExporter();
-        if(!empty($data['ids']))
+        /*if(!empty($data['ids']))
             $ee->getDataFromRecordIds($data['ids']);
-        else
-            $ee->downloadAllRecords();
+        else*/
+        $ee->downloadAllRecords();
         //$ee->getTestFile();
     }
 
@@ -305,6 +305,7 @@ class GetController extends GenericController
 
     /**
      * Gets all the people not in the specified activity, who meet the search criteria and who are not already temporarily added
+     * @todo only return like the top ten results (in order to speed up the lookup)
      */
     public function actionActivityPeople()
     {
