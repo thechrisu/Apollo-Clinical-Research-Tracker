@@ -35,7 +35,7 @@ var InputField = (function () {
         }, AJAX_LAZY_DELAY);
     };
     return InputField;
-}());
+})();
 /**
  * Input number
  *
@@ -72,7 +72,7 @@ var InputNumber = (function (_super) {
         });
     };
     return InputNumber;
-}(InputField));
+})(InputField);
 /**
  * Disabled input
  *
@@ -132,7 +132,7 @@ var InputText = (function (_super) {
         });
     };
     return InputText;
-}(InputField));
+})(InputField);
 /**
  * Field with a text area
  *
@@ -165,7 +165,7 @@ var InputLongText = (function (_super) {
         });
     };
     return InputLongText;
-}(InputField));
+})(InputField);
 var InputTextMultiple = (function (_super) {
     __extends(InputTextMultiple, _super);
     function InputTextMultiple(id, callback, attributes, values) {
@@ -255,7 +255,7 @@ var InputTextMultiple = (function (_super) {
         this.callbackWrapper(this.callback.bind(this, this.id, values));
     };
     return InputTextMultiple;
-}(InputField));
+})(InputField);
 /**
  * Input with a date
  */
@@ -290,7 +290,7 @@ var InputDate = (function (_super) {
         });
     };
     return InputDate;
-}(InputField));
+})(InputField);
 /**
  * Bootstrap dropdown
  *
@@ -386,4 +386,4 @@ var InputDropdown = (function (_super) {
         }
     };
     return InputDropdown;
-}(InputField));
+})(InputField);

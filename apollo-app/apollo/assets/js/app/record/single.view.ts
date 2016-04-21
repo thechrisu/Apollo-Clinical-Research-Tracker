@@ -175,8 +175,10 @@ class SingleView {
         duplicateButton.removeClass('disabled');
         var editButton = $('#record-edit');
         editButton.removeClass('disabled');
-        var hideButton = $('#record-hide');
-        hideButton.removeClass('disabled');
+        var hideRecordButton = $('#record-hide');
+        hideRecordButton.removeClass('disabled');
+        var hidePersonButton = $('#person-hide');
+        hidePersonButton.removeClass('disabled');
 
         addButton.click(function (e) {
             e.preventDefault();
@@ -250,13 +252,32 @@ class SingleView {
         }
 
         editButton.attr('href', Util.url('record/edit/' + data.record_id));
-        hideButton.click(function (e) {
+
+        hideRecordButton.click(function (e) {
             e.preventDefault();
             bootbox.confirm('Are you sure you want to hide this record (belonging to ' + $('<span>' + data.given_name + '</span>').text() + ' ' + $('<span>' + data.last_name + '</span>').text() + ')? The data won\'t be deleted and can be restored later.', function (result) {
                 if (result) {
                     AJAX.post(Util.url('post/record'), {
                         action: 'hide',
                         id: data.record_id
+                    }, function (data:any) {
+                        Util.to('record');
+                    }, function (message:string) {
+                        Util.error('An error has occurred during hiding of the record. Error message: ' + message);
+                    });
+                }
+            });
+        });
+
+        hidePersonButton.click(function (e) {
+            e.preventDefault();
+            var middleName = data.middle_name == null ? '' : $('<span>' + data.middle_name + '</span>').text() + ' ';
+            var personName = $('<span>' + data.given_name + '</span>').text() + ' ' + middleName + $('<span>' + data.last_name + '</span>').text();
+            bootbox.confirm('Are you sure you want to hide ' + personName + '? The data won\'t be deleted and can be restored later.', function (result) {
+                if (result) {
+                    AJAX.post(Util.url('post/person'), {
+                        action: 'hide',
+                        id: data.person_id
                     }, function (data:any) {
                         Util.to('record');
                     }, function (message:string) {

@@ -19,7 +19,7 @@ use Apollo\Entities\RecordEntity;
  * @package Apollo\Components
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.4
+ * @version 0.0.6
  */
 class Person extends DBComponent
 {
@@ -103,6 +103,25 @@ class Person extends DBComponent
         $responsePerson['phone'] = $recentRecord->findVarchar(FIELD_PHONE);
         $responsePerson['email'] = $recentRecord->findVarchar(FIELD_EMAIL);
         return $responsePerson;
+    }
+
+    /**
+     * Returns a person's name arranged in an array
+     * @param PersonEntity $person
+     * @return array
+     */
+    public static function getNameAsArray(PersonEntity $person)
+    {
+        $middleName = $person->getMiddleName();
+
+        if(empty($middleName))
+           $middleName = '';
+        $ret = [
+            $person->getGivenName(),
+            $middleName,
+            $person->getLastName()
+        ];
+        return $ret;
     }
 
     /**

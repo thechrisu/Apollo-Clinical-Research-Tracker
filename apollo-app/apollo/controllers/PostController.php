@@ -37,7 +37,7 @@ use Exception;
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @todo: Extract queries to other components
  * @todo: Extract functions for all of the fields
- * @version 0.1.3
+ * @version 0.1.4
  */
 class PostController extends GenericController
 {
@@ -65,7 +65,6 @@ class PostController extends GenericController
      * Action parsing operations on records, such as hiding, adding, duplicating
      * @todo: Extract till you drop!!!!!
      * @todo: ^ Well that didn't work
-     * @todo change if to 'switch'
      * @since 0.0.2 Parses
      * @since 0.0.1
      */
@@ -74,44 +73,42 @@ class PostController extends GenericController
         $em = DB::getEntityManager();
         $data = $this->parseRequest(['action' => null]);
         $action = strtolower($data['action']);
-        if (!in_array($action, ['create', 'add', 'hide', 'update'])) {
-            Apollo::getInstance()->getRequest()->error(400, 'Invalid action.');
-        };
         $response['error'] = null;
-        if ($action == 'create') {
-            $data = $this->parseRequest(['given_name' => null, 'middle_name' => null, 'last_name' => null, 'record_name' => null, 'start_date' => null, 'end_date' => null]);
-            if (!empty($data['given_name']) && !empty($data['last_name']) && !empty($data['record_name']) && !empty($data['start_date']) && !empty($data['end_date'])) {
-                $user = Apollo::getInstance()->getUser();
-                $person = new PersonEntity();
-                $person->setOrganisation($user->getOrganisation());
-                $person->setGivenName($data['given_name']);
-                $person->setMiddleName($data['middle_name']);
-                $person->setLastName($data['last_name']);
-                $em->persist($person);
+        switch($action) {
+            case 'create':
+                $data = $this->parseRequest(['given_name' => null, 'middle_name' => null, 'last_name' => null, 'record_name' => null, 'start_date' => null, 'end_date' => null]);
+                if (!empty($data['given_name']) && !empty($data['last_name']) && !empty($data['record_name']) && !empty($data['start_date']) && !empty($data['end_date'])) {
+                    $user = Apollo::getInstance()->getUser();
+                    $person = new PersonEntity();
+                    $person->setOrganisation($user->getOrganisation());
+                    $person->setGivenName($data['given_name']);
+                    $person->setMiddleName($data['middle_name']);
+                    $person->setLastName($data['last_name']);
+                    $em->persist($person);
 
-                $start_date = new DateTime($data['start_date']);
-                $end_date = new DateTime($data['end_date']);
-                $record = new RecordEntity($user->getEntity());
-                $record->setPerson($person);
-                $em->persist($record);
-                $record->setVarchar(FIELD_RECORD_NAME, $data['record_name']);
-                $record->setDateTime(FIELD_START_DATE, $start_date);
-                $record->setDateTime(FIELD_END_DATE, $end_date);
+                    $start_date = new DateTime($data['start_date']);
+                    $end_date = new DateTime($data['end_date']);
+                    $record = new RecordEntity($user->getEntity());
+                    $record->setPerson($person);
+                    $em->persist($record);
+                    $record->setVarchar(FIELD_RECORD_NAME, $data['record_name']);
+                    $record->setDateTime(FIELD_START_DATE, $start_date);
+                    $record->setDateTime(FIELD_END_DATE, $end_date);
 
-                $em->flush();
+                    $em->flush();
 
-                $response['record_id'] = $record->getId();
-            } else {
-                $response['error'] = $this->getJSONError(1, 'Some of the fields are empty!');
-            }
-        }
-        if ($action == 'add') {
-            $data = $this->parseRequest(['person_id' => 0, 'id' => 0, 'record_name' => null, 'start_date' => null, 'end_date' => null]);
-            if (!empty($data['record_name'])) {
-                $record = new RecordEntity(Apollo::getInstance()->getUser()->getEntity());
-                /** @var PersonEntity $person */
-                $person = Person::find($data['person_id']);
-                if ($person != null) {
+                    $response['record_id'] = $record->getId();
+                } else {
+                    $response['error'] = $this->getJSONError(1, 'Some of the fields are empty!');
+                }
+                break;
+            case 'add':
+                $data = $this->parseRequest(['person_id' => 0, 'id' => 0, 'record_name' => null, 'start_date' => null, 'end_date' => null]);
+                if (!empty($data['record_name'])) {
+                    $record = new RecordEntity(Apollo::getInstance()->getUser()->getEntity());
+                    /** @var PersonEntity $person */
+                    $person = Person::find($data['person_id']);
+                    if ($person != null) {
                         $em = DB::getEntityManager();
                         $record->setPerson($person);
                         $em->persist($record);
@@ -122,7 +119,7 @@ class PostController extends GenericController
                         $record->setDateTime(FIELD_START_DATE, $start_date);
                         $record->setDateTime(FIELD_END_DATE, $end_date);
                         if ($data['id'] > 0) {
-                            if(($sourceRecord = Record::getValidRecordWithId($data['id'])) != null) {
+                            if (($sourceRecord = Record::getValidRecordWithId($data['id'])) != null) {
                                 $fields = Field::getValidFields();
                                 /**
                                  * @var FieldEntity $field
@@ -142,56 +139,96 @@ class PostController extends GenericController
                         }
                         $em->flush();
                         $response['record_id'] = $record->getId();
-                } else {
-                    $response['error'] = $this->getJSONError(1, 'Invalid person ID.');
-                }
-            } else {
-                $response['error'] = $this->getJSONError(1, 'You must specify a name for the new record.');
-            }
-        }
-        if ($action == 'hide') {
-            $data = $this->parseRequest(['id' => 0]);
-            if ($data['id'] < 0) {
-                Apollo::getInstance()->getRequest()->error(400, 'Invalid ID specified.');
-            };
-            /**
-             * @var RecordEntity $record
-             */
-            $record = Record::getValidRecordWithId($data['id']);
-            if ($record != null) {
-                $person = $record->getPerson();
-                if (!empty($person)) {
-                    $records = $person->getRecords();
-                    $count = 0;
-                    foreach ($records as $current_record) {
-                        if (!$current_record->isHidden()) {
-                            $count++;
-                        }
-                    }
-                    if ($count > 1) {
-                        $record->setIsHidden(true);
-                        $em->flush();
                     } else {
-                        $response['error'] = [
-                            'id' => 1,
-                            'description' => 'This is the only visible record for this person, hence cannot be hidden.'
-                        ];
+                        $response['error'] = $this->getJSONError(1, 'Invalid person ID.');
                     }
                 } else {
-                    $response['error'] = [
-                        'id' => 1,
-                        'description' => 'Record belongs to another organisation!'
-                    ];
+                    $response['error'] = $this->getJSONError(1, 'You must specify a name for the new record.');
                 }
-            } else {
-                $response['error'] = [
-                    'id' => 1,
-                    'description' => 'Selected record is either already hidden or does not exist.'
-                ];
-            }
+                break;
+            case 'hide':
+                $data = $this->parseRequest(['id' => 0]);
+                if ($data['id'] < 0) {
+                    Apollo::getInstance()->getRequest()->error(400, 'Invalid ID specified.');
+                };
+                /**
+                 * @var RecordEntity $record
+                 */
+                $record = Record::getValidRecordWithId($data['id']);
+                if ($record != null) {
+                    $person = $record->getPerson();
+                    if (!empty($person)) {
+                        $records = $person->getRecords();
+                        $count = 0;
+                        foreach ($records as $current_record) {
+                            if (!$current_record->isHidden()) {
+                                $count++;
+                            }
+                        }
+                        if ($count > 1) {
+                            $record->setIsHidden(true);
+                            $em->flush();
+                        } else {
+                            $response['error'] = [
+                                'id' => 1,
+                                'description' => 'This is the only visible record for this person, hence cannot be hidden.'
+                            ];
+                        }
+                    } else {
+                        $response['error'] = $this->getJSONError(1, 'Record belongs to another organisation!');
+                    }
+                } else {
+                    $response['error'] = $this->getJSONError(1, 'Selected record is either already hidden or does not exist.');
+                }
+                break;
+            default:
+                Apollo::getInstance()->getRequest()->error(400, 'Invalid action.');
         }
         echo json_encode($response);
     }
+
+    /**
+     * @since 1.4
+     */
+    public function actionPerson()
+    {
+        $em = DB::getEntityManager();
+        $data = $this->parseRequest(['action' => null]);
+        $action = strtolower($data['action']);
+        $response['error'] = null;
+        switch($action) {
+            case 'hide':
+                $data = $this->parseRequest(['id' => 0]);
+                if ($data['id'] < 0) {
+                    Apollo::getInstance()->getRequest()->error(400, 'Invalid ID specified.');
+                };
+                /**
+                 * @var PersonEntity $record
+                 */
+                $person = Person::getValidPersonWithId($data['id']);
+                if ($person != null) {
+                    if (!empty($person)) {
+                        $records = $person->getRecords();
+                        foreach ($records as $current_record) {
+                            $current_record->setIsHidden(true);
+                            $em->persist($current_record);
+                        }
+                        $person->setIsHidden(true);
+                        $em->persist($person);
+                        $em->flush();
+                    } else {
+                        $response['error'] = $this->getJSONError(1, 'Person belongs to another organisation!');
+                    }
+                } else {
+                    $response['error'] = $this->getJSONError(1, 'Selected person is either already hidden or does not exist.');
+                }
+                break;
+            default:
+                Apollo::getInstance()->getRequest()->error(400, 'Invalid action.');
+        }
+        echo json_encode($response);
+    }
+
 
     /**
      * Parses the data/field info and saves it into database
