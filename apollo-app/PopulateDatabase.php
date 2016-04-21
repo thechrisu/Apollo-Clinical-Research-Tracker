@@ -17,6 +17,8 @@ use Apollo\Entities\RecordEntity;
 use Apollo\Entities\UserEntity;
 use Faker\Factory;
 
+date_default_timezone_set('Europe/London');
+
 Apollo::prepare();
 $entity_manager = DB::getEntityManager();
 $organisationRepo = $entity_manager->getRepository('Apollo\\Entities\\OrganisationEntity');
@@ -32,7 +34,7 @@ $user = $userRepo->find(1);
 date_default_timezone_set('Europe/London');
 $date = new DateTime();
 
-for($i = 0; $i < 0; $i++) {
+for($i = 0; $i < 1; $i++) {
 
     $faker = Factory::create();
     $person = new PersonEntity();
@@ -53,9 +55,9 @@ for($i = 0; $i < 0; $i++) {
     $record->setVarchar(FIELD_RECORD_NAME, 'First Record');
     $record->setVarchar(FIELD_EMAIL, $faker->email);
     $record->setVarchar(FIELD_PHONE, $faker->phoneNumber);
-    $record->setMultiple(FIELD_ADDRESS, [$faker->address]);
-    $record->setDateTime(FIELD_START_DATE, new DateTime());
-    $record->setDateTime(FIELD_END_DATE, new DateTime());
+    $record->setMultiple(FIELD_ADDRESS, explode(', ', $faker->address));
+    $record->setDateTime(FIELD_START_DATE, $faker->dateTime);
+    $record->setDateTime(FIELD_END_DATE, $faker->dateTime);
 
     $entity_manager->flush();
 
