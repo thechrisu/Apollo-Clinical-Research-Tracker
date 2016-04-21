@@ -263,7 +263,7 @@ var SingleView = (function () {
         });
     };
     return SingleView;
-})();
+}());
 $(document).ready(function () {
     new SingleView().load();
 });
