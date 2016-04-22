@@ -32,7 +32,7 @@ use Exception;
  * @package Apollo\Controllers
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.1.5
+ * @version 0.1.6
  */
 class GetController extends GenericController
 {
@@ -312,6 +312,7 @@ class GetController extends GenericController
         $data = $this->parseRequest(['activity_id' => null, 'temporarily_added' => null, 'search' => null]);
         $people = null;
         $pqb = $this->getQueryForPeopleNotInProgramme($data);
+        $pqb->setMaxResults(10);
         if ((empty(Activity::getValidActivityWithId($data['activity_id'])))) {
             $response['error'] = $this->getJSONError(2, "Activity hidden.");
         } else {
