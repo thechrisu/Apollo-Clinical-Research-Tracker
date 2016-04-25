@@ -97,7 +97,7 @@ class RecordTable {
     private updateTable() {
         var that = this;
         LoaderManager.showLoader(that.loader, function () {
-            AJAX.get(WebUtil.url('get/records/?page=' + that.page + '&sort=' + that.sort + '&search=' + that.search, false), function (data:TableData) {
+            AJAX.get(StringUtil.url('get/records/?page=' + that.page + '&sort=' + that.sort + '&search=' + that.search, false), function (data:TableData) {
                 if(data.count < (that.page - 1) * 10) {
                     that.pagination.pagination('selectPage', data.count / 10 - data.count % 10);
                     return;
