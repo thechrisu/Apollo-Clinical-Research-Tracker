@@ -4,7 +4,7 @@
  * Column manager typescript
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.6
+ * @version 0.0.7
  */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -60,7 +60,7 @@ var ColumnManager = (function () {
         this.target.append(this.container);
     };
     return ColumnManager;
-}());
+})();
 var Column = (function () {
     function Column(target) {
         this.target = target;
@@ -87,7 +87,7 @@ var Column = (function () {
         return this.rows.length;
     };
     return Column;
-}());
+})();
 var ColumnRow = (function () {
     function ColumnRow(key, value) {
         this.key = key;
@@ -102,7 +102,7 @@ var ColumnRow = (function () {
         target.append(rowHTML);
     };
     return ColumnRow;
-}());
+})();
 var DataField = (function () {
     function DataField(value) {
         this.parentNode = $('<div class="apollo-data-container"></div>');
@@ -130,24 +130,24 @@ var DataField = (function () {
         }
     };
     return DataField;
-}());
+})();
 var DataText = (function (_super) {
     __extends(DataText, _super);
     function DataText() {
         _super.apply(this, arguments);
     }
     DataText.prototype.decorate = function (value) {
-        return Util.buildNode('strong').text(value);
+        return WebUtil.buildNode('strong').text(value);
     };
     return DataText;
-}(DataField));
+})(DataField);
 var DataTextMultiple = (function (_super) {
     __extends(DataTextMultiple, _super);
     function DataTextMultiple() {
         _super.apply(this, arguments);
     }
     DataTextMultiple.prototype.decorate = function (value) {
-        var node = Util.buildNode('div');
+        var node = WebUtil.buildNode('div');
         for (var i = 0; i < value.length; i++) {
             var string = value[i];
             var line = $('<div class="apollo-data-text-multiple"></div>');
@@ -155,14 +155,14 @@ var DataTextMultiple = (function (_super) {
                 line.html('<span class="undefined">None</span>');
             }
             else {
-                line.append(Util.buildNode('strong').text(string));
+                line.append(WebUtil.buildNode('strong').text(string));
             }
             node.append(line);
         }
         return node;
     };
     return DataTextMultiple;
-}(DataField));
+})(DataField);
 var DataDate = (function (_super) {
     __extends(DataDate, _super);
     function DataDate() {
@@ -170,12 +170,12 @@ var DataDate = (function (_super) {
     }
     DataDate.prototype.decorate = function (value) {
         if (Util.isString(value)) {
-            value = Util.parseSQLDate(value);
+            value = DateUtil.parseSQLDate(value);
         }
-        return Util.buildNode('strong').text(Util.formatDate(value));
+        return WebUtil.buildNode('strong').text(DateUtil.formatDate(value));
     };
     return DataDate;
-}(DataField));
+})(DataField);
 var DataDateShort = (function (_super) {
     __extends(DataDateShort, _super);
     function DataDateShort() {
@@ -183,12 +183,12 @@ var DataDateShort = (function (_super) {
     }
     DataDateShort.prototype.decorate = function (value) {
         if (Util.isString(value)) {
-            value = Util.parseSQLDate(value);
+            value = DateUtil.parseSQLDate(value);
         }
-        return Util.buildNode('strong').text(Util.formatShortDate(value));
+        return WebUtil.buildNode('strong').text(DateUtil.formatShortDate(value));
     };
     return DataDateShort;
-}(DataField));
+})(DataField);
 var DataDateRange = (function (_super) {
     __extends(DataDateRange, _super);
     function DataDateRange(value) {
@@ -197,17 +197,17 @@ var DataDateRange = (function (_super) {
     DataDateRange.prototype.decorate = function (data) {
         var startDate = new DataDateShort(data.startDate).getPlain();
         var endDate = new DataDateShort(data.endDate).getPlain();
-        return Util.buildNode('strong').text(startDate + ' - ' + endDate);
+        return WebUtil.buildNode('strong').text(startDate + ' - ' + endDate);
     };
     return DataDateRange;
-}(DataField));
+})(DataField);
 var DataLongText = (function (_super) {
     __extends(DataLongText, _super);
     function DataLongText() {
         _super.apply(this, arguments);
     }
     DataLongText.prototype.decorate = function (value) {
-        return Util.buildNode('strong').text(value.replace(/\n/gi, '<br>'));
+        return WebUtil.buildNode('strong').text(value.replace(/\n/gi, '<br>'));
     };
     return DataLongText;
-}(DataField));
+})(DataField);

@@ -10,7 +10,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.1
+ * @version 0.0.2
  */
 
 interface FieldData {
@@ -94,7 +94,7 @@ class RecordSearch {
     private addRecordClick() {
         this.table.on('click', '.record-tr', function (e) {
             e.preventDefault();
-            Util.to('record/view/' + $(this).data('id'));
+            WebUtil.to('record/view/' + $(this).data('id'));
         });
     }
 
@@ -111,13 +111,13 @@ class RecordSearch {
     private setupFilters() {
         var that = this;
         LoaderManager.showLoader(that.loaderField, function () {
-            AJAX.get(Util.url('get/fields'), function (data:FieldInputData) {
+            AJAX.get(StringUtil.url('get/fields'), function (data:FieldInputData) {
                 that.fieldData = data;
                 that.addFilter();
                 that.updateTable();
                 LoaderManager.hideLoader(that.loaderField);
             }, function (message:string) {
-                Util.error('An error has occurred during the loading of the field data. Please reload the page or contact the administrator. Error message: ' + message);
+                WebUtil.error('An error has occurred during the loading of the field data. Please reload the page or contact the administrator. Error message: ' + message);
             });
         });
     }
@@ -154,7 +154,7 @@ class RecordSearch {
                 sort: that.sort,
                 states: states,
             };
-            AJAX.post(Util.url('post/search/'), postData, function (data:TableData) {
+            AJAX.post(StringUtil.url('post/search/'), postData, function (data:TableData) {
                 if(data.count < (that.page - 1) * 10) {
                     that.pagination.pagination('selectPage', data.count / 10 - data.count % 10);
                     return;
@@ -170,7 +170,7 @@ class RecordSearch {
                 }
                 LoaderManager.hideLoader(that.loaderRecord);
             }, function (message:string) {
-                Util.error('An error has occurred during the loading of the list of records. Please reload the page or contact the administrator. Error message: ' + message);
+                WebUtil.error('An error has occurred during the loading of the list of records. Please reload the page or contact the administrator. Error message: ' + message);
             });
         });
     }
@@ -179,7 +179,7 @@ class RecordSearch {
         var tr = $('<tr class="record-tr clickable" data-id="' + data.id + '"></tr>');
         [data.given_name, data.last_name, data.email, data.phone].forEach(function (string) {
             var td = $('<td></td>');
-            var field = new DataText(Util.shortify(string, 50));
+            var field = new DataText(StringUtil.shortify(string, 50));
             field.renderPlain(td);
             tr.append(td);
         });
@@ -228,14 +228,14 @@ class Filter implements Renderable {
         this.updateCallback = updateCallback;
         this.addCallback = addCallback;
         this.removeCallback = removeCallback;
-        this.parentNode = Util.buildNode('tr');
-        this.fieldNode = Util.buildNode('td', {width: '25%'});
+        this.parentNode = WebUtil.buildNode('tr');
+        this.fieldNode = WebUtil.buildNode('td', {width: '25%'});
         this.parentNode.append(this.fieldNode);
-        this.relationNode = Util.buildNode('td', {width: '25%'});
+        this.relationNode = WebUtil.buildNode('td', {width: '25%'});
         this.parentNode.append(this.relationNode);
-        this.valueNode = Util.buildNode('td', {width: '25%'});
+        this.valueNode = WebUtil.buildNode('td', {width: '25%'});
         this.parentNode.append(this.valueNode);
-        this.actionNode = Util.buildNode('td', {width: '25%'});
+        this.actionNode = WebUtil.buildNode('td', {width: '25%'});
         var addButton = $('<button class="btn btn-block btn-sm btn-success"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add</button>');
         addButton.on({
             click: function (e) {
@@ -295,7 +295,7 @@ class Filter implements Renderable {
         state['field'] = this.field.id;
         state['relation'] = this.relation;
         if(this.field.type == 3) {
-            state['value'] = Util.toMysqlFormat(Util.parseNumberDate(<string> this.value));
+            state['value'] = DateUtil.toMysqlFormat(DateUtil.parseNumberDate(<string> this.value));
         } else {
             state['value'] = this.value;
         }
@@ -408,8 +408,8 @@ class Filter implements Renderable {
                         }
                 }
             case 3:
-                this.value = Util.formatNumberDate(new Date());
-                return new InputDate(this.id, this.changeValue.bind(this), {placeholder: 'Date'}, Util.formatNumberDate(new Date()));
+                this.value = DateUtil.formatNumberDate(new Date());
+                return new InputDate(this.id, this.changeValue.bind(this), {placeholder: 'Date'}, DateUtil.formatNumberDate(new Date()));
             case 4:
                 this.value = '';
                 if (this.relation == 0)

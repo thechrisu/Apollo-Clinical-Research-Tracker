@@ -11,7 +11,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.2
+ * @version 0.0.3
  */
 
 interface FieldData {
@@ -41,7 +41,7 @@ class FieldTable {
     private updateTable() {
         var that = this;
         LoaderManager.showLoader(that.loader, function () {
-            AJAX.get(Util.url('get/fields'), function (data:TableData) {
+            AJAX.get(StringUtil.url('get/fields'), function (data:TableData) {
                 if(data.data.length > 0) {
                     for(var i = 0; i < data.data.length; i++) {
                         that.renderTr(data.data[i]);
@@ -51,7 +51,7 @@ class FieldTable {
                 }
                 LoaderManager.hideLoader(that.loader);
             }, function (message:string) {
-                Util.error('An error has occurred during the loading of the list of fields. Please reload the page or contact the administrator. Error message: ' + message);
+                WebUtil.error('An error has occurred during the loading of the list of fields. Please reload the page or contact the administrator. Error message: ' + message);
             });
         });
     }
@@ -66,7 +66,7 @@ class FieldTable {
             id: id,
             value: value
         };
-        AJAX.post(Util.url('post/field/update'), data, function (response:any) {
+        AJAX.post(StringUtil.url('post/field/update'), data, function (response:any) {
             button.removeClass('btn-warning');
             button.addClass('btn-success');
             button.html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Changes saved.');
@@ -74,7 +74,7 @@ class FieldTable {
             button.removeClass('btn-warning');
             button.addClass('btn-danger');
             button.html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Saving failed.');
-            Util.error('An error has occurred during the process of updating of the data. Error message: ' + message);
+            WebUtil.error('An error has occurred during the process of updating of the data. Error message: ' + message);
         });
     }
 
@@ -92,7 +92,7 @@ class FieldTable {
                         var id = data.id;
                         bootbox.confirm('Are you sure you want to hide the field ' + data.name + '? The data won\'t be deleted and can be restored later.', function (result) {
                             if (result) {
-                                AJAX.post(Util.url('post/field/hide'), {id: id}, function (response:any) {
+                                AJAX.post(WebUtil.url('post/field/hide'), {id: id}, function (response:any) {
                                     addButton.removeClass('btn-warning');
                                     addButton.addClass('btn-success');
                                     addButton.html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Field hidden.');
@@ -101,7 +101,7 @@ class FieldTable {
                                     addButton.removeClass('btn-warning');
                                     addButton.addClass('btn-danger');
                                     addButton.html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Hiding failed.');
-                                    Util.error('An error has occurred during the process of hiding of the field. Error message: ' + message);
+                                    WebUtil.error('An error has occurred during the process of hiding of the field. Error message: ' + message);
                                 });
                             }
                         });
@@ -199,13 +199,13 @@ $(document).ready(function () {
                             var modal = $('.modal');
                             var name = modal.find('#add-field-name').val();
                             var type = modal.find('#add-field-type').val();
-                            AJAX.post(Util.url('post/field/add'), {
+                            AJAX.post(StringUtil.url('post/field/add'), {
                                 name: name,
                                 type: type
                             }, function (response:any) {
-                                Util.to('field');
+                                WebUtil.to('field');
                             }, function (message:string) {
-                                Util.error('An error has occurred during the process of adding of a new field. Error message: ' + message);
+                                WebUtil.error('An error has occurred during the process of adding of a new field. Error message: ' + message);
                             });
                         }
                     }

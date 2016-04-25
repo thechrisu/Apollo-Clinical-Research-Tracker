@@ -10,7 +10,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.1
+ * @version 0.1.2
  */
 var SingleView = (function () {
     function SingleView() {
@@ -18,7 +18,7 @@ var SingleView = (function () {
     SingleView.prototype.load = function (id) {
         this.id = id;
         var that = this;
-        AJAX.get(Util.url('get/record-edit/?id=' + this.id, false), function (data) {
+        AJAX.get(StringUtil.url('get/record-edit/?id=' + this.id, false), function (data) {
             var breadcrumbs = $('#nav-breadcrumbs');
             breadcrumbs.find('li:nth-child(3)').text(data.essential.given_name + ' ' + data.essential.last_name);
             breadcrumbs.find('li:nth-child(4)').text('Record #' + data.essential.record_id + ': ' + data.essential.record_name);
@@ -26,7 +26,7 @@ var SingleView = (function () {
             that.parseFields(data.data);
             that.setupButtons(data.essential);
         }, function (message) {
-            Util.error('An error has occurred during the loading of single record data. Please reload the page or contact the administrator. Error message: ' + message);
+            WebUtil.error('An error has occurred during the loading of single record data. Please reload the page or contact the administrator. Error message: ' + message);
         });
     };
     SingleView.prototype.submitCallback = function (type, id, value) {
@@ -56,13 +56,13 @@ var SingleView = (function () {
                 data['value'] = value;
                 break;
             case 'date':
-                data['value'] = Util.toMysqlFormat(Util.parseNumberDate(value));
+                data['value'] = DateUtil.toMysqlFormat(DateUtil.parseNumberDate(value));
                 break;
             case 'long-text':
                 data['value'] = value;
                 break;
         }
-        AJAX.post(Util.url('post/data'), data, function (response) {
+        AJAX.post(StringUtil.url('post/data'), data, function (response) {
             that.saveButton.removeClass('btn-warning');
             that.saveButton.addClass('btn-success');
             that.saveButton.html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Changes saved.');
@@ -70,7 +70,7 @@ var SingleView = (function () {
             that.saveButton.removeClass('btn-warning');
             that.saveButton.addClass('btn-danger');
             that.saveButton.html('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>Saving failed.');
-            Util.error('An error has occurred during the process of updating of the data. Error message: ' + message);
+            WebUtil.error('An error has occurred during the process of updating of the data. Error message: ' + message);
         });
     };
     SingleView.prototype.parseEssentials = function (data) {
@@ -98,10 +98,10 @@ var SingleView = (function () {
             }, { placeholder: 'Record name' }, data.record_name)));
             columnManager.addToColumn(1, new ColumnRow('Start date', new InputDate(FIELD_START_DATE, function (id, value) {
                 that.submitCallback('date', id, value);
-            }, { placeholder: 'Start date' }, Util.formatNumberDate(Util.parseSQLDate(data.start_date)))));
+            }, { placeholder: 'Start date' }, DateUtil.formatNumberDate(DateUtil.parseSQLDate(data.start_date)))));
             columnManager.addToColumn(1, new ColumnRow('End date', new InputDate(FIELD_END_DATE, function (id, value) {
                 that.submitCallback('date', id, value);
-            }, { placeholder: 'End date' }, Util.formatNumberDate(Util.parseSQLDate(data.end_date)))));
+            }, { placeholder: 'End date' }, DateUtil.formatNumberDate(DateUtil.parseSQLDate(data.end_date)))));
             columnManager.addToColumn(2, new ColumnRow('Address', new InputTextMultiple(FIELD_ADDRESS, function (id, value) {
                 that.submitCallback('text-multiple', id, value);
             }, { placeholder: 'Address line' }, data.address)));
@@ -172,7 +172,7 @@ var SingleView = (function () {
                     case 3:
                         renderable = new InputDate(field.id, function (id, value) {
                             that.submitCallback('date', id, value);
-                        }, { placeholder: field.name }, Util.formatNumberDate(Util.parseSQLDate(field.value)));
+                        }, { placeholder: field.name }, DateUtil.formatNumberDate(DateUtil.parseSQLDate(field.value)));
                         break;
                     case 4:
                         renderable = new InputLongText(field.id, function (id, value) {
@@ -195,14 +195,14 @@ var SingleView = (function () {
         dropdownCurrent.html(data.record_name + ' <span class="caret"></span>');
         if (data.record_ids.length > 0) {
             for (var i = 0; i < data.record_ids.length; i++) {
-                dropdownOther.append('<li><a href="' + Util.url('record/view/' + data.record_ids[i]) + '">' + data.record_names[i] + '</a></li>');
+                dropdownOther.append('<li><a href="' + StringUtil.url('record/view/' + data.record_ids[i]) + '">' + data.record_names[i] + '</a></li>');
             }
         }
         else {
             dropdownOther.append('<li class="dropdown-header">Nothing to display . . .</li>');
         }
         var viewButton = $('#record-view');
-        viewButton.attr('href', Util.url('record/view/' + data.record_id));
+        viewButton.attr('href', StringUtil.url('record/view/' + data.record_id));
         viewButton.removeClass('disabled');
         this.saveButton = $('#record-save');
         this.saveButton.removeClass('btn-warning');
@@ -213,6 +213,6 @@ var SingleView = (function () {
 })();
 $(document).ready(function () {
     var single = new SingleView();
-    var id = Util.extractId(window.location.toString());
+    var id = StringUtil.extractId(window.location.toString());
     single.load(id);
 });

@@ -9,14 +9,14 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.5
+ * @version 0.0.6
  */
 var SingleView = (function () {
     function SingleView() {
     }
     SingleView.prototype.load = function () {
         var that = this;
-        AJAX.get(Util.url('get/record-view/-?id=' + Util.extractId(window.location.toString()), false), function (data) {
+        AJAX.get(StringUtil.url('get/record-view/-?id=' + StringUtil.extractId(window.location.toString()), false), function (data) {
             var breadcrumbs = $('#nav-breadcrumbs');
             breadcrumbs.find('li:nth-child(3)').text(data.essential.given_name + ' ' + data.essential.last_name);
             breadcrumbs.find('li:nth-child(4)').text('Record #' + data.essential.record_id + ': ' + data.essential.record_name);
@@ -24,7 +24,7 @@ var SingleView = (function () {
             that.parseFields(data.data);
             that.setupButtons(data.essential);
         }, function (message) {
-            Util.error('An error has occurred during the loading of single record data. Please reload the page or contact the administrator. Error message: ' + message);
+            WebUtil.error('An error has occurred during the loading of single record data. Please reload the page or contact the administrator. Error message: ' + message);
         });
     };
     SingleView.prototype.parseEssentials = function (data) {
@@ -122,17 +122,17 @@ var SingleView = (function () {
         var row;
         var startD;
         var endD;
-        startD = Util.formatShortDate(Util.parseSQLDate(data.start_date));
-        endD = Util.formatShortDate(Util.parseSQLDate(data.end_date));
+        startD = DateUtil.formatShortDate(DateUtil.parseSQLDate(data.start_date));
+        endD = DateUtil.formatShortDate(DateUtil.parseSQLDate(data.end_date));
         row = $('<div class="apollo-data-text-multiple"></div>');
         var name = $('<span></span>');
-        name.text(Util.shortify(data.name, 20));
+        name.text(StringUtil.shortify(data.name, 20));
         row.append(name);
         var date = $('<span class="pull-right undefined"></span>');
         date.text(startD + ' - ' + endD);
         row.append(date);
         row.click(function () {
-            Util.to('/activity/view/' + data.id);
+            WebUtil.to('/activity/view/' + data.id);
         });
         row.addClass('selectionItem');
         row.addClass('clickable');
@@ -145,7 +145,7 @@ var SingleView = (function () {
         dropdownCurrent.html(data.record_name + ' <span class="caret"></span>');
         if (data.record_ids.length > 0) {
             for (var i = 0; i < data.record_ids.length; i++) {
-                dropdownOther.append('<li><a href="' + Util.url('record/view/' + data.record_ids[i]) + '">' + data.record_names[i] + '</a></li>');
+                dropdownOther.append('<li><a href="' + StringUtil.url('record/view/' + data.record_ids[i]) + '">' + data.record_names[i] + '</a></li>');
             }
         }
         else {
@@ -179,8 +179,8 @@ var SingleView = (function () {
                         callback: function () {
                             var modal = $('.modal');
                             var name = modal.find('#add-name').val();
-                            var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
-                            var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
+                            var startDate = DateUtil.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
+                            var endDate = DateUtil.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
                             newRecord(name, startDate, endDate);
                         }
                     }
@@ -205,8 +205,8 @@ var SingleView = (function () {
                         callback: function () {
                             var modal = $('.modal');
                             var name = modal.find('#add-name').val();
-                            var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
-                            var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
+                            var startDate = DateUtil.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
+                            var endDate = DateUtil.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
                             newRecord(name, startDate, endDate, data.record_id);
                         }
                     }
@@ -215,7 +215,7 @@ var SingleView = (function () {
         });
         function newRecord(name, startDate, endDate, id) {
             if (id === void 0) { id = 0; }
-            AJAX.post(Util.url('post/record'), {
+            AJAX.post(StringUtil.url('post/record'), {
                 action: 'add',
                 person_id: data.person_id,
                 record_name: name,
@@ -223,23 +223,23 @@ var SingleView = (function () {
                 end_date: endDate,
                 id: id
             }, function (response) {
-                Util.to('record/edit/' + response.record_id);
+                WebUtil.to('record/edit/' + response.record_id);
             }, function (message) {
-                Util.error('An error has occurred during the process of creation of the record. Error message: ' + message);
+                WebUtil.error('An error has occurred during the process of creation of the record. Error message: ' + message);
             });
         }
-        editButton.attr('href', Util.url('record/edit/' + data.record_id));
+        editButton.attr('href', StringUtil.url('record/edit/' + data.record_id));
         hideRecordButton.click(function (e) {
             e.preventDefault();
             bootbox.confirm('Are you sure you want to hide this record (belonging to ' + $('<span>' + data.given_name + '</span>').text() + ' ' + $('<span>' + data.last_name + '</span>').text() + ')? The data won\'t be deleted and can be restored later.', function (result) {
                 if (result) {
-                    AJAX.post(Util.url('post/record'), {
+                    AJAX.post(StringUtil.url('post/record'), {
                         action: 'hide',
                         id: data.record_id
                     }, function (data) {
-                        Util.to('record');
+                        WebUtil.to('record');
                     }, function (message) {
-                        Util.error('An error has occurred during hiding of the record. Error message: ' + message);
+                        WebUtil.error('An error has occurred during hiding of the record. Error message: ' + message);
                     });
                 }
             });
@@ -250,20 +250,20 @@ var SingleView = (function () {
             var personName = $('<span>' + data.given_name + '</span>').text() + ' ' + middleName + $('<span>' + data.last_name + '</span>').text();
             bootbox.confirm('Are you sure you want to hide ' + personName + '? The data won\'t be deleted and can be restored later.', function (result) {
                 if (result) {
-                    AJAX.post(Util.url('post/person'), {
+                    AJAX.post(StringUtil.url('post/person'), {
                         action: 'hide',
                         id: data.person_id
                     }, function (data) {
-                        Util.to('record');
+                        WebUtil.to('record');
                     }, function (message) {
-                        Util.error('An error has occurred during hiding of the record. Error message: ' + message);
+                        WebUtil.error('An error has occurred during hiding of the record. Error message: ' + message);
                     });
                 }
             });
         });
     };
     return SingleView;
-}());
+})();
 $(document).ready(function () {
     new SingleView().load();
 });

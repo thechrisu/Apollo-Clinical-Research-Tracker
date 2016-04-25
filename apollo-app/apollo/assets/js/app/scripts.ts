@@ -1,12 +1,12 @@
 ///<reference path="../typings/jquery.d.ts"/>
 /**
- * Scripts file containing functions related to modal windows
+ * Scripts file containing functions related to modal windows and other helper functions
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.2.3
+ * @version 0.2.4
  */
 
 /**
@@ -91,29 +91,13 @@ interface Attributes {
 }
 
 /**
- * Util class
- * @since 0.0.5
+ * Class specific to operations on helper functions that have to do with DOM modifications and jQuery object modification
+ * @since 2.4
  */
-class Util {
+class WebUtil {
 
     public static getOuterHTML(elem:JQuery) {
         return $('<div />').append(elem.eq(0).clone()).html();
-    }
-
-    /**
-     * Returns the full URL to resource
-     *
-     * @returns {string}
-     * @since 0.0.4
-     */
-    public static url(url:string, trailingSlash:boolean = true):string {
-        if (url.substr(0, 1) != '/') {
-            url = '/' + url;
-        }
-        if (trailingSlash && url.substr(url.length - 1) != '/') {
-            url += '/';
-        }
-        return url;
     }
 
     /**
@@ -121,17 +105,17 @@ class Util {
      *
      * @param url
      * @param trailingSlash
-     * @since 0.1.0
+     * @since 0.2.4
      */
     public static to(url:string, trailingSlash:boolean = true) {
-        location.href = Util.url(url, trailingSlash);
+        location.href = StringUtil.url(url, trailingSlash);
     }
 
     /**
      * Displays the error modal window
      *
      * @param message
-     * @since 0.0.4
+     * @since 0.2.4
      */
     public static error(message:string = 'An error has occurred.') {
         var modal = $('#error-modal');
@@ -143,49 +127,47 @@ class Util {
     }
 
     /**
-     * Removes all instances of an element from another array
-     * @param toSubtractFrom
-     * @param subtractedBy
-     * @returns any[]
+     * Gets a date picker with specified value and div id
+     *
+     * @param date
+     * @param divid
+     * @returns {JQuery}
+     * @since 0.2.4
      */
-    public static arraySubtract(toSubtractFrom:any[], subtractedBy:any[]) {
-        return toSubtractFrom.filter(function (item) {
-            return subtractedBy.indexOf(item) === -1;
-        });
+    public static getDatePicker(date:string, divid:string):JQuery {
+        var inputField = $('<input id="' + divid + '" type="text" value="' + date + '" class="form-control input-sm input-block-level">');
+        var container = $('<div class="input-group date" data-provide="datepicker"></div>');
+        var content = $('<span class="input-group-addon" style="padding: 0 18px !important; font-size: 0.8em !important;"><i class="glyphicon glyphicon-th"></i></span>');
+        var assembled = container.append(inputField);
+        assembled.append(content);
+        return container;
     }
 
     /**
-     * Removes all instances of an item from an array using a custom compare function
-     * @param needle
-     * @param haystack
-     * @param compareFunction
+     * Builds a JQuery node
+     *
+     * @param tag
+     * @param attributes
+     * @param content
+     * @param selfClosing
+     * @returns {JQuery}
+     * @since 0.2.4
      */
-    public static removeFromArrayCmp(needle:any, haystack:any[], compareFunction) {
-        for (var i = 0; i < haystack.length; i++) {
-            if (compareFunction(haystack[i], needle) == 0) {
-                haystack.splice(i, 1);
-                i--; //decrement since the array indices will move up
+    public static buildNode(tag:string, attributes:Attributes = {}, content:string = '', selfClosing:boolean = false):JQuery {
+        var attributesString = '';
+        for (var key in attributes) {
+            if (attributes.hasOwnProperty(key)) {
+                attributesString += ' ' + key + '="' + attributes[key].replace('"', '\\"') + '"';
             }
         }
+        return $('<' + tag + attributesString + (selfClosing ? ' />' : '>' + content + '</' + tag + '>'));
     }
+}
 
-    /**
-     * Checks if an element is in an array using a custom compare function
-     * @param needle
-     * @param haystack
-     * @param compareFunction
-     * @returns {boolean}
-     */
-    public static isInCmp(needle:any, haystack:any[], compareFunction) {
-        for (var i = 0; i < haystack.length; i++) {
-            var item = haystack[i];
-            if (compareFunction(needle, item) == 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+/**
+ * Contains helper functions that help with string manipulations
+ */
+class StringUtil {
     /**
      * If a string is larger than a given size, it will shorten the string and replace the last three characters with dots
      * @param str
@@ -204,11 +186,105 @@ class Util {
     }
 
     /**
+     * Returns the full URL to resource
+     *
+     * @returns {string}
+     * @since 0.2.4
+     */
+    public static url(url:string, trailingSlash:boolean = true):string {
+        if (url.substr(0, 1) != '/') {
+            url = '/' + url;
+        }
+        if (trailingSlash && url.substr(url.length - 1) != '/') {
+            url += '/';
+        }
+        return url;
+    }
+
+    /**
+     * Extracts the ID (e.g. of a record) from the URL, i.e.
+     * ../record/view/201/ -> 201
+     *
+     * @param url
+     * @returns {number}
+     * @since 0.1.3
+     */
+    public static extractId(url:string):number {
+        var re = new RegExp("[^\/]+(?=\/*$)|$");
+        var base = re.exec(url);
+        if (base == null)
+            return NaN;
+        else
+            return parseInt(base[0]);
+    }
+}
+
+/**
+ * Helper functions for helping with arrays
+ * @since 0.2.4
+ */
+class ArrayUtil {
+
+    /**
+     * Removes all instances of an element from another array
+     * @param toSubtractFrom
+     * @param subtractedBy
+     * @returns any[]
+     * @since 0.2.4
+     */
+    public static arraySubtract(toSubtractFrom:any[], subtractedBy:any[]) {
+        return toSubtractFrom.filter(function (item) {
+            return subtractedBy.indexOf(item) === -1;
+        });
+    }
+
+    /**
+     * Removes all instances of an item from an array using a custom compare function
+     * @param needle
+     * @param haystack
+     * @param compareFunction
+     * @since 0.2.4
+     */
+    public static removeFromArrayCmp(needle:any, haystack:any[], compareFunction) {
+        for (var i = 0; i < haystack.length; i++) {
+            if (compareFunction(haystack[i], needle) == 0) {
+                haystack.splice(i, 1);
+                i--; //decrement since the array indices will move up
+            }
+        }
+    }
+
+    /**
+     * Checks if an element is in an array using a custom compare function
+     * @param needle
+     * @param haystack
+     * @param compareFunction
+     * @returns {boolean}
+     * @since 0.2.4
+     */
+    public static isInCmp(needle:any, haystack:any[], compareFunction) {
+        for (var i = 0; i < haystack.length; i++) {
+            var item = haystack[i];
+            if (compareFunction(needle, item) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+/**
+ * Used for helper functions on JS dates and strings that have to be converted to dates
+ * @since 0.2.4
+ */
+class DateUtil {
+
+    /**
      * Converts MySQL date time string into JS' Date object
      *
      * @param sqlDate
      * @returns {Date}
-     * @since 0.0.6
+     * @since 0.2.4
      */
     public static parseSQLDate(sqlDate:string):Date {
         var parts = sqlDate.split(/[- :]/);
@@ -221,7 +297,7 @@ class Util {
      *
      * @param numberDate
      * @returns {Date}
-     * @since 0.2.0
+     * @since 0.2.4
      */
     public static parseNumberDate(numberDate:string):Date {
         var parts = numberDate.split(/\//);
@@ -233,18 +309,18 @@ class Util {
      *
      * @param date
      * @returns {string}
-     * @since 0.1.2
+     * @since 0.2.4
      */
     public static toMysqlFormat(date:Date):string {
-        return date.getUTCFullYear() + "-" + Util.twoDigits(1 + date.getUTCMonth()) + "-" + Util.twoDigits(date.getUTCDate()) + " " + Util.twoDigits(date.getUTCHours()) + ":" + Util.twoDigits(date.getUTCMinutes()) + ":" + Util.twoDigits(date.getUTCSeconds());
+        return date.getUTCFullYear() + "-" + DateUtil.twoDigits(1 + date.getUTCMonth()) + "-" + DateUtil.twoDigits(date.getUTCDate()) + " " + DateUtil.twoDigits(date.getUTCHours()) + ":" + DateUtil.twoDigits(date.getUTCMinutes()) + ":" + DateUtil.twoDigits(date.getUTCSeconds());
     };
 
     /**
-     * Required for the function above
+     * Required for the function above: formats a number always as at least two digits
      *
      * @param d
      * @returns {string}
-     * @since 0.1.2
+     * @since 0.2.4
      */
     public static twoDigits(d:any):string {
         if (0 <= d && d < 10) return "0" + d.toString();
@@ -258,7 +334,7 @@ class Util {
      *
      * @param date
      * @returns {string}
-     * @since 0.0.7
+     * @since 0.2.4
      */
     public static formatDate(date:Date):string {
         var months = [
@@ -267,7 +343,7 @@ class Util {
             "August", "September", "October",
             "November", "December"
         ];
-        return months[date.getMonth()] + ' ' + Util.ordinalSuffix(date.getDate()) + ', ' + date.getFullYear();
+        return months[date.getMonth()] + ' ' + DateUtil.ordinalSuffix(date.getDate()) + ', ' + date.getFullYear();
     }
 
     /**
@@ -275,7 +351,7 @@ class Util {
      *
      * @param i
      * @returns {string}
-     * @since 0.2.3
+     * @since 0.2.4
      */
     private static ordinalSuffix(i) {
         var j = i % 10,
@@ -298,7 +374,7 @@ class Util {
      *
      * @param date
      * @returns {string}
-     * @since 0.1.1
+     * @since 0.2.4
      */
     public static formatShortDate(date:Date):string {
         var months = [
@@ -314,63 +390,21 @@ class Util {
      *
      * @param date
      * @return {string}
-     * @since 0.1.6
+     * @since 0.2.4
      */
     public static formatNumberDate(date:Date):string {
         return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
     }
+}
 
-    /**
-     * Gets a date picker with specified value and div id
-     *
-     * @param date
-     * @param divid
-     * @returns {JQuery}
-     * @since 0.1.5
-     */
-    public static getDatePicker(date:string, divid:string):JQuery {
-        var inputField = $('<input id="' + divid + '" type="text" value="' + date + '" class="form-control input-sm input-block-level">');
-        var container = $('<div class="input-group date" data-provide="datepicker"></div>');
-        var content = $('<span class="input-group-addon" style="padding: 0 18px !important; font-size: 0.8em !important;"><i class="glyphicon glyphicon-th"></i></span>');
-        var assembled = container.append(inputField);
-        assembled.append(content);
-        return container;
-    }
 
-    /**
-     * Extracts the ID (of a record) from the URL, i.e.
-     * ../record/view/201/ -> 201
-     *
-     * @param url
-     * @returns {number}
-     * @since 0.1.3
-     */
-    public static extractId(url:string):number {
-        var re = new RegExp("[^\/]+(?=\/*$)|$");
-        var base = re.exec(url);
-        if (base == null) return NaN;
-        return parseInt(base[0]);
-    }
+/**
+ * Util class
+ * @todo bad practice of having todo class --> delete class/extract
+ * @since 0.0.5
+ */
+class Util {
 
-    /**
-     * Builds a JQuery node
-     *
-     * @param tag
-     * @param attributes
-     * @param content
-     * @param selfClosing
-     * @returns {JQuery}
-     * @since 0.1.4
-     */
-    public static buildNode(tag:string, attributes:Attributes = {}, content:string = '', selfClosing:boolean = false):JQuery {
-        var attributesString = '';
-        for (var key in attributes) {
-            if (attributes.hasOwnProperty(key)) {
-                attributesString += ' ' + key + '="' + attributes[key].replace('"', '\\"') + '"';
-            }
-        }
-        return $('<' + tag + attributesString + (selfClosing ? ' />' : '>' + content + '</' + tag + '>'));
-    }
 
     /**
      * Merges two objects into one

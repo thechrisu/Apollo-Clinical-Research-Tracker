@@ -4,7 +4,7 @@
  * Column manager typescript
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
- * @version 0.0.6
+ * @version 0.0.7
  */
 
 class ColumnManager {
@@ -161,20 +161,20 @@ abstract class DataField implements Renderable {
 
 class DataText extends DataField {
     protected decorate(value:string):JQuery {
-        return Util.buildNode('strong').text(value);
+        return WebUtil.buildNode('strong').text(value);
     }
 }
 
 class DataTextMultiple extends DataField {
     protected decorate(value:string[]):JQuery {
-        var node = Util.buildNode('div');
+        var node = WebUtil.buildNode('div');
         for (var i = 0; i < value.length; i++) {
             var string = value[i];
             var line = $('<div class="apollo-data-text-multiple"></div>');
             if (string == null || string.length == 0) {
                 line.html('<span class="undefined">None</span>');
             } else {
-                line.append(Util.buildNode('strong').text(string))
+                line.append(WebUtil.buildNode('strong').text(string))
             }
             node.append(line);
         }
@@ -185,18 +185,18 @@ class DataTextMultiple extends DataField {
 class DataDate extends DataField {
     protected decorate(value:Date|string):JQuery {
         if (Util.isString(value)) {
-            value = Util.parseSQLDate(<string> value);
+            value = DateUtil.parseSQLDate(<string> value);
         }
-        return Util.buildNode('strong').text(Util.formatDate(<Date> value));
+        return WebUtil.buildNode('strong').text(DateUtil.formatDate(<Date> value));
     }
 }
 
 class DataDateShort extends DataField {
     protected decorate(value:Date|string):JQuery {
         if (Util.isString(value)) {
-            value = Util.parseSQLDate(<string> value);
+            value = DateUtil.parseSQLDate(<string> value);
         }
-        return Util.buildNode('strong').text(Util.formatShortDate(<Date> value));
+        return WebUtil.buildNode('strong').text(DateUtil.formatShortDate(<Date> value));
     }
 }
 
@@ -214,13 +214,13 @@ class DataDateRange extends DataField {
     protected decorate(data:DateRange):JQuery {
         var startDate = new DataDateShort(data.startDate).getPlain();
         var endDate = new DataDateShort(data.endDate).getPlain();
-        return Util.buildNode('strong').text(startDate + ' - ' + endDate);
+        return WebUtil.buildNode('strong').text(startDate + ' - ' + endDate);
     }
 
 }
 
 class DataLongText extends DataField {
     protected decorate(value:string):JQuery {
-        return Util.buildNode('strong').text(value.replace(/\n/gi, '<br>'));
+        return WebUtil.buildNode('strong').text(value.replace(/\n/gi, '<br>'));
     }
 }

@@ -57,7 +57,7 @@ var InputNumber = (function (_super) {
         this.setupCallback();
     }
     InputNumber.prototype.prepareNode = function () {
-        this.input = Util.buildNode('input', this.attributes, null, true);
+        this.input = WebUtil.buildNode('input', this.attributes, null, true);
         this.parentNode.append(this.input);
     };
     InputNumber.prototype.setupCallback = function () {
@@ -94,7 +94,7 @@ var InputDisabled = (function (_super) {
         this.prepareNode();
     }
     InputDisabled.prototype.prepareNode = function () {
-        this.input = Util.buildNode('input', this.attributes, null, true);
+        this.input = WebUtil.buildNode('input', this.attributes, null, true);
         this.parentNode.append(this.input);
     };
     return InputDisabled;
@@ -120,7 +120,7 @@ var InputText = (function (_super) {
         this.setupCallback();
     }
     InputText.prototype.prepareNode = function () {
-        this.input = Util.buildNode('input', this.attributes, null, true);
+        this.input = WebUtil.buildNode('input', this.attributes, null, true);
         this.parentNode.append(this.input);
     };
     InputText.prototype.setupCallback = function () {
@@ -153,7 +153,7 @@ var InputLongText = (function (_super) {
         this.setupCallback();
     }
     InputLongText.prototype.prepareNode = function (value) {
-        this.input = Util.buildNode('textarea', this.attributes, value);
+        this.input = WebUtil.buildNode('textarea', this.attributes, value);
         this.parentNode.append(this.input);
     };
     InputLongText.prototype.setupCallback = function () {
@@ -276,7 +276,7 @@ var InputDate = (function (_super) {
     }
     InputDate.prototype.prepareNode = function () {
         var node = $('<div class="input-group input-sm input-block-level date" data-provide="datepicker"></div>');
-        this.input = Util.buildNode('input', this.attributes, null, true);
+        this.input = WebUtil.buildNode('input', this.attributes, null, true);
         node.append(this.input);
         node.append('<span class="input-group-addon input-sm"><i class="glyphicon glyphicon-th"></i></span>');
         this.parentNode.append(node);
@@ -328,7 +328,7 @@ var InputDropdown = (function (_super) {
                 multiple: 'multiple'
             });
         }
-        this.select = Util.buildNode('select', attributes);
+        this.select = WebUtil.buildNode('select', attributes);
         for (var i = 0; i < this.options.length + (this.allowOther ? 1 : 0); i++) {
             var label = this.options[i];
             if (i == this.options.length)
@@ -337,7 +337,7 @@ var InputDropdown = (function (_super) {
         }
         this.parentNode.append(this.select);
         if (this.allowOther) {
-            this.input = Util.buildNode('input', {
+            this.input = WebUtil.buildNode('input', {
                 'style': 'display:none;',
                 'data-id': this.id.toString(),
                 'id': 'input-dropdown-other-' + this.id,

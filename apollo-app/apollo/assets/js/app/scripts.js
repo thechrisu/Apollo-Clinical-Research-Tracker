@@ -1,12 +1,12 @@
 ///<reference path="../typings/jquery.d.ts"/>
 /**
- * Scripts file containing functions related to modal windows
+ * Scripts file containing functions related to modal windows and other helper functions
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.2.3
+ * @version 0.2.4
  */
 /**
  * Constant specifying a delay before the AJAX request after the user
@@ -33,22 +33,110 @@ var FIELD_ADDRESS = 6;
 var FIELD_AWARDS = 7;
 var FIELD_PUBLICATIONS = 8;
 /**
- * Util class
- * @since 0.0.5
+ * Class specific to operations on helper functions that have to do with DOM modifications and jQuery object modification
+ * @since 2.4
  */
-var Util = (function () {
-    function Util() {
+var WebUtil = (function () {
+    function WebUtil() {
     }
-    Util.getOuterHTML = function (elem) {
+    WebUtil.getOuterHTML = function (elem) {
         return $('<div />').append(elem.eq(0).clone()).html();
+    };
+    /**
+     * Sends the user to specified URL
+     *
+     * @param url
+     * @param trailingSlash
+     * @since 0.2.4
+     */
+    WebUtil.to = function (url, trailingSlash) {
+        if (trailingSlash === void 0) { trailingSlash = true; }
+        location.href = StringUtil.url(url, trailingSlash);
+    };
+    /**
+     * Displays the error modal window
+     *
+     * @param message
+     * @since 0.2.4
+     */
+    WebUtil.error = function (message) {
+        if (message === void 0) { message = 'An error has occurred.'; }
+        var modal = $('#error-modal');
+        var messageContainer = $('#error-message');
+        modal.on('show.bs.modal', function () {
+            messageContainer.html(message);
+        });
+        modal.modal('show');
+    };
+    /**
+     * Gets a date picker with specified value and div id
+     *
+     * @param date
+     * @param divid
+     * @returns {JQuery}
+     * @since 0.2.4
+     */
+    WebUtil.getDatePicker = function (date, divid) {
+        var inputField = $('<input id="' + divid + '" type="text" value="' + date + '" class="form-control input-sm input-block-level">');
+        var container = $('<div class="input-group date" data-provide="datepicker"></div>');
+        var content = $('<span class="input-group-addon" style="padding: 0 18px !important; font-size: 0.8em !important;"><i class="glyphicon glyphicon-th"></i></span>');
+        var assembled = container.append(inputField);
+        assembled.append(content);
+        return container;
+    };
+    /**
+     * Builds a JQuery node
+     *
+     * @param tag
+     * @param attributes
+     * @param content
+     * @param selfClosing
+     * @returns {JQuery}
+     * @since 0.2.4
+     */
+    WebUtil.buildNode = function (tag, attributes, content, selfClosing) {
+        if (attributes === void 0) { attributes = {}; }
+        if (content === void 0) { content = ''; }
+        if (selfClosing === void 0) { selfClosing = false; }
+        var attributesString = '';
+        for (var key in attributes) {
+            if (attributes.hasOwnProperty(key)) {
+                attributesString += ' ' + key + '="' + attributes[key].replace('"', '\\"') + '"';
+            }
+        }
+        return $('<' + tag + attributesString + (selfClosing ? ' />' : '>' + content + '</' + tag + '>'));
+    };
+    return WebUtil;
+})();
+/**
+ * Contains helper functions that help with string manipulations
+ */
+var StringUtil = (function () {
+    function StringUtil() {
+    }
+    /**
+     * If a string is larger than a given size, it will shorten the string and replace the last three characters with dots
+     * @param str
+     * @param maxLength
+     * @returns {string}
+     */
+    StringUtil.shortify = function (str, maxLength) {
+        var res = str;
+        str = str;
+        if (str.length > maxLength) {
+            var spliceLocation = maxLength - 3;
+            res = str.substring(0, spliceLocation);
+            res = res.slice(0, spliceLocation) + '...';
+        }
+        return res;
     };
     /**
      * Returns the full URL to resource
      *
      * @returns {string}
-     * @since 0.0.4
+     * @since 0.2.4
      */
-    Util.url = function (url, trailingSlash) {
+    StringUtil.url = function (url, trailingSlash) {
         if (trailingSlash === void 0) { trailingSlash = true; }
         if (url.substr(0, 1) != '/') {
             url = '/' + url;
@@ -59,38 +147,38 @@ var Util = (function () {
         return url;
     };
     /**
-     * Sends the user to specified URL
+     * Extracts the ID (e.g. of a record) from the URL, i.e.
+     * ../record/view/201/ -> 201
      *
      * @param url
-     * @param trailingSlash
-     * @since 0.1.0
+     * @returns {number}
+     * @since 0.1.3
      */
-    Util.to = function (url, trailingSlash) {
-        if (trailingSlash === void 0) { trailingSlash = true; }
-        location.href = Util.url(url, trailingSlash);
+    StringUtil.extractId = function (url) {
+        var re = new RegExp("[^\/]+(?=\/*$)|$");
+        var base = re.exec(url);
+        if (base == null)
+            return NaN;
+        else
+            return parseInt(base[0]);
     };
-    /**
-     * Displays the error modal window
-     *
-     * @param message
-     * @since 0.0.4
-     */
-    Util.error = function (message) {
-        if (message === void 0) { message = 'An error has occurred.'; }
-        var modal = $('#error-modal');
-        var messageContainer = $('#error-message');
-        modal.on('show.bs.modal', function () {
-            messageContainer.html(message);
-        });
-        modal.modal('show');
-    };
+    return StringUtil;
+})();
+/**
+ * Helper functions for helping with arrays
+ * @since 0.2.4
+ */
+var ArrayUtil = (function () {
+    function ArrayUtil() {
+    }
     /**
      * Removes all instances of an element from another array
      * @param toSubtractFrom
      * @param subtractedBy
      * @returns any[]
+     * @since 0.2.4
      */
-    Util.arraySubtract = function (toSubtractFrom, subtractedBy) {
+    ArrayUtil.arraySubtract = function (toSubtractFrom, subtractedBy) {
         return toSubtractFrom.filter(function (item) {
             return subtractedBy.indexOf(item) === -1;
         });
@@ -100,8 +188,9 @@ var Util = (function () {
      * @param needle
      * @param haystack
      * @param compareFunction
+     * @since 0.2.4
      */
-    Util.removeFromArrayCmp = function (needle, haystack, compareFunction) {
+    ArrayUtil.removeFromArrayCmp = function (needle, haystack, compareFunction) {
         for (var i = 0; i < haystack.length; i++) {
             if (compareFunction(haystack[i], needle) == 0) {
                 haystack.splice(i, 1);
@@ -115,8 +204,9 @@ var Util = (function () {
      * @param haystack
      * @param compareFunction
      * @returns {boolean}
+     * @since 0.2.4
      */
-    Util.isInCmp = function (needle, haystack, compareFunction) {
+    ArrayUtil.isInCmp = function (needle, haystack, compareFunction) {
         for (var i = 0; i < haystack.length; i++) {
             var item = haystack[i];
             if (compareFunction(needle, item) == 0) {
@@ -125,30 +215,23 @@ var Util = (function () {
         }
         return false;
     };
-    /**
-     * If a string is larger than a given size, it will shorten the string and replace the last three characters with dots
-     * @param str
-     * @param maxLength
-     * @returns {string}
-     */
-    Util.shortify = function (str, maxLength) {
-        var res = str;
-        str = str;
-        if (str.length > maxLength) {
-            var spliceLocation = maxLength - 3;
-            res = str.substring(0, spliceLocation);
-            res = res.slice(0, spliceLocation) + '...';
-        }
-        return res;
-    };
+    return ArrayUtil;
+})();
+/**
+ * Used for helper functions on JS dates and strings that have to be converted to dates
+ * @since 0.2.4
+ */
+var DateUtil = (function () {
+    function DateUtil() {
+    }
     /**
      * Converts MySQL date time string into JS' Date object
      *
      * @param sqlDate
      * @returns {Date}
-     * @since 0.0.6
+     * @since 0.2.4
      */
-    Util.parseSQLDate = function (sqlDate) {
+    DateUtil.parseSQLDate = function (sqlDate) {
         var parts = sqlDate.split(/[- :]/);
         return new Date(+parts[0], +parts[1] - 1, +parts[2], +parts[3], +parts[4], +parts[5]);
     };
@@ -158,9 +241,9 @@ var Util = (function () {
      *
      * @param numberDate
      * @returns {Date}
-     * @since 0.2.0
+     * @since 0.2.4
      */
-    Util.parseNumberDate = function (numberDate) {
+    DateUtil.parseNumberDate = function (numberDate) {
         var parts = numberDate.split(/\//);
         return new Date(+parts[2], +parts[1] - 1, +parts[0], 0, 0, 0);
     };
@@ -169,20 +252,20 @@ var Util = (function () {
      *
      * @param date
      * @returns {string}
-     * @since 0.1.2
+     * @since 0.2.4
      */
-    Util.toMysqlFormat = function (date) {
-        return date.getUTCFullYear() + "-" + Util.twoDigits(1 + date.getUTCMonth()) + "-" + Util.twoDigits(date.getUTCDate()) + " " + Util.twoDigits(date.getUTCHours()) + ":" + Util.twoDigits(date.getUTCMinutes()) + ":" + Util.twoDigits(date.getUTCSeconds());
+    DateUtil.toMysqlFormat = function (date) {
+        return date.getUTCFullYear() + "-" + DateUtil.twoDigits(1 + date.getUTCMonth()) + "-" + DateUtil.twoDigits(date.getUTCDate()) + " " + DateUtil.twoDigits(date.getUTCHours()) + ":" + DateUtil.twoDigits(date.getUTCMinutes()) + ":" + DateUtil.twoDigits(date.getUTCSeconds());
     };
     ;
     /**
-     * Required for the function above
+     * Required for the function above: formats a number always as at least two digits
      *
      * @param d
      * @returns {string}
-     * @since 0.1.2
+     * @since 0.2.4
      */
-    Util.twoDigits = function (d) {
+    DateUtil.twoDigits = function (d) {
         if (0 <= d && d < 10)
             return "0" + d.toString();
         if (-10 < d && d < 0)
@@ -195,25 +278,25 @@ var Util = (function () {
      *
      * @param date
      * @returns {string}
-     * @since 0.0.7
+     * @since 0.2.4
      */
-    Util.formatDate = function (date) {
+    DateUtil.formatDate = function (date) {
         var months = [
             "January", "February", "March",
             "April", "May", "June", "July",
             "August", "September", "October",
             "November", "December"
         ];
-        return months[date.getMonth()] + ' ' + Util.ordinalSuffix(date.getDate()) + ', ' + date.getFullYear();
+        return months[date.getMonth()] + ' ' + DateUtil.ordinalSuffix(date.getDate()) + ', ' + date.getFullYear();
     };
     /**
      * Returns the number with an ordinal suffix
      *
      * @param i
      * @returns {string}
-     * @since 0.2.3
+     * @since 0.2.4
      */
-    Util.ordinalSuffix = function (i) {
+    DateUtil.ordinalSuffix = function (i) {
         var j = i % 10, k = i % 100;
         if (j == 1 && k != 11) {
             return i + "st";
@@ -232,9 +315,9 @@ var Util = (function () {
      *
      * @param date
      * @returns {string}
-     * @since 0.1.1
+     * @since 0.2.4
      */
-    Util.formatShortDate = function (date) {
+    DateUtil.formatShortDate = function (date) {
         var months = [
             "Jan", "Feb", "Mar",
             "Apr", "May", "Jun", "Jul",
@@ -247,64 +330,21 @@ var Util = (function () {
      *
      * @param date
      * @return {string}
-     * @since 0.1.6
+     * @since 0.2.4
      */
-    Util.formatNumberDate = function (date) {
+    DateUtil.formatNumberDate = function (date) {
         return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
     };
-    /**
-     * Gets a date picker with specified value and div id
-     *
-     * @param date
-     * @param divid
-     * @returns {JQuery}
-     * @since 0.1.5
-     */
-    Util.getDatePicker = function (date, divid) {
-        var inputField = $('<input id="' + divid + '" type="text" value="' + date + '" class="form-control input-sm input-block-level">');
-        var container = $('<div class="input-group date" data-provide="datepicker"></div>');
-        var content = $('<span class="input-group-addon" style="padding: 0 18px !important; font-size: 0.8em !important;"><i class="glyphicon glyphicon-th"></i></span>');
-        var assembled = container.append(inputField);
-        assembled.append(content);
-        return container;
-    };
-    /**
-     * Extracts the ID (of a record) from the URL, i.e.
-     * ../record/view/201/ -> 201
-     *
-     * @param url
-     * @returns {number}
-     * @since 0.1.3
-     */
-    Util.extractId = function (url) {
-        var re = new RegExp("[^\/]+(?=\/*$)|$");
-        var base = re.exec(url);
-        if (base == null)
-            return NaN;
-        return parseInt(base[0]);
-    };
-    /**
-     * Builds a JQuery node
-     *
-     * @param tag
-     * @param attributes
-     * @param content
-     * @param selfClosing
-     * @returns {JQuery}
-     * @since 0.1.4
-     */
-    Util.buildNode = function (tag, attributes, content, selfClosing) {
-        if (attributes === void 0) { attributes = {}; }
-        if (content === void 0) { content = ''; }
-        if (selfClosing === void 0) { selfClosing = false; }
-        var attributesString = '';
-        for (var key in attributes) {
-            if (attributes.hasOwnProperty(key)) {
-                attributesString += ' ' + key + '="' + attributes[key].replace('"', '\\"') + '"';
-            }
-        }
-        return $('<' + tag + attributesString + (selfClosing ? ' />' : '>' + content + '</' + tag + '>'));
-    };
+    return DateUtil;
+})();
+/**
+ * Util class
+ * @todo bad practice of having todo class --> delete class/extract
+ * @since 0.0.5
+ */
+var Util = (function () {
+    function Util() {
+    }
     /**
      * Merges two objects into one
      *
@@ -359,7 +399,7 @@ var Util = (function () {
         return '<strong>' + value + '</strong>';
     };
     return Util;
-}());
+})();
 /**
  * Deals with loaders
  * @since 0.0.9 Added documentation
@@ -435,7 +475,7 @@ var LoaderManager = (function () {
     LoaderManager.loaders = {};
     LoaderManager.counter = 0;
     return LoaderManager;
-}());
+})();
 /**
  * Sets the base url
  * @since 0.0.1

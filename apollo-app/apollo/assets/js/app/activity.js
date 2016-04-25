@@ -13,7 +13,7 @@ var ac_id = NaN;
  * This means we have to keep seeing ugly errors in our IDE.
  * Also see
  * @link http://stackoverflow.com/questions/32395563/twitter-typeahead-bloodhound-error-in-typescript
- * @version 0.0.8
+ * @version 0.0.9
  */
 var PeopleField = (function () {
     function PeopleField() {
@@ -35,17 +35,17 @@ var PeopleField = (function () {
      */
     PeopleField.prototype.resetBloodhound = function () {
         for (var i = 0; i < this.temporarily_added.length; i++) {
-            Util.removeFromArrayCmp(this.temporarily_added[i], this.people, cmpPIds);
+            ArrayUtil.removeFromArrayCmp(this.temporarily_added[i], this.people, cmpPIds);
         }
         for (var i = 0; i < this.temporarily_added.length; i++) {
             var item = this.temporarily_added[i];
-            if (!Util.isInCmp(item, this.people, cmpPIds))
+            if (!ArrayUtil.isInCmp(item, this.people, cmpPIds))
                 this.people.push(item);
         }
         this.setBloodhound();
         var promise = this.bh.initialize();
         promise.fail(function () {
-            Util.error('failed to load the suggestion engine');
+            WebUtil.error('failed to load the suggestion engine');
         });
         this.resetTypeahead();
     };
@@ -75,8 +75,8 @@ var PeopleField = (function () {
             templates: {
                 suggestion: function (data) {
                     var elem = $('<div class="noselect"></div>');
-                    elem.text(Util.shortify(data.name, 45));
-                    return Util.getOuterHTML(elem);
+                    elem.text(StringUtil.shortify(data.name, 45));
+                    return WebUtil.getOuterHTML(elem);
                 }
             }
         });
@@ -98,7 +98,7 @@ var PeopleField = (function () {
             },
             sorter: cmpNames,
             remote: {
-                url: Util.url('get/activitypeople') + '?activity_id=' + ac_id + that.formatTemporarily_added() + '&search=' + that.search,
+                url: StringUtil.url('get/activitypeople') + '?activity_id=' + ac_id + that.formatTemporarily_added() + '&search=' + that.search,
                 filter: function (data) {
                     if (data) {
                         return that.processNewSuggestionData(data.data);
@@ -117,7 +117,7 @@ var PeopleField = (function () {
      */
     PeopleField.prototype.removeItemFromSuggestions = function (data) {
         this.temporarily_added.push(data);
-        Util.removeFromArrayCmp(data, this.temporarily_removed, cmpPIds);
+        ArrayUtil.removeFromArrayCmp(data, this.temporarily_removed, cmpPIds);
     };
     /**
      * Parallel function to the latter: Adds an item to the suggestions and assumes it has been removed from the activity
@@ -125,7 +125,7 @@ var PeopleField = (function () {
      */
     PeopleField.prototype.addItemToSuggestions = function (data) {
         this.temporarily_removed.push(data);
-        Util.removeFromArrayCmp(data, this.temporarily_added, cmpPIds);
+        ArrayUtil.removeFromArrayCmp(data, this.temporarily_added, cmpPIds);
     };
     /**
      * Processes some new data: Adds all the people not yet in suggestions to them
@@ -144,18 +144,18 @@ var PeopleField = (function () {
             output = [];
         }
         $.each(data, function (k, v) {
-            if (!Util.isInCmp(v, output, cmpPIds)) {
+            if (!ArrayUtil.isInCmp(v, output, cmpPIds)) {
                 output.push(v);
             }
         });
         $.each(this.temporarily_removed, function (k, v) {
-            if (!Util.isInCmp(v, output, cmpPIds)) {
+            if (!ArrayUtil.isInCmp(v, output, cmpPIds)) {
                 output.push(v);
             }
         });
         $.each(this.temporarily_added, function (k, v) {
-            if (Util.isInCmp(v, output, cmpPIds)) {
-                Util.removeFromArrayCmp(v, output, cmpPIds);
+            if (ArrayUtil.isInCmp(v, output, cmpPIds)) {
+                ArrayUtil.removeFromArrayCmp(v, output, cmpPIds);
             }
         });
         this.people = output;
@@ -179,7 +179,7 @@ var PeopleField = (function () {
 })();
 /**
  * Defines the menu/table on the left of the view. Also responsible for all the buttons and their functions
- * @version 0.0.7
+ * @version 0.0.8
  */
 var ActivityTable = (function () {
     function ActivityTable() {
@@ -218,7 +218,7 @@ var ActivityTable = (function () {
      */
     ActivityTable.prototype.updateTable = function () {
         var that = this;
-        AJAX.get(Util.url('get/activities/?page=' + that.page + '&search=' + that.search, false), function (data) {
+        AJAX.get(StringUtil.url('get/activities/?page=' + that.page + '&search=' + that.search, false), function (data) {
             if (data.count < (that.page - 1) * 10) {
                 that.pagination.pagination('selectPage', data.count / 10 - data.count % 10);
                 return;
@@ -232,7 +232,7 @@ var ActivityTable = (function () {
                 that.table.append('<tr><td colspan="4" class="text-center"><b>Nothing to display . . .</b></td></tr>');
             }
         }, function (message) {
-            Util.error('An error has occurred while loading the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
+            WebUtil.error('An error has occurred while loading the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
         });
     };
     /**
@@ -252,10 +252,10 @@ var ActivityTable = (function () {
         if (id > 0) {
             args['id'] = id;
         }
-        AJAX.post(Util.url('post/activity'), args, function (response) {
-            Util.to('activity/view/' + response.activity_id);
+        AJAX.post(StringUtil.url('post/activity'), args, function (response) {
+            WebUtil.to('activity/view/' + response.activity_id);
         }, function (message) {
-            Util.error('An error has occurred during the process of creating the activity. Error message: ' + message);
+            WebUtil.error('An error has occurred during the process of creating the activity. Error message: ' + message);
         });
     };
     /**
@@ -279,8 +279,8 @@ var ActivityTable = (function () {
                     callback: function () {
                         var modal = $('.modal');
                         var name = modal.find('#add-name').val();
-                        var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
-                        var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
+                        var startDate = DateUtil.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
+                        var endDate = DateUtil.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
                         ActivityTable.newActivity(name, startDate, endDate, -1);
                     }
                 }
@@ -309,8 +309,8 @@ var ActivityTable = (function () {
                     callback: function () {
                         var modal = $('.modal');
                         var name = modal.find('#add-name').val();
-                        var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
-                        var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
+                        var startDate = DateUtil.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
+                        var endDate = DateUtil.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
                         ActivityTable.newActivity(name, startDate, endDate, ac_id);
                     }
                 }
@@ -324,13 +324,13 @@ var ActivityTable = (function () {
     ActivityTable.prototype.hideActivity = function (id) {
         bootbox.confirm('Are you sure you want to hide this activity? The data won\'t be deleted and can be restored later.', function (result) {
             if (result) {
-                AJAX.post(Util.url('post/activity'), {
+                AJAX.post(StringUtil.url('post/activity'), {
                     action: 'hide',
                     activity_id: id
                 }, function (response) {
-                    Util.to('activity');
+                    WebUtil.to('activity');
                 }, function (message) {
-                    Util.error('An error has occurred while hiding activity. Error message: ' + message);
+                    WebUtil.error('An error has occurred while hiding activity. Error message: ' + message);
                 });
             }
         });
@@ -425,7 +425,7 @@ var ActivityTable = (function () {
         var row;
         var name = $('<td></td>');
         row = $('<tr></tr>');
-        name.text(Util.shortify(data.name, 22));
+        name.text(StringUtil.shortify(data.name, 22));
         row.append(name);
         var date = $('<td class="undefined text-right"></td>');
         var field = new DataDateRange({
@@ -440,7 +440,7 @@ var ActivityTable = (function () {
             that.content.load(parseInt(data.id), that.content.existingPeople);
             that.load(that.content, that.page);
             ac_id = parseInt(data.id);
-            window.history.pushState("", "", Util.url('activity/view/' + data.id));
+            window.history.pushState("", "", StringUtil.url('activity/view/' + data.id));
         });
         row.addClass('selectionItem');
         row.addClass('clickable');
@@ -454,7 +454,7 @@ var ActivityTable = (function () {
 })();
 /**
  * Carries out all the tasks related to displaying the actual information of one activity on the right of the view
- * @since 0.0.6
+ * @since 0.0.7
  */
 var ActivityInformation = (function () {
     function ActivityInformation() {
@@ -495,7 +495,7 @@ var ActivityInformation = (function () {
     ActivityInformation.prototype.setUp = function () {
         var that = this;
         this.removedPeople = [];
-        AJAX.get(Util.url('get/activity/?id=' + that.id, false), function (data) {
+        AJAX.get(StringUtil.url('get/activity/?id=' + that.id, false), function (data) {
             var breadcrumbs = $('#nav-breadcrumbs');
             breadcrumbs.find('li:nth-child(3)').text('Activity #' + that.id + ': ' + data.name);
             that.activeTargetGroup = data.target_groups.active == null ? data.target_groups.data[0] : data.target_groups.active;
@@ -508,7 +508,7 @@ var ActivityInformation = (function () {
             that.displayStartDate(data.start_date);
             that.displayEndDate(data.end_date);
         }, function (message) {
-            Util.error('An error has occurred while loading the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
+            WebUtil.error('An error has occurred while loading the list of activities. Please reload the page or contact the administrator. Error message: ' + message);
         });
     };
     /**
@@ -522,11 +522,11 @@ var ActivityInformation = (function () {
         var data = this.getObjectState();
         data['action'] = 'update';
         var that = this;
-        AJAX.post(Util.url('post/activity'), data, function (response) {
+        AJAX.post(StringUtil.url('post/activity'), data, function (response) {
             that.displaySuccessfulSave(saveButton);
         }, function (message) {
             that.displaySaveFailure(saveButton);
-            Util.error('An error has occurred while saving. Error message: ' + message);
+            WebUtil.error('An error has occurred while saving. Error message: ' + message);
         });
         this.resetPeople();
     };
@@ -567,9 +567,9 @@ var ActivityInformation = (function () {
      */
     ActivityInformation.prototype.getObjectState = function () {
         var sd = this.startDate.datepicker('getDate');
-        var startDate = Util.toMysqlFormat(sd);
+        var startDate = DateUtil.toMysqlFormat(sd);
         var ed = this.endDate.datepicker('getDate');
-        var endDate = Util.toMysqlFormat(ed);
+        var endDate = DateUtil.toMysqlFormat(ed);
         return {
             activity_id: this.getId(),
             activity_name: this.title.val(),
@@ -588,12 +588,12 @@ var ActivityInformation = (function () {
     ActivityInformation.prototype.savePeople = function () {
         for (var i = 0; i < this.addedPeople.length; i++) {
             var item = this.addedPeople[i];
-            if (!Util.isInCmp(item, this.people, cmpPIds))
+            if (!ArrayUtil.isInCmp(item, this.people, cmpPIds))
                 this.people.push(item);
         }
         for (var i = 0; i < this.removedPeople.length; i++) {
             var item = this.removedPeople[i];
-            Util.removeFromArrayCmp(item, this.people, cmpPIds);
+            ArrayUtil.removeFromArrayCmp(item, this.people, cmpPIds);
         }
     };
     ;
@@ -695,9 +695,9 @@ var ActivityInformation = (function () {
     ActivityInformation.prototype.displayStartDate = function (sqlDate) {
         var timer;
         var that = this;
-        var startD = Util.formatNumberDate(Util.parseSQLDate(sqlDate));
+        var startD = DateUtil.formatNumberDate(DateUtil.parseSQLDate(sqlDate));
         $('#start-date').empty();
-        this.startDate = Util.getDatePicker(startD, "start-date-picker");
+        this.startDate = WebUtil.getDatePicker(startD, "start-date-picker");
         $('#start-date').append(this.startDate);
         this.startDate = $('#start-date-picker'); //otherwise it would not work properly
         this.startDate.on('input propertychange change', function () {
@@ -715,8 +715,8 @@ var ActivityInformation = (function () {
         var timer;
         var that = this;
         $('#end-date').empty();
-        var endD = Util.formatNumberDate(Util.parseSQLDate(sqldate));
-        this.endDate = Util.getDatePicker(endD, "end-date-picker");
+        var endD = DateUtil.formatNumberDate(DateUtil.parseSQLDate(sqldate));
+        this.endDate = WebUtil.getDatePicker(endD, "end-date-picker");
         $('#end-date').append(this.endDate);
         this.endDate = $('#end-date-picker'); //otherwise it would not work properly
         this.endDate.on('input propertychange change', function () {
@@ -734,11 +734,11 @@ var ActivityInformation = (function () {
         var people = this.people;
         for (var i = 0; i < this.addedPeople.length; i++) {
             var item = this.addedPeople[i];
-            if (!Util.isInCmp(item, people, cmpPIds)) {
+            if (!ArrayUtil.isInCmp(item, people, cmpPIds)) {
                 people.push(item);
             }
         }
-        people = Util.arraySubtract(people, this.removedPeople);
+        people = ArrayUtil.arraySubtract(people, this.removedPeople);
         people.sort(cmpNames);
         this.peopleTable.empty();
         //console.log(people);
@@ -754,7 +754,7 @@ var ActivityInformation = (function () {
     ActivityInformation.prototype.displayPerson = function (person) {
         var that = this;
         var row = $('<td class="col-md-11 selectionItem clickable"></td>');
-        row.text(Util.shortify(person.name, 40));
+        row.text(StringUtil.shortify(person.name, 40));
         var removeButton = $('<td class="col-md-1">' +
             '<button type="button" class="btn btn-xs btn-primary" style="display:block; text-align:center">' +
             '<small>' +
@@ -778,8 +778,8 @@ var ActivityInformation = (function () {
         var timer;
         function removePerson(e) {
             var c = e.data;
-            Util.removeFromArrayCmp(c.person, c.that.addedPeople, cmpPIds);
-            if (!Util.isInCmp(c.person, c.that.removedPeople, cmpPIds))
+            ArrayUtil.removeFromArrayCmp(c.person, c.that.addedPeople, cmpPIds);
+            if (!ArrayUtil.isInCmp(c.person, c.that.removedPeople, cmpPIds))
                 c.that.removedPeople.push(c.person);
             c.that.existingPeople.addItemToSuggestions(c.person);
             clearTimeout(timer);
@@ -799,7 +799,7 @@ var ActivityInformation = (function () {
      */
     ActivityInformation.prototype.addOnClickToRow = function (row, id) {
         row.click(function () {
-            Util.to('record/view/' + id);
+            WebUtil.to('record/view/' + id);
         });
     };
     return ActivityInformation;
@@ -840,8 +840,8 @@ function cmpPIds(a, b) {
 function addItemFromSuggestion(e, item) {
     var c = e.data;
     //console.log('adding activityinfo array added people name ' + item.name);
-    Util.removeFromArrayCmp(item, c.that.removedPeople, cmpPIds);
-    if (!Util.isInCmp(item, c.that.addedPeople, cmpPIds))
+    ArrayUtil.removeFromArrayCmp(item, c.that.removedPeople, cmpPIds);
+    if (!ArrayUtil.isInCmp(item, c.that.addedPeople, cmpPIds))
         c.that.addedPeople.push(item);
     c.that.existingPeople.removeItemFromSuggestions(item);
     c.that.save();
@@ -849,14 +849,14 @@ function addItemFromSuggestion(e, item) {
     c.that.makeLinkWithSuggestions();
 }
 $(document).ready(function () {
-    var id = Util.extractId(window.location.toString());
+    var id = StringUtil.extractId(window.location.toString());
     var hidden = $('input[name="hiddenField"]');
     var page = hidden.val();
     //console.log(page);
     if (isNaN(id)) {
         var breadcrumbs = $('#nav-breadcrumbs');
         var fullLink = breadcrumbs.find('li:nth-child(2)').find("a").attr("href");
-        id = Util.extractId(fullLink);
+        id = StringUtil.extractId(fullLink);
     }
     ac_id = id;
     var activity = new ActivityInformation();

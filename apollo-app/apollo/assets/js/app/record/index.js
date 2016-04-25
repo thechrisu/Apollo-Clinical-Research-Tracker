@@ -10,7 +10,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.6
+ * @version 0.0.7
  */
 var RecordTable = (function () {
     function RecordTable() {
@@ -54,7 +54,7 @@ var RecordTable = (function () {
     RecordTable.prototype.addRecordClick = function () {
         this.table.on('click', '.record-tr', function (e) {
             e.preventDefault();
-            Util.to('record/view/' + $(this).data('id'));
+            WebUtil.to('record/view/' + $(this).data('id'));
         });
     };
     RecordTable.prototype.addAutoSearch = function () {
@@ -71,7 +71,7 @@ var RecordTable = (function () {
     RecordTable.prototype.updateTable = function () {
         var that = this;
         LoaderManager.showLoader(that.loader, function () {
-            AJAX.get(Util.url('get/records/?page=' + that.page + '&sort=' + that.sort + '&search=' + that.search, false), function (data) {
+            AJAX.get(WebUtil.url('get/records/?page=' + that.page + '&sort=' + that.sort + '&search=' + that.search, false), function (data) {
                 if (data.count < (that.page - 1) * 10) {
                     that.pagination.pagination('selectPage', data.count / 10 - data.count % 10);
                     return;
@@ -88,7 +88,7 @@ var RecordTable = (function () {
                 }
                 LoaderManager.hideLoader(that.loader);
             }, function (message) {
-                Util.error('An error has occurred during the loading of the list of records. Please reload the page or contact the administrator. Error message: ' + message);
+                WebUtil.error('An error has occurred during the loading of the list of records. Please reload the page or contact the administrator. Error message: ' + message);
             });
         });
     };
@@ -96,7 +96,7 @@ var RecordTable = (function () {
         var tr = $('<tr class="record-tr clickable" data-id="' + data.id + '"></tr>');
         [data.given_name, data.last_name, data.email, data.phone].forEach(function (string) {
             var td = $('<td></td>');
-            var field = new DataText(Util.shortify(string, 50));
+            var field = new DataText(StringUtil.shortify(string, 50));
             field.renderPlain(td);
             tr.append(td);
         });
@@ -127,9 +127,9 @@ $(document).ready(function () {
                         var middleName = modal.find('#add-middle-name').val();
                         var lastName = modal.find('#add-last-name').val();
                         var recordName = modal.find('#add-record-name').val();
-                        var startDate = Util.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
-                        var endDate = Util.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
-                        AJAX.post(Util.url('post/record'), {
+                        var startDate = DateUtil.toMysqlFormat(modal.find('#add-start-date').datepicker('getDate'));
+                        var endDate = DateUtil.toMysqlFormat(modal.find('#add-end-date').datepicker('getDate'));
+                        AJAX.post(StringUtil.url('post/record'), {
                             action: 'create',
                             given_name: givenName,
                             middle_name: middleName,
@@ -138,9 +138,9 @@ $(document).ready(function () {
                             start_date: startDate,
                             end_date: endDate
                         }, function (response) {
-                            Util.to('record/edit/' + response.record_id);
+                            WebUtil.to('record/edit/' + response.record_id);
                         }, function (message) {
-                            Util.error('An error has occurred during the process of creation of a new record for a person. Error message: ' + message);
+                            WebUtil.error('An error has occurred during the process of creation of a new record for a person. Error message: ' + message);
                         });
                     }
                 }
