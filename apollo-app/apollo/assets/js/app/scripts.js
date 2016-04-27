@@ -107,7 +107,7 @@ var WebUtil = (function () {
         return $('<' + tag + attributesString + (selfClosing ? ' />' : '>' + content + '</' + tag + '>'));
     };
     return WebUtil;
-})();
+}());
 /**
  * Contains helper functions that help with string manipulations
  */
@@ -163,7 +163,7 @@ var StringUtil = (function () {
             return parseInt(base[0]);
     };
     return StringUtil;
-})();
+}());
 /**
  * Helper functions for helping with arrays
  * @since 0.2.4
@@ -216,7 +216,7 @@ var ArrayUtil = (function () {
         return false;
     };
     return ArrayUtil;
-})();
+}());
 /**
  * Used for helper functions on JS dates and strings that have to be converted to dates
  * @since 0.2.4
@@ -336,7 +336,7 @@ var DateUtil = (function () {
         return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
     };
     return DateUtil;
-})();
+}());
 /**
  * Util class
  * @todo bad practice of having todo class --> delete class/extract
@@ -399,7 +399,7 @@ var Util = (function () {
         return '<strong>' + value + '</strong>';
     };
     return Util;
-})();
+}());
 /**
  * Deals with loaders
  * @since 0.0.9 Added documentation
@@ -475,7 +475,7 @@ var LoaderManager = (function () {
     LoaderManager.loaders = {};
     LoaderManager.counter = 0;
     return LoaderManager;
-})();
+}());
 /**
  * Sets the base url
  * @since 0.0.1

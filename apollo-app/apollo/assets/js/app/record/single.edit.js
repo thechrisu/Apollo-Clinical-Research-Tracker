@@ -210,7 +210,7 @@ var SingleView = (function () {
         this.saveButton.html('<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>No changes.');
     };
     return SingleView;
-})();
+}());
 $(document).ready(function () {
     var single = new SingleView();
     var id = StringUtil.extractId(window.location.toString());
