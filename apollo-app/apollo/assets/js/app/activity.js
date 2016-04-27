@@ -176,7 +176,7 @@ var PeopleField = (function () {
         return query;
     };
     return PeopleField;
-})();
+}());
 /**
  * Defines the menu/table on the left of the view. Also responsible for all the buttons and their functions
  * @version 0.0.8
@@ -451,7 +451,7 @@ var ActivityTable = (function () {
         this.table.append(row);
     };
     return ActivityTable;
-})();
+}());
 /**
  * Carries out all the tasks related to displaying the actual information of one activity on the right of the view
  * @since 0.0.7
@@ -803,7 +803,7 @@ var ActivityInformation = (function () {
         });
     };
     return ActivityInformation;
-})();
+}());
 /**
  * Compare function for property name
  * @param a:Object
