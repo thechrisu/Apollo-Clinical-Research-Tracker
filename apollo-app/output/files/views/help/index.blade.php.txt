@@ -1,0 +1,212 @@
+<?php
+/**
+ * @author Desislava Koleva <desy.koleva96@gmail.com>
+ * @copyright 2016
+ * @license https://opensource.org/licenses/mit-license.php MIT License
+ * @version 0.0.1
+ */
+use Apollo\Helpers\AssetHelper;
+use Apollo\Helpers\URLHelper;
+
+?>
+@extends('layouts.extended')
+@section('content')
+        <!-- Bootstrap start -->
+
+{{--<form class="form-inline">--}}
+    {{--<div class="form-group">--}}
+        {{--<label class="sr-only" for="problem">Problem.</label>--}}
+        {{--<div class="input-group">--}}
+            {{--<div class="input-group-addon"><span class="glyphicon glyphicon-search"></span></div>--}}
+            {{--<input type="text" class="form-control" id="problem" placeholder="Search for a problem...">--}}
+        {{--</div>--}}
+    {{--</div>--}}
+{{--</form>--}}
+
+<ul class="nav nav-tabs top-buffer" id="sort-tabs">
+    <li role="presentation" class="sort-tab active" data-section="records"><a href="#">Records</a></li>
+    <li role="presentation" class="sort-tab" data-section="activities"><a href="#">Activities</a></li>
+    <li role="presentation" class="sort-tab" data-section="fields"><a href="#">Fields</a></li>
+    <li role="presentation" class="sort-tab" data-section="access"><a href="#">Users and Security</a></li>
+    <li role="presentation" class="sort-tab" data-section="faq"><a href="#">FAQ</a></li>
+    <li role="presentation" class="sort-tab" data-section="contact"><a href="#">Contact IT Support</a></li>
+</ul>
+
+<style>
+
+    .data {
+        display: none;
+    }
+
+</style>
+
+<div class="data records">
+    <h1>Records</h1>
+    <h2>How can I add a new record?</h2>
+    <p>
+        To add a blank record to the database, first navigate to ‘Records’ on the top of the Apollo app. Then click on the ‘Add a record’ button. You will first be asked to specify the name, record name and time period covered by the record. The record with the latest end date specified will be displayed as the default record for a person. Click ‘Add’. You will then be directed to another page to fill in the remaining features. The changes are updated in real time and saved automatically.
+    </p>
+    <h2>How can I edit an existing record?</h2>
+    <p>
+        To edit an already existing record in the database, first navigate to ‘Records’ on the top bar of the Apollo app. Select the particular record you want to edit. Once you open the record, go to ‘Record actions:’ and click on the ‘Edit’ button. You will then be directed to the page where you can make the appropriate changes. The changes are updated in real time and saved automatically.
+    </p>
+    <h2>How can I remove a record?</h2>
+    <p>
+        You cannot. Data cannot be deleted in the Apollo app as such a functionality would contradict its original purpose.
+    </p>
+    <h2>Can I hide an existing record from the database?</h2>
+    <p>
+        Yes. Navigate to ‘Records’ on the top of the Apollo app. Find and open the particular record you want to make a copy of. Go to ‘Record actions:’ and click the ‘Hide’ button. A pop up will appear asking you for confirmation. Click ‘OK’.
+    </p>
+    <h2>Can I add a new record to an existing person?</h2>
+    <p>
+        Yes. Navigate to ‘Records’ on the top of the Apollo app. Find and select an existing record belonging to the person you want to add a new record to. Once you open the record, go to ‘Records actions’ and click on the ‘Add a record’ button. A prompt will appear asking you to give the new record a name and time period. Confirm by clicking ‘Add’. You will then be directed to the page where you can fill in the remaining features.
+    </p>
+    <h2>Can I make a copy of an existing record?</h2>
+    <p>
+        Yes. Navigate to ‘Records’ on the top of the Apollo app. Find and open the particular record you want to make a copy of. Go to ‘Record actions:’ and click the ‘Duplicate record’ button. A prompt will appear asking you to give the record copy a name and time period. Confirm by clicking ‘Add’. You will then be directed to the new record where you can edit and add changes. In other words, duplicating the record will create copies of all the data from the original but allow you to enter a new name and time period. To return to the original record, go to ‘Current record:’, open the dropdown list and select the respective record name.
+    </p>
+    <h2>How can I find a particular existing record?</h2>
+    <p>
+        There are several ways to browse through records and navigate to a specific existing one. Navigate to ‘Records’ on the top of the Apollo app. Make sure you have selected the ‘All records’ tab. You can choose to browse through the list of records until you find the required one. Alternatively, you can type in the name/surname in the search bar. Once you finish typing, the search will update automatically and the required record will be displayed below. In the case that the specific record you are looking for was added recently you can choose to select the ‘Recently added’ tab where the records are sorted by the date they were added. You can then find the record from there.  In the case that it was updated recently you can choose to select the ‘Recently updated’ tab where they are sorted by the date they were updated and find it from there.
+    </p>
+    <h2>What is ‘Advanced Search’?</h2>
+    <p>
+        This is a feature of the Apollo app that allows for a quick and efficient search within all records in the database based on multiple filters holding some condition.
+        Navigate to ‘Records’ on top of the Apollo app and click on the ‘Advanced search’ button. You will be directed to a page where you can specify the desired filters. Select the field from the ‘Field’ dropdown list (Job category, Publications, Awards, Address, Phone, Email, End date, Start date, Record name) that you would like to add a filter to. Depending on the field selected, you can then add the filter by specifying some relation it must have to a particular value, or simply filter only records with an empty/non-empty field. To include multiple filters, click on ‘Add’. To remove a filter already included, click on ‘Remove’.
+    </p>
+    <h2>Can I download all existing records?</h2>
+    <p>
+        Yes. To download all records from the database, first navigate to ‘Records’ on the top of the Apollo app. Then simply click on the ‘Download’ button. The records will be downloaded in a .xml file.
+    </p>
+</div>
+<div class="data activities">
+    <h1>Activities</h1>
+    <h2>How can I add a new activity?</h2>
+    <p>
+        To add an activity to the database, first navigate to ‘Activities’ on the top of the Apollo app. Then click on the ‘Add an activity’ button. You will first be asked to specify the activity name and time period covered by the activity. Click ‘Add’. You will then be directed to another page to choose the required target group, list the people involved in the activity, as well as provide an activity description. The changes are updated in real time and saved automatically.
+    </p>
+    <h2>How can I edit an existing activity?</h2>
+    <p>
+        To edit an already existing activity, first navigate to ‘Activities’ on the top bar of the Apollo app. Select the particular activity you want to edit from the activity list on the left hand side. Once you open the activity, simply apply the appropriate changes. The changes are updated in real time and saved automatically.
+    </p>
+    <h2>How can I remove an activity?</h2>
+    <p>
+        You cannot. Data cannot be deleted in the Apollo app as such a functionality would contradict its original purpose.
+    </p>
+    <h2>Can I make a copy of an existing activity?</h2>
+    <p>
+        Yes. Navigate to ‘Activities’ on the top of the Apollo app Select the particular activity you want to edit from the activity list on the left hand side. Once you open the activity, simply click the ‘Duplicate activity’ button. A prompt will appear asking you to give the activity copy a name and time period. Confirm by clicking ‘Add’. You will then be directed to the new activity where you can add changes. In other words, duplicating the activity will create copies of all the data from the original but allow you to enter a new name and time period.
+    </p>
+    <h2>Can I hide an existing activity?</h2>
+    <p>
+        Yes. Navigate to ‘Activities’ on the top of the Apollo app. Select the particular activity you want to edit from the activity list on the left hand side. Once you open the activity, simply click the ‘Hide’ button. A pop up will appear asking you for confirmation. Click ‘OK’.
+    </p>
+    <h2>How can I find a particular existing activity?</h2>
+    <p>
+        Navigate to ‘Activities’ on the top of the Apollo app. You can choose to browse through the activities list on the left hand side of the page until you find the required one. Alternatively, you can start type the name in the search bar above the list. Once you stop typing, the search will update automatically and the required activity/ies will be displayed below.
+    </p>
+</div>
+<div class="data fields">
+    <h1>Fields</h1>
+    <h2>Why do I need this functionality?</h2>
+    <p>
+        This functionality is a key feature in the Apollo app. It provides the ability to customize the fields attached to each record, including custom default values and various field types.
+    </p>
+    <h2>How can I add a new field?</h2>
+    <p>
+        Navigate to ‘Fields’ on the top of the Apollo app and click on the ‘Add field’ button. You will be asked to specify a field name and field type (Integer, Single text input, Multiple inputs, Dropdown, Dropdown and input, Multiple options, Date, Long text). Click ‘Add’ and the field will appear at the top. The field type chosen determines whether specifying default values is applicable. If applicable, you can now list the necessary default value/s for the new field.
+    </p>
+    <h2>How can I edit an existing field?</h2>
+    <p>
+        You cannot. Instead, you can create a new field where you can include the necessary changes.
+    </p>
+    <h2>How can I remove an existing field?</h2>
+    <p>
+        You cannot. Data cannot be deleted in the Apollo app as such a functionality would contradict its original purpose.
+    </p>
+    <h2>Can I hide an existing field?</h2>
+    <p>
+        Yes. Navigate to ‘Fields’ on the top of the Apollo app. Locate the field you want to hide. On the right hand side of each field, you will find a ‘Hide’ button. Upon clicking it, a pop up will appear asking you for confirmation. Click ‘OK’.
+    </p>
+    <h2>Can I make a copy of an existing field?</h2>
+    <p>
+        You cannot. Instead, you can create a new field with the same field name, type and default values (if applicable) and add any changes if necessary.
+    </p>
+    <h2>How can I find a particular existing field?</h2>
+    <p>
+        Navigate to ‘Fields’ on the top of the Apollo app. Scroll through the fields until you locate the required one.
+    </p>
+</div>
+<div class="data users">
+    <h1>Users</h1>
+    <h2>Where can I view my information?</h2>
+    <p>
+        Navigate to ‘User Settings’ on the top of the Apollo app. Click on ‘Settings’. You will be directed to the page holding your personal information, as well as organisation information.
+    </p>
+    <h2>Who will be using the Apollo app?</h2>
+    <p>
+        The users of the Apollo web app are Colby Benari from UCL School of Life and Medical Sciences and her team.
+    </p>
+    <h2>Who has access to the Apollo app?</h2>
+    <p>
+        Only the users of the app have access to its contents.
+    </p>
+    <h2>Who are the admins in the Apollo app?</h2>
+    <p>
+        The first admin of the Apollo app is Colby Benari from UCL School of Life and Medical Sciences. Further admins can be added by her. To request becoming an admin, contact Colby Benari directly at c.benari@ucl.ac.uk.
+    </p>
+    <h2>What authorisation system does the Apollo app use?</h2>
+    <p>
+        The Apollo app uses the UCL authorisation system.
+    </p>
+</div>
+<div class="data faq">
+    <h1>FAQ</h1>
+    <h2>Are there any shortcuts/hotkeys I should be aware of?</h2>
+    <p>
+        Yes. You can use the Enter/Backspace hotkeys. These can be used when editing a multiple text field. Once you have filled in the first field, you can move to the next one by pressing Enter. Similarly, you can remove an empty field by pressing Backspace.
+    </p>
+</div>
+<div class="data contact">
+    <h1>Contact</h1>
+    <h2>Orinigal developers:</h2>
+    <p>
+        Timur Kuzhagaliyev: tim.kuzhagaliyev.15@ucl.ac.uk
+        Christoph Ulshoefer: christoph.ulshoefer.15@ucl.ac.uk
+        Desislava Koleva: desislava.koleva.15@ucl.ac.uk
+    </p>
+    <h2>For further help:</h2>
+    <p>
+        (pending…)
+    </p>
+</div>
+
+<!-- Bootstrap end -->
+@stop
+@section('scripts')
+    @parent
+    <script>
+        $(document).ready(function () {
+
+            $('.records').slideDown(200);
+
+            var allTabs = $('.sort-tab');
+
+            allTabs.click(function (event) {
+                event.preventDefault();
+                allTabs.removeClass('active');
+
+                var button = $(this);
+                button.addClass('active');
+                var section = button.data('section');
+                $('.data').slideUp(200);
+                setTimeout(function() {
+                    $('.' + section).slideDown(200);
+                }, 200)
+
+            });
+
+        });
+    </script>
+@stop

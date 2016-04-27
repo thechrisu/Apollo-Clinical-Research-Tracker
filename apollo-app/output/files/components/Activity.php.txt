@@ -1,0 +1,135 @@
+<?php
+/**
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @copyright 2016
+ * @license http://opensource.org/licenses/gpl-license.php MIT License
+ */
+
+namespace Apollo\Components;
+use Apollo\Apollo;
+use Apollo\Entities\ActivityEntity;
+
+
+/**
+ * Class Activity
+ *
+ * @package Apollo\Components
+ * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
+ * @version 0.0.3
+ */
+class Activity extends DBComponent
+{
+    /**
+     * Namespace of entity class
+     * @var string
+     */
+    protected static $entityNamespace = 'Apollo\\Entities\\ActivityEntity';
+
+    /**
+     * @return int
+     */
+    public static function getMinId()
+    {
+        $em = DB::getEntityManager();
+        $repo = $em->getRepository(Activity::getEntityNamespace());
+        $qb = $repo->createQueryBuilder('a');
+        $organisation_id = Apollo::getInstance()->getUser()->getOrganisationId();
+        $notHidden = $qb->expr()->eq('a' . '.is_hidden', '0');
+        $sameOrgId = $qb->expr()->eq('a' . '.organisation', $organisation_id);
+        $cond = $qb->expr()->andX($notHidden, $sameOrgId);
+        $qb->where($cond);
+        $query = $qb->getQuery()
+        ->setFirstResult(0)
+        ->setMaxResults(1);
+        /** @var ActivityEntity[] $result */
+        $result = $query->getResult();
+        $item = $result[0]->getId();
+        /*    ->setFirstResult(0)
+            ->setMaxResults(1)
+            ->getResult();*/
+        return $item;
+    }
+
+    /**
+     * Given an id, this returns the number of activities with ids smaller than that
+     * @param $id
+     * @return int
+     */
+    public static function getNumSmallerIds($id)
+    {
+        $em = DB::getEntityManager();
+        $repo = $em->getRepository(Activity::getEntityNamespace());
+        $qb = $repo->createQueryBuilder('a');
+        $organisation_id = Apollo::getInstance()->getUser()->getOrganisationId();
+        $notHidden = $qb->expr()->eq('a' . '.is_hidden', '0');
+        $sameOrgId = $qb->expr()->eq('a' . '.organisation', $organisation_id);
+        $cond = $qb->expr()->andX($notHidden, $sameOrgId);
+        $qb->where($cond);
+        $qb->andWhere('a.id < ' . $id);
+        $result = $qb->getQuery()->getResult();
+        return count($result);
+    }
+
+    /**
+     * Given an id, this should return a valid ActivityEntity (that has that id).
+     * @param $id
+     * @return ActivityEntity
+     */
+    public static function getValidActivityWithId($id)
+    {
+        $org = Apollo::getInstance()->getUser()->getOrganisationId();
+        return self::getRepository()->findBy(['id' => $id, 'is_hidden' => false, 'organisation' => $org])[0];
+    }
+
+    /**
+     * @param ActivityEntity[] $activities
+     * @param $page
+     * @return mixed
+     */
+    public static function getFormattedActivities($activities, $page)
+    {
+        $response['error'] = null;
+        $response['count'] = count($activities);
+        for ($i = 10 * ($page - 1); $i < min($response['count'], $page * 10); $i++) {
+            $activity = $activities[$i];
+            $response['activities'][] = Activity::getFormattedShortData($activity);
+        }
+        return $response;
+    }
+
+    /**
+     * @param ActivityEntity $activity
+     * @return array
+     */
+    public static function getFormattedShortData($activity)
+    {
+        $responseActivity = [
+            'id' => $activity->getId(),
+            'name' => $activity->getName(),
+            'start_date' => $activity->getStartDate()->format('Y-m-d H:i:s'),
+            'end_date' => $activity->getEndDate()->format('Y-m-d H:i:s')
+        ];
+        return $responseActivity;
+    }
+
+    /**
+     * Formats an activity as a valid JSON object (with all the information about the activity)
+     * @param ActivityEntity $activity
+     * @return array
+     */
+    public static function getFormattedData(ActivityEntity $activity)
+    {
+        $people = Person::getFormattedPeopleShortWithRecords($activity->getPeople());
+        $activityInfo = [
+            'error' => null,
+            'id' => $activity->getId(),
+            'name' => $activity->getName(),
+            'target_groups' => TargetGroup::getFormattedTargetGroups($activity->getTargetGroup()),
+            'target_group_comment' => $activity->getTargetGroupComment(),
+            'start_date' => $activity->getStartDate()->format('Y-m-d H:i:s'),
+            'end_date' => $activity->getEndDate()->format('Y-m-d H:i:s'),
+            'participants' => $people
+        ];
+        return $activityInfo;
+    }
+}

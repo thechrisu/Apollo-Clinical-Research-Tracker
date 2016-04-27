@@ -1,0 +1,19 @@
+<?php
+/**
+ * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
+ * @copyright 2016
+ * @license http://opensource.org/licenses/gpl-license.php MIT License
+ * @version 0.0.1
+ */
+?>
+
+<?php $__env->startSection('content'); ?>
+    <div class="jumbotron error-page">
+
+        <h1><?php echo e($status_code); ?></h1>
+
+        <p><?php echo $message; ?></p>
+
+    </div>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.extended', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
