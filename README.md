@@ -12,124 +12,26 @@ This manual assumes that you have already installed Apache2 server and Composer 
 
 ## Setting up an Apache virtual host
 
-The process of setting up of a virtual host for Apollo application is standard, just follow the instructions relevant to your Apache installation and operatin system. Don't forget to point the virtual host to the `apollo-app/web` folder, as this folder contains the entry script. Additionally, it is very important to enable Apache rewriting engine. https://www.digitalocean.com/community/tutorials/how-to-set-up-mod_rewrite-for-apache-on-ubuntu-14-04
+The process of setting up of a virtual host for Apollo application is standard, just follow the instructions relevant to your Apache installation and operatin system. Don't forget to point the virtual host to the `apollo-app/web` folder, as this folder contains the `index.php` entry script. Additionally, it is very important to enable Apache rewriting engine. A tutorial on how to do so [can be found here](https://www.digitalocean.com/community/tutorials/how-to-set-up-mod_rewrite-for-apache-on-ubuntu-14-04), but if it is not suitable for your particular installation then you can easily find a similar tutorial on the web.
 
-## Note about `apollo-app`
+## Installing dependencies
 
-To decrease the amount of files transfered to the repository the Composer folder `vendor` is ignored by Git, hence the app will not run out of the box. Make sure to run `composer install` before trying to run the app.
+The dependencies can be installed by opening the terminal (or a similar command line), switching to the `apollo-app` directory and running the command `composer install`. If you will get any errors about the permissions, try using `sudo composer install`.
 
-Additionally, make sure that the `fileinfo` PHP module is enabled. Usually this just means uncommenting `extension=fileinfo.so` or `extension=php_fileinfo.dll` in your `php.ini`.
+This way, composer will install all of the required dependencies for you.
 
-## Some notes about setting up the app for the first time
+##  Importing the MySQL dumps
 
-After cloning the repository and running `composer install` in the directory where `composer.json` is located, you will have to setup the MySQL database. This is the most recent version of the database: (just paste the whole thing into the text area in the SQL section)
+The MySQL dump of our database can be found in the file called `apollo.sql`. Simply create a database in your MySQL installation (using, say, phpMyAdmin) called `apollo` or something similar and execute the SQL code found inside the file to import the content.
 
-	-- phpMyAdmin SQL Dump
-	-- version 4.5.1
-	-- http://www.phpmyadmin.net
-	--
-	-- Host: 127.0.0.1
-	-- Generation Time: Feb 19, 2016 at 04:14 AM
-	-- Server version: 10.1.9-MariaDB
-	-- PHP Version: 5.6.15
+## Setting up the config
 
-	SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-	SET time_zone = "+00:00";
+You can find the config file located in `apollo-app/apollo/Config.example.php`. You can create a copy of this file and rename it into `Config.php`. Edit the resultant file to specify the credentials of your local MySQL server. Or, you have a choice to use the default values which will give you access to development MySQL server of Group 30 team members, but this one will be available only for a limited period of time (we will shut it down in the of May 2016).
 
+## Running the application
 
-	/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-	/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-	/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-	/*!40101 SET NAMES utf8mb4 */;
+Now the applicaiton should be good to go. Try accessing the URL you have specified in your Apache virtual host. Feel free to contact us if you will experience any issues.
 
-	--
-	-- Database: `apollo`
-	--
+## Documentation and unit testing
 
-	-- --------------------------------------------------------
-
-	--
-	-- Table structure for table `organisations`
-	--
-
-	CREATE TABLE `organisations` (
-	  `id` int(11) NOT NULL,
-	  `name` varchar(255) NOT NULL,
-	  `timezone` varchar(255) NOT NULL
-	) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-	-- --------------------------------------------------------
-
-	--
-	-- Table structure for table `users`
-	--
-
-	CREATE TABLE `users` (
-	  `id` int(11) NOT NULL,
-	  `name` varchar(255) NOT NULL,
-	  `email` varchar(255) NOT NULL,
-	  `password` varchar(255) NOT NULL,
-	  `org_id` int(11) NOT NULL,
-	  `is_admin` tinyint(1) NOT NULL,
-	  `registered_on` datetime NOT NULL
-	) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-	--
-	-- Indexes for dumped tables
-	--
-
-	--
-	-- Indexes for table `organisations`
-	--
-	ALTER TABLE `organisations`
-	  ADD PRIMARY KEY (`id`),
-	  ADD KEY `id` (`id`);
-
-	--
-	-- Indexes for table `users`
-	--
-	ALTER TABLE `users`
-	  ADD PRIMARY KEY (`id`);
-
-	--
-	-- AUTO_INCREMENT for dumped tables
-	--
-
-	--
-	-- AUTO_INCREMENT for table `organisations`
-	--
-	ALTER TABLE `organisations`
-	  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-	--
-	-- AUTO_INCREMENT for table `users`
-	--
-	ALTER TABLE `users`
-	  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-	/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-	/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-	/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-To sign in you will have to insert user details into the `users` table. The only field that is not self-explanatory is the `password` field. It should contain the hash of your password generated using PHP's `hash_password()` function. So, to get one of said hashes create a new PHP file somewhere (or use an online interpreter) and execute the following command:
-
-	echo hash_password('your-password-here');
-
-The output will be your desired hash, just set the `password` field in your record in the `users` table to the hash you got and you should be able to login using your password (`your-password-here` in my case).
-
-Additionally, you might have to do some Doctrine setup, but it will take forever to explain. Try googling `Doctrine getting started`.
-
-## Setting up the virtual host in XAMPP
-
-Open `httpd-vhosts.conf` in `<xampp-directory>/apache/conf/extra/` folder and add this to the end:
-
-	<VirtualHost *:80>
-	    DocumentRoot "D:/path/to/apollo-app/web/"
-	    ServerName apollo.dev
-	    ErrorLog "logs/apollo.local-error.log"
-	    CustomLog "logs/apollo.local-access.log" combined
-	    <Directory "D:/path/to/apollo-app/web/">
-		    Require all granted
-		    AllowOverride All
-	    </Directory>
-	</VirtualHost>
-
-Restart XAMPP and you should be able to access your server using the address `http://apollo.dev/`.
+Documentation for the PHP source code can be found in the `docs` folder in this repositroy. When you installed the dependencies, Composer automatically installed PHPUnit for you. You can run unit tests by simply executing the command `vendor/bin/phpunit` in your terminal, just make sure you current directory is `apollo-app.
