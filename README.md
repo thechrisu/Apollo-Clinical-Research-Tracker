@@ -30,7 +30,7 @@ You can find the config file located in `apollo-app/apollo/Config.example.php`. 
 
 ## Running the application
 
-Now the applicaiton should be good to go. Try accessing the URL you have specified in your Apache virtual host. Feel free to contact us if you will experience any issues.
+Now the applicaiton should be good to go. Try accessing the URL you have specified in your Apache virtual host. The default user email is `test@test.com` and the password is `test`. Feel free to contact us if you will experience any issues.
 
 ## Documentation and unit testing
 
