@@ -186,6 +186,8 @@ class Apollo
      */
     public static function getInstance()
     {
+        if(empty(self::$instance))
+            self::prepare();
         return self::$instance;
     }
 

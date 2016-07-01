@@ -14,8 +14,14 @@
 
 require_once '../apollo/Bootstrap.php';
 use Apollo\Apollo;
+use Apollo\components\GlobalWebManager;
+use Apollo\Components\UserFriendlyException;
+
 try {
     Apollo::getInstance()->start();
 } catch (Exception $e) {
-    \Apollo\Components\GlobalWebManager::printExceptionToUser($e);
+    GlobalWebManager::printExceptionToUser($e);
+} catch (Error $e) {
+    $friendlyE = new UserFriendlyException("A critical error occurred.", 0, $e);
+    GlobalWebManager::printExceptionToUser($friendlyE);
 }
