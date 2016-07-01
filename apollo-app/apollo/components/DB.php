@@ -7,10 +7,14 @@
 
 
 namespace Apollo\Components;
+use Apollo\Helpers\GlobalWebManager;
 use Apollo\Helpers\StringHelper;
+use Doctrine\DBAL\Driver\PDOException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Tools\Setup;
+use Exception;
+use Symfony\Component\Finder\Glob;
 
 
 /**
@@ -40,16 +44,15 @@ class DB
      */
     public static function getEntityManager()
     {
-        if(isset(self::$entityManager)) {
+        if (isset(self::$entityManager)) {
             return self::$entityManager;
         } else {
-            $isDevMode = true;
-            $config = Setup::createAnnotationMetadataConfiguration([APP_DIR . DOCTRINE_ENTITIES_PATH], $isDevMode);
+            $config = Setup::createAnnotationMetadataConfiguration([APP_DIR . DOCTRINE_ENTITIES_PATH], IS_DEVMODE);
             $conn = array(
-                'driver'   => 'pdo_mysql',
-                'host'     => DB_HOST,
-                'dbname'   => DB_NAME,
-                'user'     => DB_USER,
+                'driver' => 'pdo_mysql',
+                'host' => DB_HOST,
+                'dbname' => DB_NAME,
+                'user' => DB_USER,
                 'password' => DB_PASS
             );
             self::$entityManager = EntityManager::create($conn, $config);

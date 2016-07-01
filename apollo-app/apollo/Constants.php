@@ -7,7 +7,7 @@
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.5
+ * @version 0.1.6
  */
 
 /**
@@ -17,6 +17,12 @@
 if(file_exists(__DIR__ . '/Config.php')) {
     require_once __DIR__ . '/Config.php';
 }
+
+/**
+ * Switch between development/production environment
+ * @since 0.1.6
+ */
+define('IS_DEVMODE', true);
 
 /**
  * Application name

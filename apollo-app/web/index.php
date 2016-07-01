@@ -14,7 +14,8 @@
 
 require_once '../apollo/Bootstrap.php';
 use Apollo\Apollo;
-
-
-Apollo::prepare();
-Apollo::getInstance()->start();
+try {
+    Apollo::getInstance()->start();
+} catch (Exception $e) {
+    \Apollo\Components\GlobalWebManager::printExceptionToUser($e);
+}
