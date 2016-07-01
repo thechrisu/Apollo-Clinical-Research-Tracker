@@ -3,6 +3,7 @@
 ///<reference path="../../typings/jquery.d.ts"/>
 ///<reference path="../../typings/bootbox.d.ts"/>
 ///<reference path="../columns.ts"/>
+///<reference path="../apollopagination.ts"/>
 /**
  * Records index typescript
  *
@@ -10,14 +11,13 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.7
+ * @version 0.0.8
  */
 var RecordTable = (function () {
     function RecordTable() {
     }
     RecordTable.prototype.load = function () {
         this.table = $('#table-body');
-        this.pagination = $('#pagination');
         this.loader = LoaderManager.createLoader($('.table-responsive.loader-ready'));
         this.page = 1;
         this.sort = 1;
@@ -27,7 +27,8 @@ var RecordTable = (function () {
     };
     RecordTable.prototype.setup = function () {
         var that = this;
-        this.pagination.pagination({
+        var paginationWrapper = $('#pagination');
+        this.pagination = new ApolloPagination(paginationWrapper, {
             items: 0,
             itemsOnPage: 10,
             onPageClick: function (page, event) {
@@ -37,7 +38,7 @@ var RecordTable = (function () {
                 that.page = page;
                 that.updateTable();
             }
-        });
+        }, that.page);
         this.addTabFunctions();
         this.addRecordClick();
         this.addAutoSearch();
@@ -72,11 +73,9 @@ var RecordTable = (function () {
         var that = this;
         LoaderManager.showLoader(that.loader, function () {
             AJAX.get(StringUtil.url('get/records/?page=' + that.page + '&sort=' + that.sort + '&search=' + that.search, false), function (data) {
-                if (data.count < (that.page - 1) * 10) {
-                    that.pagination.pagination('selectPage', data.count / 10 - data.count % 10);
+                var tooFewElements = that.pagination.updateNumPagesSmart(data.count);
+                if (tooFewElements)
                     return;
-                }
-                that.pagination.pagination('updateItems', data.count);
                 that.table.html('');
                 if (data.count > 0) {
                     for (var i = 0; i < data.data.length; i++) {

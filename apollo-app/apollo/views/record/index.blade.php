@@ -4,7 +4,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license https://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.5
+ * @version 0.0.6
  */
 use Apollo\Helpers\AssetHelper;
 use Apollo\Helpers\URLHelper;
@@ -114,13 +114,11 @@ use Apollo\Helpers\URLHelper;
             </tbody>
         </table>
     </div>
-    <nav class="text-center">
-        <ul class="pagination" id="pagination">
-        </ul>
-    </nav>
+    @include('templates.pagination')
 @stop
 @section('scripts')
     @parent
     <script src="{{ AssetHelper::js('app/columns') }}"></script>
+    <script src="{{ AssetHelper::js('app/apollopagination') }}"></script>
     <script src="{{ AssetHelper::js('app/record/index') }}"></script>
 @stop

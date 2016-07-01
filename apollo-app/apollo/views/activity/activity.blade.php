@@ -87,10 +87,7 @@ $page = Activity::getNumSmallerIds($id)/10 + 1;
                         </tbody>
                     </table>
 
-                    <nav class="text-center">
-                        <ul class="pagination" id="pagination">
-                        </ul>
-                    </nav>
+                    @include('templates.pagination');
 
                 </div>
                 <div class="col-lg-8 content-loader-ready" id="activityContent">
@@ -117,6 +114,7 @@ $page = Activity::getNumSmallerIds($id)/10 + 1;
                             <div>
                                 <input type="text" class="form-control input-sm" id="person-input"
                                        placeholder="Add more people..." data-provide="typeahead" autocomplete="off"/>
+                                <div class="no-border-top secondary-text text-center" id="paginationNumItemsActivityParticipants"></div>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">

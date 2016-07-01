@@ -8,5 +8,5 @@
 
 <nav class="text-center">
     <ul class="pagination" id="pagination"></ul>
-    <div class="no-border-top" id="paginationNumItems"></div>
+    <div class="no-border-top secondary-text" id="paginationNumItems"></div>
 </nav>

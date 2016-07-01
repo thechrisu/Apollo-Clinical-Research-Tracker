@@ -1,4 +1,4 @@
-/* Apollo stylesheet v0.0.4
+/* Apollo stylesheet v0.0.5
  * Copyright 2016 Timur Kuzhagaliyev
  * https://opensource.org/licenses/mit-license.php MIT License */
 body {
@@ -122,6 +122,10 @@ body {
 }
 .fields-buttons .col-md-6:last-child, .search-buttons .col-md-6:last-child {
   padding-right: 0;
+}
+
+.secondary-text {
+  color: #aaa;
 }
 
 #filter-table .input-sm {

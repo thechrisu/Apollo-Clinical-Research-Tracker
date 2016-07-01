@@ -4,13 +4,14 @@
 ///<reference path="../../typings/bootbox.d.ts"/>
 ///<reference path="../columns.ts"/>
 ///<reference path="../inputs.ts"/>
+///<reference path="../apollopagination.ts"/>
 /**
  * Records advanced search typescript
  *
  * @author Timur Kuzhagaliyev <tim.kuzh@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.0.2
+ * @version 0.0.3
  */
 var RecordSearch = (function () {
     function RecordSearch() {
@@ -21,7 +22,6 @@ var RecordSearch = (function () {
         this.filterAmount = 0;
         this.filterParentNode = $('#filter-table');
         this.table = $('#table-body');
-        this.pagination = $('#pagination');
         this.loaderField = LoaderManager.createLoader($('.filter.loader-ready'));
         this.loaderRecord = LoaderManager.createLoader($('.record.loader-ready'));
         this.page = 1;
@@ -30,7 +30,8 @@ var RecordSearch = (function () {
     };
     RecordSearch.prototype.setup = function () {
         var that = this;
-        this.pagination.pagination({
+        var paginationWrapper = $('#pagination');
+        this.pagination = new ApolloPagination(paginationWrapper, {
             items: 0,
             itemsOnPage: 10,
             onPageClick: function (page, event) {
@@ -40,7 +41,7 @@ var RecordSearch = (function () {
                 that.page = page;
                 that.updateTable();
             }
-        });
+        }, that.page);
         this.addRecordClick();
         this.addTabFunctions();
         this.setupFilters();
@@ -104,11 +105,9 @@ var RecordSearch = (function () {
                 states: states
             };
             AJAX.post(StringUtil.url('post/search/'), postData, function (data) {
-                if (data.count < (that.page - 1) * 10) {
-                    that.pagination.pagination('selectPage', data.count / 10 - data.count % 10);
+                var tooFewElements = that.pagination.updateNumPagesSmart(data.count);
+                if (tooFewElements)
                     return;
-                }
-                that.pagination.pagination('updateItems', data.count);
                 that.table.html('');
                 if (data.count > 0) {
                     for (var i = 0; i < data.data.length; i++) {

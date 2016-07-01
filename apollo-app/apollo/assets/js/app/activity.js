@@ -5,6 +5,9 @@
 ///<reference path="../typings/bootbox.d.ts"/>
 ///<reference path="../typings/typeahead.d.ts"/>
 ///<reference path="columns.ts"/>
+///<reference path="apollopagination.ts"/>
+var PAGINATION_ITEMS_DEFAULT_ID = 'paginationNumItems';
+var PAGINATION_ITEMS_ACTIVITYPARTICIPANTS_ID = "paginationNumItemsActivityParticipants";
 var ac_id = NaN;
 /**
  * Class to store the token field (the field to add/remove users from a activity)
@@ -13,7 +16,7 @@ var ac_id = NaN;
  * This means we have to keep seeing ugly errors in our IDE.
  * Also see
  * @link http://stackoverflow.com/questions/32395563/twitter-typeahead-bloodhound-error-in-typescript
- * @version 0.0.9
+ * @version 0.1.0
  */
 var PeopleField = (function () {
     function PeopleField() {
@@ -179,7 +182,7 @@ var PeopleField = (function () {
 }());
 /**
  * Defines the menu/table on the left of the view. Also responsible for all the buttons and their functions
- * @version 0.0.8
+ * @version 0.0.9
  */
 var ActivityTable = (function () {
     function ActivityTable() {
@@ -224,6 +227,7 @@ var ActivityTable = (function () {
                 return;
             }
             that.pagination.pagination('updateItems', data.count);
+            displayNumItemsInDiv(data.count, PAGINATION_ITEMS_DEFAULT_ID);
             that.table.html('');
             if (data.count > 0) {
                 that.addDataToTable(data);
@@ -746,6 +750,7 @@ var ActivityInformation = (function () {
             var person = people[i];
             this.displayPerson(person);
         }
+        displayNumItemsInDiv(people.length, PAGINATION_ITEMS_ACTIVITYPARTICIPANTS_ID);
     };
     /**
      * Adds a row to the table showing the people currently in the activity
@@ -847,6 +852,20 @@ function addItemFromSuggestion(e, item) {
     c.that.save();
     c.that.existingPeople.resetBloodhound();
     c.that.makeLinkWithSuggestions();
+}
+function displayNumItemsInDiv(numItems, divName) {
+    var paginationNumItemsDiv = $('#' + divName);
+    paginationNumItemsDiv.empty();
+    var itemText;
+    if (numItems == 1) {
+        itemText = "1 item";
+    }
+    else {
+        itemText = numItems + " items";
+    }
+    var textContainer = $("<span class=" + PAGINATION_ITEMS_DEFAULT_ID + "></span>");
+    textContainer.text(itemText);
+    paginationNumItemsDiv.append(textContainer);
 }
 $(document).ready(function () {
     var id = StringUtil.extractId(window.location.toString());
