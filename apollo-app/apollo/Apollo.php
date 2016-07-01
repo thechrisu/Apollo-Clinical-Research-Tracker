@@ -13,7 +13,10 @@ namespace Apollo;
 
 use Apollo\Components\Request;
 use Apollo\Components\User;
+use Apollo\Components\UserFriendlyException;
 use Apollo\Controllers\GenericController;
+use Doctrine\DBAL\Driver\PDOException;
+use Exception;
 use ReflectionMethod;
 
 
@@ -78,13 +81,13 @@ class Apollo
      */
     public function __construct($debug)
     {
-        $this->debug = $debug;
-        $this->console = new User(1);
-        if(!$this->debug) {
-            $this->request = new Request();
-            $this->user = new User();
-            if(!$this->user->isGuest()) date_default_timezone_set($this->user->getOrganisation()->getTimezone());
-        }
+            $this->debug = $debug;
+            $this->console = new User(1);
+            if (!$this->debug) {
+                $this->request = new Request();
+                $this->user = new User();
+                if (!$this->user->isGuest()) date_default_timezone_set($this->user->getOrganisation()->getTimezone());
+            }
     }
 
     /**
@@ -96,7 +99,11 @@ class Apollo
      */
     public static function prepare($debug = false)
     {
+        try {
         self::$instance = new Apollo($debug);
+        } catch (Exception $e) {
+            throw new UserFriendlyException("Unable to register your request", 0, $e);
+        }
     }
 
     /**

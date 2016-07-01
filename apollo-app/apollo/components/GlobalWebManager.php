@@ -30,7 +30,7 @@ class GlobalWebManager
             $friendlyE = new UserFriendlyException($e->getMessage(), 0, $e);
             self::printHalfHeartedExplanation($friendlyE);
         } else {
-            $friendlyE = new UserFriendlyException("to be honest, we're not quite sure...", 0, $e);
+            $friendlyE = new UserFriendlyException("the entire app (?)", 0, $e);
             self::printHalfHeartedExplanation($friendlyE);
         }
     }
@@ -40,7 +40,7 @@ class GlobalWebManager
      */
     private function printHappyException(Exception $e) {
         echo ("<h1>something went wrong</h1> 
-But fear not, help is (hopefully) on the way (that is, if you called for help...)
+But fear not, help is (hopefully) on the way (that is, if you call for help...)
 Tell the help people, that you get an \"exception\"");
     }
 
