@@ -25,6 +25,7 @@ use DateTime;
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @version 0.0.5
  * @Entity @Table("activities")
+ * @todo remove target group column
  */
 class ActivityEntity
 {
