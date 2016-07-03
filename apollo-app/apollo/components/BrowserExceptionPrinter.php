@@ -10,19 +10,20 @@ use Exception;
 
 
 /**
- * Class GlobalWebManager
+ * Class BrowserExceptionPrinter
  *
  * @package Apollo\Components
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @version 0.0.1
  */
-class GlobalWebManager
+class BrowserExceptionPrinter
 {
+
     /**
      * @param Exception $e
      * @since 0.0.1
      */
-    public static function printExceptionToUser(Exception $e) {
+    public function printHappyExceptionToUser(Exception $e) {
         self::printHappyException($e);
         if(IS_DEVMODE){
             self::printHelpMessage($e);
@@ -34,9 +35,8 @@ class GlobalWebManager
             self::printHalfHeartedExplanation($friendlyE);
         }
     }
-
     /**
-     * @since 0.0.1
+     * @param Exception $e
      */
     private function printHappyException(Exception $e) {
         echo ("<h1>something went wrong</h1> 
@@ -45,7 +45,7 @@ Tell the help people, that you get an \"exception\"");
     }
 
     /**
-     * @since 0.0.1
+     * @param UserFriendlyException $e
      */
     private function printHalfHeartedExplanation(UserFriendlyException $e) {
         echo("<br>Roughly speaking, this went wrong: <br>");
@@ -60,4 +60,5 @@ Tell the help people, that you get an \"exception\"");
         echo("<br><br>Here is stuff to make the people happy that resolve the problem:<br><br> ");
         echo($e->getTraceAsString());
     }
+
 }

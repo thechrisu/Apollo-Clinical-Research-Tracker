@@ -87,7 +87,7 @@ $page = Activity::getNumSmallerIds($id)/10 + 1;
                         </tbody>
                     </table>
 
-                    @include('templates.pagination');
+                    @include('templates.pagination')
 
                 </div>
                 <div class="col-lg-8 content-loader-ready" id="activityContent">
