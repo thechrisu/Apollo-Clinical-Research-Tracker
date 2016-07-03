@@ -13,7 +13,7 @@ const PAGINATION_ITEMS_ACTIVITYPARTICIPANTS_ID = "paginationNumItemsActivityPart
  *
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
- * @version 0.1.9
+ * @version 0.2.0
  * @todo for some later time: Make use of WebUtil.buildNode to replace all the jQuery constructors
  *
  */
@@ -29,7 +29,7 @@ interface ParticipantData {
     p_id:string,
     r_id:string
 }
-
+/*
 interface TargetGroupData {
     name:string,
     id:string
@@ -38,13 +38,13 @@ interface TargetGroupData {
 interface TargetGroupObject {
     active:TargetGroupData,
     data:TargetGroupData[]
-}
+}*/
 
 interface DetailActivityData {
     error:Error,
     page:number,
     name:string,
-    target_groups:TargetGroupObject,
+    //target_groups:TargetGroupObject,
     target_group_comment:string,
     start_date:string,
     end_date:string,
@@ -434,7 +434,7 @@ class ActivityTable {
         this.addButton = $('#add-activity');
         this.duplicateButton = $('#duplicate-activity');
         this.hideButton = $('#hide-activity');
-        this.targetGroupButton = $("#target-button");
+        //this.targetGroupButton = $("#target-button");
         this.addButton.unbind('click');
         this.duplicateButton.unbind('click');
         this.hideButton.unbind('click');
@@ -470,7 +470,7 @@ class ActivityTable {
         this.addButton.removeClass('disabled');
         this.duplicateButton.removeClass('disabled');
         this.hideButton.removeClass('disabled');
-        this.targetGroupButton.removeClass('disabled');
+        //this.targetGroupButton.removeClass('disabled');
     }
 
     /**
@@ -539,7 +539,7 @@ class ActivityInformation {
     private startDate:JQuery; //the activity start date
     private endDate:JQuery; //the activity end date
     public existingPeople:PeopleField; //the object for Twitter Typeahead to suggest people to add to the activity
-    private activeTargetGroup:TargetGroupData; //the current target group selection
+    //private activeTargetGroup:TargetGroupData; //the current target group selection
     private people:ParticipantData[]; //the people in the activity
     private addedPeople:ParticipantData[] = []; //the people that have been added to the activity since page was loaded
     private removedPeople:ParticipantData[] = []; //the people that have been removed from the activity since page was loaded
@@ -565,7 +565,7 @@ class ActivityInformation {
             that.peopleTable = $('#existingPeople');
             that.id = id;
             ac_id = id;
-            that.activeTargetGroup = null;
+            //that.activeTargetGroup = null;
             that.setUp();
             that.existingPeople.load();
             that.existingPeople.resetBloodhound();
@@ -585,12 +585,12 @@ class ActivityInformation {
         AJAX.get(StringUtil.url('get/activity/?id=' + that.id, false), function (data:DetailActivityData) {
             var breadcrumbs = $('#nav-breadcrumbs');
             breadcrumbs.find('li:nth-child(3)').text('Activity #' + that.id + ': ' + data.name);
-            that.activeTargetGroup = data.target_groups.active == null ? data.target_groups.data[0] : data.target_groups.active;
+            //that.activeTargetGroup = data.target_groups.active == null ? data.target_groups.data[0] : data.target_groups.active;
             that.people = data.participants;
             that.onPage = data.page;
             that.displayTitle(data.name);
             that.displayPeople();
-            that.displayTargetGroup(data.target_groups.data);
+            //that.displayTargetGroup(data.target_groups.data);
             that.displayComment(data.target_group_comment);
             that.displayStartDate(data.start_date);
             that.displayEndDate(data.end_date);
@@ -662,7 +662,7 @@ class ActivityInformation {
         return {
             activity_id: this.getId(),
             activity_name: this.title.val(),
-            target_group: this.activeTargetGroup == null ? null : this.activeTargetGroup.id,
+            //target_group: this.activeTargetGroup == null ? null : this.activeTargetGroup.id,
             target_group_comment: this.targetComment.val(),
             start_date: startDate,
             end_date: endDate,
@@ -732,6 +732,7 @@ class ActivityInformation {
      * Shows the target group as dropdown
      * @param options
      */
+    /*
     private displayTargetGroup(options:TargetGroupData[]) {
         var that = this;
         var dropD = $('#target-dropdown');
@@ -761,7 +762,7 @@ class ActivityInformation {
             }
             dropD.append(option);
         }
-    }
+    }*/
 
     /**
      * Displays the comment for the target group

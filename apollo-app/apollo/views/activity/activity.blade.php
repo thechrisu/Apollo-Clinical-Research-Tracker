@@ -3,7 +3,7 @@
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
  * @copyright 2016
  * @license http://opensource.org/licenses/gpl-license.php MIT License
- * @version 0.0.3
+ * @version 0.0.4
  */
 
 use Apollo\Apollo;
@@ -91,9 +91,12 @@ $page = Activity::getNumSmallerIds($id)/10 + 1;
 
                 </div>
                 <div class="col-lg-8 content-loader-ready" id="activityContent">
-                    <div class="row">
-                        <div class="col-lg-8 col-md-6 col-sx-12">
+                    <div class="row form-group">
+                        <div class="col-lg-12">
                             <input class="form-control input-medium" placeholder="Activity name" id="activity-title"/>
+                        </div>
+                    </div>
+                        <!--<div class="col-lg-8 col-md-6 col-sx-12">
                         </div>
                         <div class="col-lg-4 col-md-6 col-sm-12 col-sx-12">
                             <div class="btn-group btn-block">
@@ -103,8 +106,7 @@ $page = Activity::getNumSmallerIds($id)/10 + 1;
                                 </button>
                                 <ul class="dropdown-menu" id="target-dropdown"></ul>
                             </div>
-                        </div>
-                    </div>
+                        </div>-->
                     <div class="row top-buffer">
                         <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
                             <table class="table table-hover small-table table-condensed table-responsive no-border-top table-striped">

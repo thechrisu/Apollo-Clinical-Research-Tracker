@@ -15,7 +15,7 @@ use Apollo\Entities\ActivityEntity;
  *
  * @package Apollo\Components
  * @author Christoph Ulshoefer <christophsulshoefer@gmail.com>
- * @version 0.0.3
+ * @version 0.0.4
  */
 class Activity extends DBComponent
 {
@@ -124,7 +124,7 @@ class Activity extends DBComponent
             'error' => null,
             'id' => $activity->getId(),
             'name' => $activity->getName(),
-            'target_groups' => TargetGroup::getFormattedTargetGroups($activity->getTargetGroup()),
+            //'target_groups' => TargetGroup::getFormattedTargetGroups($activity->getTargetGroup()),
             'target_group_comment' => $activity->getTargetGroupComment(),
             'start_date' => $activity->getStartDate()->format('Y-m-d H:i:s'),
             'end_date' => $activity->getEndDate()->format('Y-m-d H:i:s'),
