@@ -1,3 +1,9 @@
+We put together a video to explain the application! Watch here!
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=BRYr1T7KGXc
+" target="_blank"><img src="http://img.youtube.com/vi/BRYr1T7KGXc/0.jpg" 
+alt="Youtube Video of our app!" width="480" height="360" border="10" /></a>
+
 #Clinical Research Tracker
 
 This repo contains the front-end and back-end source code for the Apollo Clinical Research Tracker. Made by UCL Computer Science students Desislava Koleva, Christoph Ulshoefer and Timur Kuzhagaliyev in 2016.
