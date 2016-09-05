@@ -12,6 +12,7 @@
  * @copyright 2016
  * @license http://opensource.org/licenses/mit-license.php MIT License
  * @version 0.0.3
+ * TODO fiilter names/basic info of people
  */
 var RecordSearch = (function () {
     function RecordSearch() {

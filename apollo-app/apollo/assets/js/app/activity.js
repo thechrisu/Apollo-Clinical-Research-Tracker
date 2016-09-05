@@ -368,7 +368,7 @@ var ActivityTable = (function () {
         this.addButton = $('#add-activity');
         this.duplicateButton = $('#duplicate-activity');
         this.hideButton = $('#hide-activity');
-        this.targetGroupButton = $("#target-button");
+        //this.targetGroupButton = $("#target-button");
         this.addButton.unbind('click');
         this.duplicateButton.unbind('click');
         this.hideButton.unbind('click');
@@ -403,7 +403,7 @@ var ActivityTable = (function () {
         this.addButton.removeClass('disabled');
         this.duplicateButton.removeClass('disabled');
         this.hideButton.removeClass('disabled');
-        this.targetGroupButton.removeClass('disabled');
+        //this.targetGroupButton.removeClass('disabled');
     };
     /**
      * With the data of all the activities, it successively creates the rows for each activity
@@ -483,7 +483,7 @@ var ActivityInformation = (function () {
             that.peopleTable = $('#existingPeople');
             that.id = id;
             ac_id = id;
-            that.activeTargetGroup = null;
+            //that.activeTargetGroup = null;
             that.setUp();
             that.existingPeople.load();
             that.existingPeople.resetBloodhound();
@@ -502,12 +502,12 @@ var ActivityInformation = (function () {
         AJAX.get(StringUtil.url('get/activity/?id=' + that.id, false), function (data) {
             var breadcrumbs = $('#nav-breadcrumbs');
             breadcrumbs.find('li:nth-child(3)').text('Activity #' + that.id + ': ' + data.name);
-            that.activeTargetGroup = data.target_groups.active == null ? data.target_groups.data[0] : data.target_groups.active;
+            //that.activeTargetGroup = data.target_groups.active == null ? data.target_groups.data[0] : data.target_groups.active;
             that.people = data.participants;
             that.onPage = data.page;
             that.displayTitle(data.name);
             that.displayPeople();
-            that.displayTargetGroup(data.target_groups.data);
+            //that.displayTargetGroup(data.target_groups.data);
             that.displayComment(data.target_group_comment);
             that.displayStartDate(data.start_date);
             that.displayEndDate(data.end_date);
@@ -577,7 +577,7 @@ var ActivityInformation = (function () {
         return {
             activity_id: this.getId(),
             activity_name: this.title.val(),
-            target_group: this.activeTargetGroup == null ? null : this.activeTargetGroup.id,
+            //target_group: this.activeTargetGroup == null ? null : this.activeTargetGroup.id,
             target_group_comment: this.targetComment.val(),
             start_date: startDate,
             end_date: endDate,
@@ -644,7 +644,8 @@ var ActivityInformation = (function () {
      * Shows the target group as dropdown
      * @param options
      */
-    ActivityInformation.prototype.displayTargetGroup = function (options) {
+    /*
+    private displayTargetGroup(options:TargetGroupData[]) {
         var that = this;
         var dropD = $('#target-dropdown');
         dropD.empty();
@@ -660,8 +661,7 @@ var ActivityInformation = (function () {
             option.append(link);
             if (options[i].id == this.activeTargetGroup.id) {
                 option.addClass('disabled');
-            }
-            else {
+            } else {
                 option.click(function () {
                     that.activeTargetGroup.id = $(this).data('id');
                     that.activeTargetGroup.name = $(this).data('name');
@@ -674,7 +674,7 @@ var ActivityInformation = (function () {
             }
             dropD.append(option);
         }
-    };
+    }*/
     /**
      * Displays the comment for the target group
      * @param initialData
