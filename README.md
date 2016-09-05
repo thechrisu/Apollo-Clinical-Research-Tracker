@@ -18,11 +18,11 @@ This manual assumes that you have already installed Apache2 server and Composer 
 
 ## Setting up an Apache virtual host
 
-The process of setting up of a virtual host for Apollo application is standard, just follow the instructions relevant to your Apache installation and operating system. Don't forget to point the virtual host to the `apollo-app/web` folder, as this folder contains the `index.php` entry script. Additionally, it is very important to enable Apache rewriting engine. A tutorial on how to do so [can be found here](https://www.digitalocean.com/community/tutorials/how-to-set-up-mod_rewrite-for-apache-on-ubuntu-14-04), but if it is not suitable for your particular installation then you can easily find a similar tutorial on the web.
+The process of setting up of a virtual host for Apollo application is standard, just follow the instructions relevant to your Apache installation and operating system. Don't forget to point the virtual host to the `apollo-app/web` folder, as this folder contains the `index.php` entry script. Additionally, it is very important to enable Apache rewriting engine. A tutorial on how to do so [can be found here](), but if it is not suitable for your particular installation then you can easily find a similar tutorial on the web.
 
 ## Installing dependencies
 
-We use a dependency manager called Composer for managing dependencies. Information on how to install Composer can be found [here](https://github.com/culshoefer/Apollo-Clinical-Research-Tracker.git).
+We use a dependency manager called Composer for managing dependencies. Information on how to install Composer can be found [here](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx).
 The (real) dependencies can be installed by opening the terminal (or a similar command line), switching to the `apollo-app` directory and running the command `composer install`. If you will get any errors about the permissions, try using `sudo composer install`.
 
 ##  Importing the MySQL dumps
