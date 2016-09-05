@@ -1,7 +1,6 @@
-We put together a video to explain the application! Watch here!
+We put together a video to explain the application! Watch it here!
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=BRYr1T7KGXc
-" target="_blank"><img src="http://img.youtube.com/vi/BRYr1T7KGXc/0.jpg" 
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=BRYr1T7KGXc" target="_blank"><img src="http://img.youtube.com/vi/BRYr1T7KGXc/0.jpg"
 alt="Youtube Video of our app!" width="480" height="360" border="10" /></a>
 
 #Clinical Research Tracker
